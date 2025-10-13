@@ -726,14 +726,16 @@ def main():
         initial_sidebar_state="expanded"
     )
 
-    # Add sidebar with test page link
+    # Add sidebar with test page information
     with st.sidebar:
         st.title("📚 Manga Lookup")
         st.markdown("---")
 
-        if st.button("🧪 Cover Image Test Page", use_container_width=True):
-            # This will redirect to the test page
-            st.switch_page("cover_image_test.py")
+        st.markdown("### Test Pages")
+        st.markdown("To access the cover image test page:")
+        st.markdown("1. Use the URL: `/cover_image_test`")
+        st.markdown("2. Or click the sidebar navigation in Streamlit Cloud")
+        st.markdown("---")
 
         st.markdown("---")
         st.markdown("### About")
