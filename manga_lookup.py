@@ -40,6 +40,7 @@ class BookInfo:
     genres: List[str]
     warnings: List[str]
     barcode: Optional[str] = None
+    cover_image_url: Optional[str] = None
 
 class ProjectState:
     """Advanced project state management with API call logging"""
@@ -529,6 +530,9 @@ def process_book_data(raw_data: Dict, volume_number: int) -> BookInfo:
     else:
         genres = genres_raw
 
+    # Extract cover image URL if available
+    cover_image_url = raw_data.get("cover_image_url")
+
     return BookInfo(
         series_name=series_name,
         volume_number=volume_number,
@@ -541,7 +545,8 @@ def process_book_data(raw_data: Dict, volume_number: int) -> BookInfo:
         description=raw_data.get("description"),
         physical_description=raw_data.get("physical_description"),
         genres=genres,
-        warnings=warnings
+        warnings=warnings,
+        cover_image_url=cover_image_url
     )
 
 def display_text_list(books: List[BookInfo], console: Console):

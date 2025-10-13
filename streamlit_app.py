@@ -547,20 +547,33 @@ def process_series():
 
 
 def show_book_details_modal(book: BookInfo):
-    """Show book details in a modal-like popup"""
+    """Show book details in a modal-like popup with cover image"""
     st.markdown("---")
     st.subheader(f"📖 Book Details - Volume {book.volume_number}")
 
-    col1, col2 = st.columns(2)
+    # Create columns - adjust ratio based on whether we have a cover image
+    if book.cover_image_url:
+        col1, col2 = st.columns([1, 2])
+    else:
+        col1, col2 = st.columns(2)
 
     with col1:
+        # Display cover image if available
+        if book.cover_image_url:
+            try:
+                st.image(book.cover_image_url, use_column_width=True, caption="Cover Image")
+            except Exception as e:
+                st.error(f"Could not load cover image: {e}")
+                st.write("**Cover:** Image unavailable")
+        else:
+            st.write("**Cover:** No image available")
+
+    with col2:
         st.write(f"**Title:** {book.book_title}")
         st.write(f"**Series:** {book.series_name}")
         st.write(f"**Authors:** {DataValidator.format_authors_list(book.authors)}")
         st.write(f"**Volume:** {book.volume_number}")
         st.write(f"**Barcode:** {book.barcode}")
-
-    with col2:
         st.write(f"**MSRP:** ${book.msrp_cost:.2f}" if book.msrp_cost else "**MSRP:** Unknown")
         st.write(f"**ISBN-13:** {book.isbn_13}" if book.isbn_13 else "**ISBN-13:** Unknown")
         st.write(f"**Publisher:** {book.publisher_name}" if book.publisher_name else "**Publisher:** Unknown")
@@ -661,6 +674,7 @@ def display_results():
             description_cell = "✓" if book.description else "✗"
             physical_cell = "✓" if book.physical_description else "✗"
             genres_cell = "✓" if book.genres else "✗"
+            cover_cell = "✓" if book.cover_image_url else "✗"
 
             table_data.append({
                 'Barcode': book.barcode,
@@ -674,7 +688,8 @@ def display_results():
                 'Year': year_cell,
                 'Description': description_cell,
                 'Physical': physical_cell,
-                'Genres': genres_cell
+                'Genres': genres_cell,
+                'Cover': cover_cell
             })
 
         # Create DataFrame and display as table

@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""
+Google Books API Client for fetching cover images
+
+This module provides functionality to fetch cover image URLs from Google Books API
+using ISBN-13 numbers. It includes caching and rate limiting.
+"""
+
+import os
+import time
+import requests
+from typing import Optional, Dict, Any
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+class GoogleBooksClient:
+    """Client for Google Books API with rate limiting and caching"""
+
+    def __init__(self):
+        self.base_url = "https://www.googleapis.com/books/v1/volumes"
+        self.api_key = os.getenv("GOOGLE_BOOKS_API_KEY")
+        self.last_request_time = 0
+        self.min_request_interval = 0.1  # 100ms between requests (10 requests/second)
+
+    def _rate_limit(self):
+        """Implement basic rate limiting"""
+        current_time = time.time()
+        time_since_last = current_time - self.last_request_time
+
+        if time_since_last < self.min_request_interval:
+            time.sleep(self.min_request_interval - time_since_last)
+
+        self.last_request_time = time.time()
+
+    def get_cover_image_url(self, isbn_13: str) -> Optional[str]:
+        """
+        Fetch cover image URL from Google Books API using ISBN-13
+
+        Args:
+            isbn_13: ISBN-13 number as string
+
+        Returns:
+            URL string for cover image or None if not found
+        """
+        if not isbn_13:
+            return None
+
+        self._rate_limit()
+
+        params = {
+            'q': f'isbn:{isbn_13}',
+            'key': self.api_key
+        }
+
+        try:
+            response = requests.get(self.base_url, params=params, timeout=10)
+            response.raise_for_status()
+
+            data = response.json()
+
+            # Check if we found any books
+            if data.get('totalItems', 0) == 0:
+                return None
+
+            # Get the first item
+            item = data['items'][0]
+            volume_info = item.get('volumeInfo', {})
+
+            # Try to get the largest available cover image
+            image_links = volume_info.get('imageLinks', {})
+
+            # Prefer larger images, fall back to smaller ones
+            for image_size in ['extraLarge', 'large', 'medium', 'small', 'thumbnail']:
+                if image_size in image_links:
+                    return image_links[image_size]
+
+            return None
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching cover image for ISBN {isbn_13}: {e}")
+            return None
+        except (KeyError, IndexError) as e:
+            print(f"Error parsing Google Books response for ISBN {isbn_13}: {e}")
+            return None
+
+def get_cover_image_url(isbn_13: str) -> Optional[str]:
+    """
+    Convenience function to get cover image URL
+
+    Args:
+        isbn_13: ISBN-13 number as string
+
+    Returns:
+        URL string for cover image or None if not found
+    """
+    client = GoogleBooksClient()
+    return client.get_cover_image_url(isbn_13)
+
+if __name__ == "__main__":
+    # Test the client with a known ISBN
+    test_isbn = "9781569319017"  # One Piece Volume 1
+    cover_url = get_cover_image_url(test_isbn)
+    print(f"Cover URL for {test_isbn}: {cover_url}")
