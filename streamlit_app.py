@@ -61,77 +61,6 @@ def initialize_session_state():
         st.session_state.pending_series_name = None
 
 
-def get_openlibrary_cover_by_isbn(isbn: str, size: str = "L") -> Optional[str]:
-    """Get cover image URL from OpenLibrary by ISBN"""
-    try:
-        url = f"https://covers.openlibrary.org/b/isbn/{isbn}-{size}.jpg"
-        response = requests.head(url, timeout=5)
-        if response.status_code == 200:
-            return url
-        return None
-    except Exception:
-        return None
-
-
-def get_openlibrary_series_cover(series_name: str) -> Optional[str]:
-    """Get cover image URL from OpenLibrary by series name"""
-
-    # Hardcoded cover IDs for popular manga series
-    popular_manga_covers = {
-        "bleach": "https://covers.openlibrary.org/b/id/11822114-L.jpg",  # Bleach Vol. 1
-        "one piece": "https://covers.openlibrary.org/b/id/15693190-L.jpg",  # One Piece Vol. 1
-        "naruto": "https://covers.openlibrary.org/b/id/15693190-L.jpg",  # Naruto Vol. 1
-        "dragon ball": "https://covers.openlibrary.org/b/id/15693190-L.jpg",  # Dragon Ball Vol. 1
-        "attack on titan": "https://covers.openlibrary.org/b/id/15693190-L.jpg",  # Attack on Titan Vol. 1
-        "my hero academia": "https://covers.openlibrary.org/b/id/15693190-L.jpg",  # My Hero Academia Vol. 1
-        "tokyo ghoul": "https://covers.openlibrary.org/b/id/14215803-L.jpg",  # Tokyo Ghoul Vol. 1
-    }
-
-    # Check if we have a hardcoded cover for this series
-    lower_name = series_name.lower()
-    if lower_name in popular_manga_covers:
-        return popular_manga_covers[lower_name]
-
-    try:
-        # Try multiple search strategies
-        search_urls = [
-            f"https://openlibrary.org/search.json?q={series_name}+manga&limit=5",
-            f"https://openlibrary.org/search.json?title={series_name}&limit=5",
-            f"https://openlibrary.org/search.json?series={series_name}&limit=5"
-        ]
-
-        for search_url in search_urls:
-            response = requests.get(search_url, timeout=10)
-            if response.status_code == 200:
-                data = response.json()
-                if data.get("docs"):
-                    # Look for manga-related results first
-                    for doc in data["docs"]:
-                        # Check if this looks like a manga result
-                        title = doc.get("title", "").lower()
-                        subject = doc.get("subject", [])
-
-                        # Look for manga-related keywords
-                        is_manga = (
-                            "manga" in title or
-                            any("manga" in str(s).lower() for s in subject) or
-                            any("comic" in str(s).lower() for s in subject)
-                        )
-
-                        cover_id = doc.get("cover_i")
-                        if cover_id and is_manga:
-                            return f"https://covers.openlibrary.org/b/id/{cover_id}-L.jpg"
-
-                    # If no manga-specific results, just take the first cover
-                    for doc in data["docs"]:
-                        cover_id = doc.get("cover_i")
-                        if cover_id:
-                            return f"https://covers.openlibrary.org/b/id/{cover_id}-L.jpg"
-        return None
-    except Exception:
-        return None
-
-
 def get_volume_1_isbn(series_name: str) -> Optional[str]:
     """Get ISBN for volume 1 of a series using DeepSeek API"""
     try:
@@ -279,7 +208,7 @@ def series_input_form():
 
 
 def confirm_single_series(series_name):
-    """Confirm a single series name with cover images in separate cards"""
+    """Confirm a single series name with series information in separate cards"""
     st.header(f"🔍 Confirm: {series_name}")
 
     # Initialize DeepSeek API
@@ -306,35 +235,14 @@ def confirm_single_series(series_name):
                     # Show title immediately
                     st.subheader(suggestion)
 
-                    # Initialize placeholder for cover images
-                    cover_placeholder = st.empty()
+                    # Get series information
+                    series_info = deepseek_api._get_series_info(suggestion)
 
-                    # Try to get cover images in background
-                    isbn = get_volume_1_isbn(suggestion)
-                    volume_cover_url = None
-                    series_cover_url = None
-
-                    if isbn:
-                        volume_cover_url = get_openlibrary_cover_by_isbn(isbn)
-
-                    # Get series cover from OpenLibrary
-                    series_cover_url = get_openlibrary_series_cover(suggestion)
-
-                    # Display cover image(s) in the placeholder
-                    if volume_cover_url and series_cover_url and volume_cover_url != series_cover_url:
-                        # Show both covers if they're different
-                        cover_placeholder.image(volume_cover_url, width=80, caption=f"Volume 1")
-                        cover_placeholder.image(series_cover_url, width=80, caption=f"Series")
-                    elif volume_cover_url:
-                        # Show volume 1 cover
-                        cover_placeholder.image(volume_cover_url, width=120, caption=suggestion)
-                    elif series_cover_url:
-                        # Show series cover
-                        cover_placeholder.image(series_cover_url, width=120, caption=suggestion)
+                    # Display series information
+                    if series_info:
+                        st.write(f"**Info:** {series_info}")
                     else:
-                        # No covers available
-                        cover_placeholder.markdown("📚")
-                        cover_placeholder.caption("No cover available")
+                        st.write("*No additional information available*")
 
                     # Make the entire card clickable
                     if st.button(f"✓ Select {suggestion}", key=f"select_{i}", use_container_width=True):
@@ -363,39 +271,22 @@ def confirm_single_series(series_name):
         selected_series = suggestions[0]
         st.success(f"✓ Using: {selected_series}")
 
-        # Show cover images in a card
+        # Show series information in a card
         with st.container():
             col1, col2 = st.columns([1, 3])
             with col1:
-                # Try to get volume 1 cover from OpenLibrary
-                isbn = get_volume_1_isbn(selected_series)
-                volume_cover_url = None
-                series_cover_url = None
-
-                if isbn:
-                    volume_cover_url = get_openlibrary_cover_by_isbn(isbn)
-
-                # Get series cover from OpenLibrary
-                series_cover_url = get_openlibrary_series_cover(selected_series)
-
-                # Display cover image(s)
-                if volume_cover_url and series_cover_url and volume_cover_url != series_cover_url:
-                    # Show both covers if they're different
-                    st.image(volume_cover_url, width=80, caption=f"Volume 1")
-                    st.image(series_cover_url, width=80, caption=f"Series")
-                elif volume_cover_url:
-                    # Show volume 1 cover
-                    st.image(volume_cover_url, width=120, caption=selected_series)
-                elif series_cover_url:
-                    # Show series cover
-                    st.image(series_cover_url, width=120, caption=selected_series)
-                else:
-                    # No covers available from OpenLibrary
-                    st.markdown("📚")
-                    st.caption("No cover available")
+                # Display series icon
+                st.markdown("📚")
+                st.caption("Manga Series")
 
             with col2:
                 st.subheader(selected_series)
+
+                # Get and display series information
+                series_info = deepseek_api._get_series_info(selected_series)
+                if series_info:
+                    st.write(f"**Series Info:** {series_info}")
+
                 if st.button("✓ Confirm and Add Volumes", type="primary", use_container_width=True):
                     get_volume_input(series_name, selected_series)
 
@@ -726,20 +617,20 @@ def main():
         initial_sidebar_state="expanded"
     )
 
-    # Add sidebar with test page information
+    # Add sidebar with app information
     with st.sidebar:
         st.title("📚 Manga Lookup")
         st.markdown("---")
 
-        st.markdown("### Test Pages")
-        st.markdown("To access the cover image test page:")
-        st.markdown("1. Use the URL: `/cover_image_test`")
-        st.markdown("2. Or click the sidebar navigation in Streamlit Cloud")
-        st.markdown("---")
-
-        st.markdown("---")
         st.markdown("### About")
         st.markdown("Streamlined web interface for manga series lookup and MARC export")
+        st.markdown("---")
+
+        st.markdown("### Features")
+        st.markdown("• Series name correction")
+        st.markdown("• Volume range support")
+        st.markdown("• MARC export for library systems")
+        st.markdown("• Barcode generation")
 
     st.title("📚 Manga Lookup Tool")
     st.markdown("Streamlined web interface for manga series lookup and MARC export")
