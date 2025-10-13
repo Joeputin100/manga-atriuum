@@ -143,10 +143,19 @@ class DeepSeekAPI:
 
         prompt = f"""
         Given the manga series name "{series_name}", provide 3-5 corrected or alternative names
-        that are actual manga series. Prioritize the main series over spinoffs, sequels, or adaptations.
+        that are actual manga series.
+
+        IMPORTANT: If "{series_name}" is already a correct manga series name, include it as the first suggestion.
+        If "{series_name}" is a valid manga series, prioritize it over other suggestions.
+
+        Only include actual manga series names, not unrelated popular series.
+        If "{series_name}" is misspelled or incomplete, provide the correct full name first.
+
+        Prioritize the main series over spinoffs, sequels, or adaptations.
         If the series has multiple parts (like Tokyo Ghoul and Tokyo Ghoul:re), include the main series first.
         Include recent and ongoing series, not just completed ones.
         For Boruto specifically, include both "Boruto: Naruto Next Generations" and "Boruto: Two Blue Vortex".
+
         Return only the names as a JSON list, no additional text.
 
         Example format: ["One Piece", "Naruto", "Bleach", "Boruto: Naruto Next Generations", "Boruto: Two Blue Vortex"]
@@ -175,6 +184,19 @@ class DeepSeekAPI:
 
             # Parse JSON response
             suggestions = json.loads(content)
+
+            # Ensure the original series name is included if it's valid
+            # Check if the original name is in the suggestions, if not add it
+            if series_name not in suggestions:
+                # Check if any suggestion contains the original name (case-insensitive)
+                original_in_suggestions = any(
+                    series_name.lower() in suggestion.lower()
+                    for suggestion in suggestions
+                )
+                if not original_in_suggestions:
+                    # Add original name as first suggestion
+                    suggestions.insert(0, series_name)
+
             return suggestions
 
         except Exception as e:
