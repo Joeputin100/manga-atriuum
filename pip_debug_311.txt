@@ -1,0 +1,74 @@
+pip version: pip 25.2 from /data/data/com.termux/files/usr/lib/python3.11/site-packages/pip (python 3.11)
+sys.version: 3.11.10 (main, Oct  9 2024, 23:47:10) [Clang 18.0.2 (https://android.googlesource.com/toolchain/llvm-project d8003a456
+sys.executable: /data/data/com.termux/files/usr/bin/python3.11
+sys.getdefaultencoding: utf-8
+sys.getfilesystemencoding: utf-8
+locale.getpreferredencoding: utf-8
+sys.platform: linux
+sys.implementation:
+  name: cpython
+'cert' config value: global
+REQUESTS_CA_BUNDLE: None
+CURL_CA_BUNDLE: None
+pip._vendor.certifi.where(): /data/data/com.termux/files/usr/lib/python3.11/site-packages/pip/_vendor/certifi/cacert.pem
+pip._vendor.DEBUNDLED: False
+vendored library versions:
+  CacheControl==0.14.3
+  distlib==0.4.0
+  distro==1.9.0
+  msgpack==1.1.1
+  packaging==25.0
+  platformdirs==4.3.8
+  pyproject-hooks==1.2.0
+  requests==2.32.4
+  certifi==2025.07.14
+  idna==3.10
+  urllib3==1.26.20
+  rich==14.1.0 (Unable to locate actual module version, using vendor.txt specified version)
+  pygments==2.19.2
+  resolvelib==1.2.0
+  setuptools==70.3.0 (Unable to locate actual module version, using vendor.txt specified version)
+  tomli==2.2.1
+  tomli-w==1.2.0
+  truststore==0.10.1
+  dependency-groups==1.3.1 (Unable to locate actual module version, using vendor.txt specified version)
+Compatible tags: 39
+  cp311-cp311-linux_aarch64
+  cp311-abi3-linux_aarch64
+  cp311-none-linux_aarch64
+  cp310-abi3-linux_aarch64
+  cp39-abi3-linux_aarch64
+  cp38-abi3-linux_aarch64
+  cp37-abi3-linux_aarch64
+  cp36-abi3-linux_aarch64
+  cp35-abi3-linux_aarch64
+  cp34-abi3-linux_aarch64
+  cp33-abi3-linux_aarch64
+  cp32-abi3-linux_aarch64
+  py311-none-linux_aarch64
+  py3-none-linux_aarch64
+  py310-none-linux_aarch64
+  py39-none-linux_aarch64
+  py38-none-linux_aarch64
+  py37-none-linux_aarch64
+  py36-none-linux_aarch64
+  py35-none-linux_aarch64
+  py34-none-linux_aarch64
+  py33-none-linux_aarch64
+  py32-none-linux_aarch64
+  py31-none-linux_aarch64
+  py30-none-linux_aarch64
+  cp311-none-any
+  py311-none-any
+  py3-none-any
+  py310-none-any
+  py39-none-any
+  py38-none-any
+  py37-none-any
+  py36-none-any
+  py35-none-any
+  py34-none-any
+  py33-none-any
+  py32-none-any
+  py31-none-any
+  py30-none-any

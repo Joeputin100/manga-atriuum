@@ -103,6 +103,23 @@ def display_duck_animation():
     """, unsafe_allow_html=True)
 
 
+def calculate_elapsed_time(start_time):
+    """Calculate elapsed time"""
+    if not start_time:
+        return "0 seconds"
+
+    elapsed = time.time() - start_time
+    if elapsed < 60:
+        return f"{int(elapsed)} seconds"
+    elif elapsed < 3600:
+        minutes = int(elapsed / 60)
+        seconds = int(elapsed % 60)
+        return f"{minutes}m {seconds}s"
+    else:
+        hours = int(elapsed / 3600)
+        minutes = int((elapsed % 3600) / 60)
+        return f"{hours}h {minutes}m"
+
 def calculate_eta(start_time, progress, total):
     """Calculate estimated time remaining"""
     if progress == 0:
@@ -146,8 +163,8 @@ def display_progress_section():
 
     with col2:
         if state['start_time']:
-            eta = calculate_eta(state['start_time'], progress, total)
-            st.metric("ETA", eta)
+            elapsed = calculate_elapsed_time(state['start_time'])
+            st.metric("Elapsed Time", elapsed)
 
     with col3:
         # Animated duck
@@ -469,12 +486,7 @@ def process_series():
     # Show initial processing message
     st.info("🔄 Please wait while we look up your manga volumes...")
 
-    # Add elapsed time display
-    if st.session_state.processing_state['start_time']:
-        elapsed = time.time() - st.session_state.processing_state['start_time']
-        st.write(f"**Elapsed time:** {int(elapsed)} seconds")
-
-    # Use Streamlit's experimental_rerun to avoid infinite loops
+    # Process all series and volumes
     for series_entry in st.session_state.series_entries:
         series_name = series_entry['confirmed_name']
         volumes = series_entry['volumes']
@@ -487,9 +499,6 @@ def process_series():
             progress += 1
             st.session_state.processing_state['progress'] = progress
 
-            # Update progress display - use placeholder for now
-            st.write(f"Processing: **{series_name}** - Volume **{volume}** ({progress}/{st.session_state.processing_state['total_volumes']})")
-
             # Get book data
             try:
                 book_data = deepseek_api.get_book_info(
@@ -499,7 +508,6 @@ def process_series():
                 if book_data:
                     book = process_book_data(book_data, volume)
                     series_books.append(book)
-                    st.success(f"✓ Found volume {volume}")
                 else:
                     st.warning(f"⚠️ Volume {volume} not found")
             except Exception as e:
@@ -579,65 +587,32 @@ def display_results():
 
     st.header("📋 Results")
 
-    # Create DataFrame for display
-    books_data = []
-    for i, book in enumerate(st.session_state.all_books):
-        books_data.append({
-            'Barcode': book.barcode,
-            'Title': book.book_title,
-            'Series': book.series_name,
-            'Volume': book.volume_number,
-            'Authors': DataValidator.format_authors_list(book.authors),
-            'MSRP': '✓' if book.msrp_cost else '✗',
-            'ISBN': '✓' if book.isbn_13 else '✗',
-            'Publisher': '✓' if book.publisher_name else '✗',
-            'Year': '✓' if book.copyright_year else '✗',
-            'Description': '✓' if book.description else '✗',
-            'Physical': '✓' if book.physical_description else '✗',
-            'Genres': '✓' if book.genres else '✗',
-            'Index': i  # Store index for modal
-        })
-
-    df = pd.DataFrame(books_data)
-    display_df = df.drop('Index', axis=1)  # Don't show index column
-
-    # Display expandable table
-    with st.expander(f"Results ({len(df)} books)", expanded=True):
-        st.dataframe(
-            display_df,
-            use_container_width=True,
-            hide_index=True
-        )
-
-    # Book details modal
-    st.subheader("Book Details")
-
-    # Create a selectbox for book selection
-    book_options = [f"{book.barcode} - {book.book_title}" for book in st.session_state.all_books]
-
-    if book_options:
-        selected_book = st.selectbox(
-            "Select a book to view details:",
-            options=book_options,
-            key="book_details_selector"
-        )
-
-        if selected_book:
-            # Find the selected book
-            selected_index = book_options.index(selected_book)
-            selected_book_obj = st.session_state.all_books[selected_index]
-
-            # Show details
-            show_book_details_modal(selected_book_obj)
-
-    # Export options
+    # Export options - moved above the table
     st.subheader("Export Options")
 
-    col1, col2 = st.columns(2)
+    # Large MARC export button
+    col1, col2 = st.columns([2, 1])
 
     with col1:
+        if st.button("📚 Export MARC Records", type="primary", use_container_width=True):
+            try:
+                filename = f"manga_marc_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mrc"
+                export_books_to_marc(st.session_state.all_books, filename, "M")
+
+                with open(filename, "rb") as file:
+                    st.download_button(
+                        label="📚 Download MARC File",
+                        data=file,
+                        file_name=filename,
+                        mime="application/marc",
+                        use_container_width=True
+                    )
+            except Exception as e:
+                st.error(f"Error exporting MARC: {e}")
+
+    with col2:
         # JSON export
-        if st.button("💾 Export JSON"):
+        if st.button("💾 Export JSON", use_container_width=True):
             results_data = [
                 {
                     "series_name": book.series_name,
@@ -659,28 +634,128 @@ def display_results():
 
             json_str = json.dumps(results_data, indent=2)
             st.download_button(
-                label="Download JSON",
+                label="💾 Download JSON",
                 data=json_str,
                 file_name=f"manga_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
-                mime="application/json"
+                mime="application/json",
+                use_container_width=True
             )
 
-    with col2:
-        # MARC export
-        if st.button("📚 Export MARC"):
-            try:
-                filename = f"manga_marc_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mrc"
-                export_books_to_marc(st.session_state.all_books, filename, "M")
+    # Display expandable table with regular HTML table
+    with st.expander(f"Results ({len(st.session_state.all_books)} books)", expanded=True):
+        # Create table header
+        st.markdown("""
+        <style>
+        .manga-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+        }
+        .manga-table th {
+            background-color: #f0f2f6;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            font-weight: bold;
+        }
+        .manga-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+        }
+        .manga-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        </style>
+        """, unsafe_allow_html=True)
 
-                with open(filename, "rb") as file:
-                    st.download_button(
-                        label="Download MARC",
-                        data=file,
-                        file_name=filename,
-                        mime="application/marc"
-                    )
-            except Exception as e:
-                st.error(f"Error exporting MARC: {e}")
+        # Create table HTML
+        table_html = """
+        <table class="manga-table">
+            <thead>
+                <tr>
+                    <th>Barcode</th>
+                    <th>Title</th>
+                    <th>Series</th>
+                    <th>Volume</th>
+                    <th>Authors</th>
+                    <th>MSRP</th>
+                    <th>ISBN</th>
+                    <th>Publisher</th>
+                    <th>Year</th>
+                    <th>Description</th>
+                    <th>Physical</th>
+                    <th>Genres</th>
+                </tr>
+            </thead>
+            <tbody>
+        """
+
+        for i, book in enumerate(st.session_state.all_books):
+            msrp_cell = "✓" if book.msrp_cost else "✗"
+            isbn_cell = "✓" if book.isbn_13 else "✗"
+            publisher_cell = "✓" if book.publisher_name else "✗"
+            year_cell = "✓" if book.copyright_year else "✗"
+            description_cell = "✓" if book.description else "✗"
+            physical_cell = "✓" if book.physical_description else "✗"
+            genres_cell = "✓" if book.genres else "✗"
+
+            table_html += f"""
+                <tr>
+                    <td><strong>{book.barcode}</strong></td>
+                    <td>{book.book_title}</td>
+                    <td>{book.series_name}</td>
+                    <td>{book.volume_number}</td>
+                    <td>{DataValidator.format_authors_list(book.authors)}</td>
+                    <td>{msrp_cell}</td>
+                    <td>{isbn_cell}</td>
+                    <td>{publisher_cell}</td>
+                    <td>{year_cell}</td>
+                    <td>{description_cell}</td>
+                    <td>{physical_cell}</td>
+                    <td>{genres_cell}</td>
+                </tr>
+            """
+
+        table_html += """
+            </tbody>
+        </table>
+        """
+
+        st.markdown(table_html, unsafe_allow_html=True)
+
+    # Book details modal
+    st.subheader("Book Details")
+
+    # Create a selectbox for book selection
+    book_options = [f"{book.barcode} - {book.book_title}" for book in st.session_state.all_books]
+
+    if book_options:
+        # Initialize selected book index in session state
+        if 'selected_book_index' not in st.session_state:
+            st.session_state.selected_book_index = 0
+
+        selected_book = st.selectbox(
+            "Select a book to view details:",
+            options=book_options,
+            index=st.session_state.selected_book_index,
+            key="book_details_selector"
+        )
+
+        if selected_book:
+            # Find the selected book
+            selected_index = book_options.index(selected_book)
+
+            # Update session state if selection changed
+            if selected_index != st.session_state.selected_book_index:
+                st.session_state.selected_book_index = selected_index
+                st.rerun()
+
+            selected_book_obj = st.session_state.all_books[selected_index]
+
+            # Show details
+            show_book_details_modal(selected_book_obj)
+
 
 
 def main():
@@ -706,6 +781,64 @@ def main():
         st.markdown("• Volume range support")
         st.markdown("• MARC export for library systems")
         st.markdown("• Barcode generation")
+        st.markdown("---")
+
+        # Help section
+        with st.expander("📖 Help & Instructions", expanded=False):
+            st.markdown("""
+            ### How to Use This App
+
+            **1. Enter Starting Barcode**
+            - Enter your starting barcode (e.g., T000001)
+            - This will be used to generate sequential barcodes for all volumes
+
+            **2. Add Series**
+            - Enter manga series names one at a time
+            - For each series, enter volume ranges:
+              - Single volumes: `7`
+              - Ranges: `1-5`
+              - Omnibus volumes: `17-18-19`
+              - Combinations: `1-5,7,10-12`
+
+            **3. Confirm Series Names**
+            - The app will suggest correct series names
+            - Select the correct series from the suggestions
+
+            **4. Process Volumes**
+            - Click "Start Lookup" to begin processing
+            - The app will fetch detailed information for each volume
+            - Progress will be shown with elapsed time
+
+            **5. Export Results**
+            - **MARC Export**: Creates library catalog records
+            - **JSON Export**: Raw data for other uses
+
+            ### Importing MARC Files into Atriuum
+
+            **Step 1: Download MARC File**
+            - Click the "📚 Export MARC Records" button
+            - Download the generated .mrc file
+
+            **Step 2: Import into Atriuum**
+            1. Open Atriuum Library System
+            2. Go to **Cataloging** → **Import/Export**
+            3. Select **MARC Import**
+            4. Choose the downloaded .mrc file
+            5. Map fields according to your library's specifications
+            6. Run the import process
+
+            **Important Notes:**
+            - Each volume becomes a separate bibliographic record
+            - Barcodes are automatically assigned sequentially
+            - Records include full MARC 21 format with holding information
+            - Verify the import results before finalizing
+
+            ### Volume Range Examples
+            - `1-5` → Volumes 1, 2, 3, 4, 5
+            - `7` → Volume 7 only
+            - `17-18-19` → Omnibus containing volumes 17, 18, 19
+            - `1-3,7,10-12` → Volumes 1, 2, 3, 7, 10, 11, 12
+            """)
 
     st.title("📚 Manga Lookup Tool")
     st.markdown("Streamlined web interface for manga series lookup and MARC export")

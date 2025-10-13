@@ -466,6 +466,10 @@ def process_book_data(raw_data: Dict, volume_number: int) -> BookInfo:
     series_name = DataValidator.format_title(raw_data.get("series_name", ""))
     book_title = DataValidator.format_title(raw_data.get("book_title", f"{series_name} (Volume {volume_number})"))
 
+    # Ensure series name is in the title if missing
+    if series_name and series_name.lower() not in book_title.lower():
+        book_title = f"{series_name}: {book_title}"
+
     # Handle authors - ensure they're in list format
     authors_raw = raw_data.get("authors", [])
     if isinstance(authors_raw, str):
