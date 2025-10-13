@@ -26,6 +26,7 @@ import pandas as pd
 from datetime import datetime
 from typing import List, Dict, Optional
 import base64
+import requests
 
 # Import existing core logic
 from manga_lookup import (
@@ -56,6 +57,39 @@ def initialize_session_state():
         }
     if 'project_state' not in st.session_state:
         st.session_state.project_state = ProjectState()
+    if 'pending_series_name' not in st.session_state:
+        st.session_state.pending_series_name = None
+
+
+def get_cover_image_url(series_name: str) -> Optional[str]:
+    """Get cover image URL from Google Books API"""
+    try:
+        # Search Google Books API
+        search_url = "https://www.googleapis.com/books/v1/volumes"
+        params = {
+            'q': f'intitle:\"{series_name}\" manga',
+            'maxResults': 1,
+            'printType': 'books'
+        }
+
+        response = requests.get(search_url, params=params, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('items'):
+                item = data['items'][0]
+                volume_info = item.get('volumeInfo', {})
+
+                # Get thumbnail image
+                image_links = volume_info.get('imageLinks', {})
+                if image_links.get('thumbnail'):
+                    return image_links['thumbnail']
+                elif image_links.get('smallThumbnail'):
+                    return image_links['smallThumbnail']
+
+        return None
+    except Exception:
+        # Return None if API call fails
+        return None
 
 
 def get_duck_animation():
@@ -145,35 +179,27 @@ def series_input_form():
     st.header("📚 Manga Series Input")
 
     # Starting barcode
+    st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
     start_barcode = st.text_input(
         "Starting Barcode",
-        value="T000001",
+        placeholder="Enter starting barcode",
         help="Enter starting barcode (e.g., T000001 or MANGA001)"
     )
+    if start_barcode:
+        st.session_state.start_barcode = start_barcode
 
     # Series input section
     st.subheader("Add Series")
 
     with st.form("series_form", clear_on_submit=True):
         series_name = st.text_input("Manga Series Name")
-        volume_input = st.text_input(
-            "Volume Numbers/Ranges",
-            placeholder="e.g., 1-5,7,10 or 17-18-19 (for omnibus)",
-            help="Supports ranges (1-5), single volumes (7), and omnibus formats (17-18-19)"
-        )
 
-        submitted = st.form_submit_button("Add Series")
+        submitted = st.form_submit_button("Confirm Series Name")
 
-        if submitted and series_name and volume_input:
-            try:
-                volumes = parse_volume_range(volume_input)
-                st.session_state.series_entries.append({
-                    'original_name': series_name,
-                    'volumes': volumes
-                })
-                st.success(f"✓ Added {series_name} with volumes: {', '.join(map(str, volumes))}")
-            except ValueError as e:
-                st.error(f"Error parsing volume range: {e}")
+        if submitted and series_name:
+            # Store the series name for confirmation
+            st.session_state.pending_series_name = series_name
+            st.rerun()
 
     # Display current series
     if st.session_state.series_entries:
@@ -198,6 +224,105 @@ def series_input_form():
                 len(entry['volumes']) for entry in st.session_state.series_entries
             )
             st.rerun()
+
+
+def confirm_single_series(series_name):
+    """Confirm a single series name with cover images"""
+    st.header(f"🔍 Confirm: {series_name}")
+
+    # Initialize DeepSeek API
+    try:
+        deepseek_api = DeepSeekAPI()
+    except ValueError as e:
+        st.error(f"API configuration error: {e}")
+        return
+
+    # Get suggestions
+    suggestions = deepseek_api.correct_series_name(series_name)
+
+    if len(suggestions) > 1:
+        # Multiple suggestions - display with cover images
+        st.write("Select the correct series name:")
+
+        for i, suggestion in enumerate(suggestions):
+            col1, col2 = st.columns([1, 3])
+
+            with col1:
+                # Get cover image from Google Books API
+                cover_url = get_cover_image_url(suggestion)
+                if cover_url:
+                    st.image(cover_url, width=100, caption=suggestion)
+                else:
+                    st.markdown("📚")
+                    st.caption("No cover available")
+
+            with col2:
+                if st.button(f"✓ Use: {suggestion}", key=f"select_{i}"):
+                    # Get volume input after confirmation
+                    get_volume_input(series_name, suggestion)
+                    return
+
+        # Look Again and Skip options
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🔄 Look Again", use_container_width=True):
+                st.info("Searching for more options...")
+                # Clear pending series to restart
+                st.session_state.pending_series_name = None
+                st.rerun()
+
+        with col2:
+            if st.button("⏭️ Skip", use_container_width=True):
+                st.warning(f"Skipped {series_name}")
+                st.session_state.pending_series_name = None
+                st.rerun()
+    else:
+        # Single suggestion
+        selected_series = suggestions[0]
+        st.success(f"✓ Using: {selected_series}")
+
+        # Show cover image
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            cover_url = get_cover_image_url(selected_series)
+            if cover_url:
+                st.image(cover_url, width=100, caption=selected_series)
+            else:
+                st.markdown("📚")
+                st.caption("No cover available")
+
+        with col2:
+            if st.button("✓ Confirm and Add Volumes", type="primary"):
+                get_volume_input(series_name, selected_series)
+
+
+def get_volume_input(original_name, confirmed_name):
+    """Get volume input for a confirmed series"""
+    st.subheader(f"📚 Add Volumes for {confirmed_name}")
+
+    with st.form("volume_form"):
+        volume_input = st.text_input(
+            "Volume Numbers/Ranges",
+            placeholder="e.g., 1-5,7,10 or 17-18-19 (for omnibus)",
+            help="Supports ranges (1-5), single volumes (7), and omnibus formats (17-18-19)"
+        )
+
+        submitted = st.form_submit_button("Add Series")
+
+        if submitted and volume_input:
+            try:
+                volumes = parse_volume_range(volume_input)
+                st.session_state.series_entries.append({
+                    'original_name': original_name,
+                    'confirmed_name': confirmed_name,
+                    'volumes': volumes
+                })
+                st.success(f"✓ Added {confirmed_name} with volumes: {', '.join(map(str, volumes))}")
+                # Clear pending series
+                st.session_state.pending_series_name = None
+                st.rerun()
+            except ValueError as e:
+                st.error(f"Error parsing volume range: {e}")
 
 
 def confirm_series_names():
@@ -271,7 +396,7 @@ def confirm_series_names():
 
 def process_series():
     """Process all confirmed series"""
-    if not st.session_state.confirmed_series:
+    if not st.session_state.series_entries:
         return
 
     # Initialize API
@@ -284,7 +409,7 @@ def process_series():
     all_books = []
     progress = 0
 
-    for series_entry in st.session_state.confirmed_series:
+    for series_entry in st.session_state.series_entries:
         series_name = series_entry['confirmed_name']
         volumes = series_entry['volumes']
 
@@ -309,12 +434,13 @@ def process_series():
                 series_books.append(book)
                 st.success(f"✓ Found volume {volume}")
             else:
-                st.warning(f"✗ Volume {volume} not found")
+                st.warning(f"��� Volume {volume} not found")
 
         all_books.extend(series_books)
 
     # Assign barcodes
-    start_barcode = "T000001"  # This should come from user input
+    # Get start barcode from user input or use default
+    start_barcode = st.session_state.get('start_barcode', "T000001")
     barcodes = generate_sequential_barcodes(start_barcode, len(all_books))
     for book, barcode in zip(all_books, barcodes):
         book.barcode = barcode
@@ -325,7 +451,7 @@ def process_series():
     # Record interaction
     series_info = ", ".join([
         f"{entry['confirmed_name']} ({len(entry['volumes'])} vols)"
-        for entry in st.session_state.confirmed_series
+        for entry in st.session_state.series_entries
     ])
     st.session_state.project_state.record_interaction(
         f"Multiple series: {series_info}", len(all_books)
@@ -514,6 +640,9 @@ def main():
     elif st.session_state.confirmed_series:
         # Ready to process
         confirm_series_names()
+    elif st.session_state.pending_series_name:
+        # Series confirmation phase
+        confirm_single_series(st.session_state.pending_series_name)
     else:
         # Input phase
         series_input_form()
