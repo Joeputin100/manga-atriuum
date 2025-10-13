@@ -61,34 +61,43 @@ def initialize_session_state():
         st.session_state.pending_series_name = None
 
 
-def get_cover_image_url(series_name: str) -> Optional[str]:
-    """Get cover image URL from Google Books API"""
+def get_openlibrary_cover_by_isbn(isbn: str, size: str = "L") -> Optional[str]:
+    """Get cover image URL from OpenLibrary by ISBN"""
     try:
-        # Search Google Books API
-        search_url = "https://www.googleapis.com/books/v1/volumes"
-        params = {
-            'q': f'intitle:\"{series_name}\" manga',
-            'maxResults': 1,
-            'printType': 'books'
-        }
-
-        response = requests.get(search_url, params=params, timeout=10)
+        url = f"https://covers.openlibrary.org/b/isbn/{isbn}-{size}.jpg"
+        response = requests.head(url, timeout=5)
         if response.status_code == 200:
-            data = response.json()
-            if data.get('items'):
-                item = data['items'][0]
-                volume_info = item.get('volumeInfo', {})
-
-                # Get thumbnail image
-                image_links = volume_info.get('imageLinks', {})
-                if image_links.get('thumbnail'):
-                    return image_links['thumbnail']
-                elif image_links.get('smallThumbnail'):
-                    return image_links['smallThumbnail']
-
+            return url
         return None
     except Exception:
-        # Return None if API call fails
+        return None
+
+
+def get_openlibrary_series_cover(series_name: str) -> Optional[str]:
+    """Get cover image URL from OpenLibrary by series name"""
+    try:
+        search_url = f"https://openlibrary.org/search.json?series={series_name}"
+        response = requests.get(search_url, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("docs"):
+                cover_id = data["docs"][0].get("cover_i")
+                if cover_id:
+                    return f"https://covers.openlibrary.org/b/id/{cover_id}-L.jpg"
+        return None
+    except Exception:
+        return None
+
+
+def get_volume_1_isbn(series_name: str) -> Optional[str]:
+    """Get ISBN for volume 1 of a series using DeepSeek API"""
+    try:
+        deepseek_api = DeepSeekAPI()
+        book_data = deepseek_api.get_book_info(series_name, 1, st.session_state.project_state)
+        if book_data and book_data.get('isbn_13'):
+            return book_data['isbn_13']
+        return None
+    except Exception:
         return None
 
 
@@ -248,11 +257,30 @@ def confirm_single_series(series_name):
             col1, col2 = st.columns([1, 3])
 
             with col1:
-                # Get cover image from Google Books API
-                cover_url = get_cover_image_url(suggestion)
-                if cover_url:
-                    st.image(cover_url, width=100, caption=suggestion)
+                # Try to get volume 1 cover from OpenLibrary
+                isbn = get_volume_1_isbn(suggestion)
+                volume_cover_url = None
+                series_cover_url = None
+
+                if isbn:
+                    volume_cover_url = get_openlibrary_cover_by_isbn(isbn)
+
+                # Get series cover from OpenLibrary
+                series_cover_url = get_openlibrary_series_cover(suggestion)
+
+                # Display cover image(s)
+                if volume_cover_url and series_cover_url and volume_cover_url != series_cover_url:
+                    # Show both covers if they're different
+                    st.image(volume_cover_url, width=80, caption=f"Volume 1")
+                    st.image(series_cover_url, width=80, caption=f"Series")
+                elif volume_cover_url:
+                    # Show volume 1 cover
+                    st.image(volume_cover_url, width=100, caption=suggestion)
+                elif series_cover_url:
+                    # Show series cover
+                    st.image(series_cover_url, width=100, caption=suggestion)
                 else:
+                    # No covers available from OpenLibrary
                     st.markdown("📚")
                     st.caption("No cover available")
 
@@ -281,13 +309,33 @@ def confirm_single_series(series_name):
         selected_series = suggestions[0]
         st.success(f"✓ Using: {selected_series}")
 
-        # Show cover image
+        # Show cover images
         col1, col2 = st.columns([1, 3])
         with col1:
-            cover_url = get_cover_image_url(selected_series)
-            if cover_url:
-                st.image(cover_url, width=100, caption=selected_series)
+            # Try to get volume 1 cover from OpenLibrary
+            isbn = get_volume_1_isbn(selected_series)
+            volume_cover_url = None
+            series_cover_url = None
+
+            if isbn:
+                volume_cover_url = get_openlibrary_cover_by_isbn(isbn)
+
+            # Get series cover from OpenLibrary
+            series_cover_url = get_openlibrary_series_cover(selected_series)
+
+            # Display cover image(s)
+            if volume_cover_url and series_cover_url and volume_cover_url != series_cover_url:
+                # Show both covers if they're different
+                st.image(volume_cover_url, width=80, caption=f"Volume 1")
+                st.image(series_cover_url, width=80, caption=f"Series")
+            elif volume_cover_url:
+                # Show volume 1 cover
+                st.image(volume_cover_url, width=100, caption=selected_series)
+            elif series_cover_url:
+                # Show series cover
+                st.image(series_cover_url, width=100, caption=selected_series)
             else:
+                # No covers available from OpenLibrary
                 st.markdown("📚")
                 st.caption("No cover available")
 
