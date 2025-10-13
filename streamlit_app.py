@@ -59,6 +59,10 @@ def initialize_session_state():
         st.session_state.project_state = ProjectState()
     if 'pending_series_name' not in st.session_state:
         st.session_state.pending_series_name = None
+    if 'selected_series' not in st.session_state:
+        st.session_state.selected_series = None
+    if 'original_series_name' not in st.session_state:
+        st.session_state.original_series_name = None
 
 
 def get_volume_1_isbn(series_name: str) -> Optional[str]:
@@ -246,9 +250,10 @@ def confirm_single_series(series_name):
 
                     # Make the entire card clickable
                     if st.button(f"✓ Select {suggestion}", key=f"select_{i}", use_container_width=True):
-                        # Get volume input after confirmation
-                        get_volume_input(series_name, suggestion)
-                        return
+                        # Store selected series for volume input
+                        st.session_state.selected_series = suggestion
+                        st.session_state.original_series_name = series_name
+                        st.rerun()
 
                     st.markdown("---")
 
@@ -288,7 +293,10 @@ def confirm_single_series(series_name):
                     st.write(f"**Series Info:** {series_info}")
 
                 if st.button("✓ Confirm and Add Volumes", type="primary", use_container_width=True):
-                    get_volume_input(series_name, selected_series)
+                    # Store selected series for volume input
+                    st.session_state.selected_series = selected_series
+                    st.session_state.original_series_name = series_name
+                    st.rerun()
 
 
 def get_volume_input(original_name, confirmed_name):
@@ -313,11 +321,18 @@ def get_volume_input(original_name, confirmed_name):
                     'volumes': volumes
                 })
                 st.success(f"✓ Added {confirmed_name} with volumes: {', '.join(map(str, volumes))}")
-                # Clear pending series
-                st.session_state.pending_series_name = None
+                # Clear selected series state to return to main input form
+                st.session_state.selected_series = None
+                st.session_state.original_series_name = None
                 st.rerun()
             except ValueError as e:
                 st.error(f"Error parsing volume range: {e}")
+
+        # Add a "Back to Main" button for better UX
+        if st.form_submit_button("← Back to Main", type="secondary"):
+            st.session_state.selected_series = None
+            st.session_state.original_series_name = None
+            st.rerun()
 
 
 def confirm_series_names():
@@ -650,6 +665,9 @@ def main():
     elif st.session_state.confirmed_series:
         # Ready to process
         confirm_series_names()
+    elif st.session_state.selected_series:
+        # Volume input phase
+        get_volume_input(st.session_state.original_series_name, st.session_state.selected_series)
     elif st.session_state.pending_series_name:
         # Series confirmation phase
         confirm_single_series(st.session_state.pending_series_name)
