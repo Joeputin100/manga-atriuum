@@ -321,9 +321,10 @@ def get_volume_input(original_name, confirmed_name):
                     'volumes': volumes
                 })
                 st.success(f"✓ Added {confirmed_name} with volumes: {', '.join(map(str, volumes))}")
-                # Clear selected series state to return to main input form
+                # Clear ALL series state to return to main input form
                 st.session_state.selected_series = None
                 st.session_state.original_series_name = None
+                st.session_state.pending_series_name = None
                 st.rerun()
             except ValueError as e:
                 st.error(f"Error parsing volume range: {e}")
@@ -332,6 +333,7 @@ def get_volume_input(original_name, confirmed_name):
         if st.form_submit_button("← Back to Main", type="secondary"):
             st.session_state.selected_series = None
             st.session_state.original_series_name = None
+            st.session_state.pending_series_name = None
             st.rerun()
 
 
