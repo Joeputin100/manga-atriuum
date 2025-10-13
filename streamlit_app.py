@@ -726,6 +726,19 @@ def main():
         initial_sidebar_state="expanded"
     )
 
+    # Add sidebar with test page link
+    with st.sidebar:
+        st.title("📚 Manga Lookup")
+        st.markdown("---")
+
+        if st.button("🧪 Cover Image Test Page", use_container_width=True):
+            # This will redirect to the test page
+            st.switch_page("cover_image_test.py")
+
+        st.markdown("---")
+        st.markdown("### About")
+        st.markdown("Streamlined web interface for manga series lookup and MARC export")
+
     st.title("📚 Manga Lookup Tool")
     st.markdown("Streamlined web interface for manga series lookup and MARC export")
 
