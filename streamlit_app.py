@@ -163,21 +163,26 @@ def series_input_form():
     """Multi-series input form"""
     st.header("📚 Manga Series Input")
 
-    # Starting barcode
-    st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
-    start_barcode = st.text_input(
-        "Starting Barcode",
-        placeholder="Enter starting barcode",
-        help="Enter starting barcode (e.g., T000001 or MANGA001)"
-    )
-    if start_barcode:
-        st.session_state.start_barcode = start_barcode
+    # Starting barcode - only show if not already set
+    if 'start_barcode' not in st.session_state or not st.session_state.start_barcode:
+        st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
+        start_barcode = st.text_input(
+            "Starting Barcode",
+            placeholder="Enter starting barcode",
+            help="Enter starting barcode (e.g., T000001 or MANGA001)"
+        )
+        if start_barcode:
+            st.session_state.start_barcode = start_barcode
 
     # Series input section
     st.subheader("Add Series")
 
     with st.form("series_form", clear_on_submit=True):
-        series_name = st.text_input("Manga Series Name")
+        # Make series name entry ordinal
+        series_count = len(st.session_state.series_entries) + 1
+        ordinal_text = "First" if series_count == 1 else "Second" if series_count == 2 else "Third" if series_count == 3 else f"{series_count}th"
+
+        series_name = st.text_input(f"Enter {ordinal_text} Series Name")
 
         submitted = st.form_submit_button("Confirm Series Name")
 
@@ -186,19 +191,58 @@ def series_input_form():
             st.session_state.pending_series_name = series_name
             st.rerun()
 
-    # Display current series
+    # Display current series with cyan background
     if st.session_state.series_entries:
-        st.subheader("Current Series")
+        st.markdown("""
+        <style>
+        .cyan-background {
+            background-color: #e0f7fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #80deea;
+            margin-bottom: 10px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        st.subheader("📋 Current Series")
+
         for i, entry in enumerate(st.session_state.series_entries):
-            col1, col2, col3 = st.columns([3, 2, 1])
-            with col1:
-                st.write(f"**{entry['original_name']}**")
-            with col2:
-                st.write(f"Volumes: {', '.join(map(str, entry['volumes']))}")
-            with col3:
-                if st.button("Remove", key=f"remove_{i}"):
-                    st.session_state.series_entries.pop(i)
-                    st.rerun()
+            with st.container():
+                st.markdown('<div class="cyan-background">', unsafe_allow_html=True)
+
+                # Series header
+                col1, col2 = st.columns([4, 1])
+                with col1:
+                    st.write(f"**Series {i+1}: {entry['confirmed_name']}**")
+                with col2:
+                    if st.button("🗑️ Remove", key=f"remove_{i}"):
+                        st.session_state.series_entries.pop(i)
+                        st.rerun()
+
+                # Create table with volume numbers and barcodes
+                if 'all_books' in st.session_state and st.session_state.all_books:
+                    # Get books for this specific series
+                    series_books = [book for book in st.session_state.all_books if book.series_name == entry['confirmed_name']]
+                    if series_books:
+                        # Create table data
+                        table_data = []
+                        for book in series_books:
+                            table_data.append({
+                                'Volume': book.volume_number,
+                                'Barcode': book.barcode if hasattr(book, 'barcode') and book.barcode else 'Pending'
+                            })
+
+                        # Display as table
+                        if table_data:
+                            df = pd.DataFrame(table_data)
+                            st.dataframe(df, use_container_width=True, hide_index=True)
+                    else:
+                        st.write(f"*Volumes: {', '.join(map(str, entry['volumes']))} (not yet processed)*")
+                else:
+                    st.write(f"*Volumes: {', '.join(map(str, entry['volumes']))} (not yet processed)*")
+
+                st.markdown('</div>', unsafe_allow_html=True)
 
     # Start processing button
     if st.session_state.series_entries:
