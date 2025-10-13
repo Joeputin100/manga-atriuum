@@ -460,11 +460,21 @@ def process_series():
         deepseek_api = DeepSeekAPI()
     except ValueError as e:
         st.error(f"API configuration error: {e}")
+        st.session_state.processing_state['is_processing'] = False
         return
 
     all_books = []
     progress = 0
 
+    # Show initial processing message
+    st.info("🔄 Please wait while we look up your manga volumes...")
+
+    # Add elapsed time display
+    if st.session_state.processing_state['start_time']:
+        elapsed = time.time() - st.session_state.processing_state['start_time']
+        st.write(f"**Elapsed time:** {int(elapsed)} seconds")
+
+    # Use Streamlit's experimental_rerun to avoid infinite loops
     for series_entry in st.session_state.series_entries:
         series_name = series_entry['confirmed_name']
         volumes = series_entry['volumes']
@@ -477,20 +487,23 @@ def process_series():
             progress += 1
             st.session_state.processing_state['progress'] = progress
 
-            # Update progress display
-            st.rerun()
+            # Update progress display - use placeholder for now
+            st.write(f"Processing: **{series_name}** - Volume **{volume}** ({progress}/{st.session_state.processing_state['total_volumes']})")
 
             # Get book data
-            book_data = deepseek_api.get_book_info(
-                series_name, volume, st.session_state.project_state
-            )
+            try:
+                book_data = deepseek_api.get_book_info(
+                    series_name, volume, st.session_state.project_state
+                )
 
-            if book_data:
-                book = process_book_data(book_data, volume)
-                series_books.append(book)
-                st.success(f"✓ Found volume {volume}")
-            else:
-                st.warning(f"��� Volume {volume} not found")
+                if book_data:
+                    book = process_book_data(book_data, volume)
+                    series_books.append(book)
+                    st.success(f"✓ Found volume {volume}")
+                else:
+                    st.warning(f"⚠️ Volume {volume} not found")
+            except Exception as e:
+                st.error(f"❌ Error processing volume {volume}: {str(e)}")
 
         all_books.extend(series_books)
 
@@ -514,6 +527,7 @@ def process_series():
     )
 
     st.success(f"✓ Found {len(all_books)} books!")
+    st.rerun()  # Final rerun to show results
 
 
 def show_book_details_modal(book: BookInfo):
