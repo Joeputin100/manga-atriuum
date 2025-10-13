@@ -27,6 +27,8 @@ from datetime import datetime
 from typing import List, Dict, Optional
 import base64
 import requests
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import existing core logic
 from manga_lookup import (
@@ -77,30 +79,9 @@ def get_volume_1_isbn(series_name: str) -> Optional[str]:
         return None
 
 
-def get_duck_animation():
-    """Get duck drinking coffee animation (placeholder)"""
-    # This will be replaced with an actual animated GIF
-    # For now, using emojis that can be animated with CSS
-    return "🦆☕"
-
-
 def display_duck_animation():
-    """Display animated duck with CSS"""
-    st.markdown("""
-    <style>
-    @keyframes drink-coffee {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-5px); }
-        100% { transform: translateY(0px); }
-    }
-    .duck-animation {
-        animation: drink-coffee 2s ease-in-out infinite;
-        font-size: 3em;
-        text-align: center;
-    }
-    </style>
-    <div class="duck-animation">🦆☕</div>
-    """, unsafe_allow_html=True)
+    """Display animated duck with GIF"""
+    st.image('duck_coffee.gif', use_column_width=True)
 
 
 def calculate_elapsed_time(start_time):
@@ -467,8 +448,21 @@ def confirm_series_names():
             st.rerun()
 
 
+def process_single_volume(series_name, volume, project_state):
+    """Process a single volume and return book info"""
+    try:
+        deepseek_api = DeepSeekAPI()
+        book_data = deepseek_api.get_book_info(series_name, volume, project_state)
+        if book_data:
+            book = process_book_data(book_data, volume)
+            return book, None
+        else:
+            return None, f"Volume {volume} not found"
+    except Exception as e:
+        return None, f"Error processing volume {volume}: {str(e)}"
+
 def process_series():
-    """Process all confirmed series"""
+    """Process all confirmed series with threaded execution for better progress updates"""
     if not st.session_state.series_entries:
         return
 
@@ -481,42 +475,49 @@ def process_series():
         return
 
     all_books = []
-    progress = 0
+    errors = []
 
     # Show initial processing message
     st.info("🔄 Please wait while we look up your manga volumes...")
 
-    # Process all series and volumes
+    # Create a list of all volumes to process
+    all_volumes = []
     for series_entry in st.session_state.series_entries:
         series_name = series_entry['confirmed_name']
         volumes = series_entry['volumes']
-
-        st.session_state.processing_state['current_series'] = series_name
-
-        series_books = []
         for volume in volumes:
+            all_volumes.append((series_name, volume))
+
+    # Process volumes with threading
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        # Submit all tasks
+        future_to_volume = {
+            executor.submit(process_single_volume, series_name, volume, st.session_state.project_state): (series_name, volume)
+            for series_name, volume in all_volumes
+        }
+
+        # Process results as they complete
+        for i, future in enumerate(as_completed(future_to_volume)):
+            series_name, volume = future_to_volume[future]
+
+            # Update progress
+            st.session_state.processing_state['current_series'] = series_name
             st.session_state.processing_state['current_volume'] = volume
-            progress += 1
-            st.session_state.processing_state['progress'] = progress
+            st.session_state.processing_state['progress'] = i + 1
 
-            # Get book data
+            # Force rerun to update progress display
+            st.rerun()
+
             try:
-                book_data = deepseek_api.get_book_info(
-                    series_name, volume, st.session_state.project_state
-                )
-
-                if book_data:
-                    book = process_book_data(book_data, volume)
-                    series_books.append(book)
-                else:
-                    st.warning(f"⚠️ Volume {volume} not found")
+                book, error = future.result()
+                if book:
+                    all_books.append(book)
+                elif error:
+                    errors.append(error)
             except Exception as e:
-                st.error(f"❌ Error processing volume {volume}: {str(e)}")
-
-        all_books.extend(series_books)
+                errors.append(f"Unexpected error processing {series_name} volume {volume}: {str(e)}")
 
     # Assign barcodes
-    # Get start barcode from user input or use default
     start_barcode = st.session_state.get('start_barcode', "T000001")
     barcodes = generate_sequential_barcodes(start_barcode, len(all_books))
     for book, barcode in zip(all_books, barcodes):
@@ -534,7 +535,14 @@ def process_series():
         f"Multiple series: {series_info}", len(all_books)
     )
 
-    st.success(f"✓ Found {len(all_books)} books!")
+    # Show results
+    if all_books:
+        st.success(f"✓ Found {len(all_books)} books!")
+    if errors:
+        st.warning(f"⚠️ {len(errors)} volumes had issues:")
+        for error in errors:
+            st.write(f"• {error}")
+
     st.rerun()  # Final rerun to show results
 
 
@@ -641,57 +649,11 @@ def display_results():
                 use_container_width=True
             )
 
-    # Display expandable table with regular HTML table
+    # Display expandable table with Streamlit data table
     with st.expander(f"Results ({len(st.session_state.all_books)} books)", expanded=True):
-        # Create table header
-        st.markdown("""
-        <style>
-        .manga-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: Arial, sans-serif;
-        }
-        .manga-table th {
-            background-color: #f0f2f6;
-            padding: 12px;
-            text-align: left;
-            border-bottom: 2px solid #ddd;
-            font-weight: bold;
-        }
-        .manga-table td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            vertical-align: top;
-        }
-        .manga-table tr:hover {
-            background-color: #f5f5f5;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
-        # Create table HTML
-        table_html = """
-        <table class="manga-table">
-            <thead>
-                <tr>
-                    <th>Barcode</th>
-                    <th>Title</th>
-                    <th>Series</th>
-                    <th>Volume</th>
-                    <th>Authors</th>
-                    <th>MSRP</th>
-                    <th>ISBN</th>
-                    <th>Publisher</th>
-                    <th>Year</th>
-                    <th>Description</th>
-                    <th>Physical</th>
-                    <th>Genres</th>
-                </tr>
-            </thead>
-            <tbody>
-        """
-
-        for i, book in enumerate(st.session_state.all_books):
+        # Create DataFrame for the table
+        table_data = []
+        for book in st.session_state.all_books:
             msrp_cell = "✓" if book.msrp_cost else "✗"
             isbn_cell = "✓" if book.isbn_13 else "✗"
             publisher_cell = "✓" if book.publisher_name else "✗"
@@ -700,29 +662,27 @@ def display_results():
             physical_cell = "✓" if book.physical_description else "✗"
             genres_cell = "✓" if book.genres else "✗"
 
-            table_html += f"""
-                <tr>
-                    <td><strong>{book.barcode}</strong></td>
-                    <td>{book.book_title}</td>
-                    <td>{book.series_name}</td>
-                    <td>{book.volume_number}</td>
-                    <td>{DataValidator.format_authors_list(book.authors)}</td>
-                    <td>{msrp_cell}</td>
-                    <td>{isbn_cell}</td>
-                    <td>{publisher_cell}</td>
-                    <td>{year_cell}</td>
-                    <td>{description_cell}</td>
-                    <td>{physical_cell}</td>
-                    <td>{genres_cell}</td>
-                </tr>
-            """
+            table_data.append({
+                'Barcode': book.barcode,
+                'Title': book.book_title,
+                'Series': book.series_name,
+                'Volume': book.volume_number,
+                'Authors': DataValidator.format_authors_list(book.authors),
+                'MSRP': msrp_cell,
+                'ISBN': isbn_cell,
+                'Publisher': publisher_cell,
+                'Year': year_cell,
+                'Description': description_cell,
+                'Physical': physical_cell,
+                'Genres': genres_cell
+            })
 
-        table_html += """
-            </tbody>
-        </table>
-        """
-
-        st.markdown(table_html, unsafe_allow_html=True)
+        # Create DataFrame and display as table
+        if table_data:
+            df = pd.DataFrame(table_data)
+            st.dataframe(df, use_container_width=True, hide_index=True)
+        else:
+            st.info("No books found to display")
 
     # Book details modal
     st.subheader("Book Details")
