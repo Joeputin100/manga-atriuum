@@ -279,7 +279,7 @@ def series_input_form():
 
 
 def confirm_single_series(series_name):
-    """Confirm a single series name with cover images"""
+    """Confirm a single series name with cover images in separate cards"""
     st.header(f"🔍 Confirm: {series_name}")
 
     # Initialize DeepSeek API
@@ -293,45 +293,56 @@ def confirm_single_series(series_name):
     suggestions = deepseek_api.correct_series_name(series_name)
 
     if len(suggestions) > 1:
-        # Multiple suggestions - display with cover images
+        # Multiple suggestions - display in separate cards
         st.write("Select the correct series name:")
 
+        # Create columns for the cards
+        cols = st.columns(min(3, len(suggestions)))
+
         for i, suggestion in enumerate(suggestions):
-            col1, col2 = st.columns([1, 3])
+            with cols[i % len(cols)]:
+                # Create a card container
+                with st.container():
+                    # Show title immediately
+                    st.subheader(suggestion)
 
-            with col1:
-                # Try to get volume 1 cover from OpenLibrary
-                isbn = get_volume_1_isbn(suggestion)
-                volume_cover_url = None
-                series_cover_url = None
+                    # Initialize placeholder for cover images
+                    cover_placeholder = st.empty()
 
-                if isbn:
-                    volume_cover_url = get_openlibrary_cover_by_isbn(isbn)
+                    # Try to get cover images in background
+                    isbn = get_volume_1_isbn(suggestion)
+                    volume_cover_url = None
+                    series_cover_url = None
 
-                # Get series cover from OpenLibrary
-                series_cover_url = get_openlibrary_series_cover(suggestion)
+                    if isbn:
+                        volume_cover_url = get_openlibrary_cover_by_isbn(isbn)
 
-                # Display cover image(s)
-                if volume_cover_url and series_cover_url and volume_cover_url != series_cover_url:
-                    # Show both covers if they're different
-                    st.image(volume_cover_url, width=80, caption=f"Volume 1")
-                    st.image(series_cover_url, width=80, caption=f"Series")
-                elif volume_cover_url:
-                    # Show volume 1 cover
-                    st.image(volume_cover_url, width=100, caption=suggestion)
-                elif series_cover_url:
-                    # Show series cover
-                    st.image(series_cover_url, width=100, caption=suggestion)
-                else:
-                    # No covers available from OpenLibrary
-                    st.markdown("📚")
-                    st.caption("No cover available")
+                    # Get series cover from OpenLibrary
+                    series_cover_url = get_openlibrary_series_cover(suggestion)
 
-            with col2:
-                if st.button(f"✓ Use: {suggestion}", key=f"select_{i}"):
-                    # Get volume input after confirmation
-                    get_volume_input(series_name, suggestion)
-                    return
+                    # Display cover image(s) in the placeholder
+                    if volume_cover_url and series_cover_url and volume_cover_url != series_cover_url:
+                        # Show both covers if they're different
+                        cover_placeholder.image(volume_cover_url, width=80, caption=f"Volume 1")
+                        cover_placeholder.image(series_cover_url, width=80, caption=f"Series")
+                    elif volume_cover_url:
+                        # Show volume 1 cover
+                        cover_placeholder.image(volume_cover_url, width=120, caption=suggestion)
+                    elif series_cover_url:
+                        # Show series cover
+                        cover_placeholder.image(series_cover_url, width=120, caption=suggestion)
+                    else:
+                        # No covers available
+                        cover_placeholder.markdown("📚")
+                        cover_placeholder.caption("No cover available")
+
+                    # Make the entire card clickable
+                    if st.button(f"✓ Select {suggestion}", key=f"select_{i}", use_container_width=True):
+                        # Get volume input after confirmation
+                        get_volume_input(series_name, suggestion)
+                        return
+
+                    st.markdown("---")
 
         # Look Again and Skip options
         col1, col2 = st.columns(2)
@@ -352,39 +363,41 @@ def confirm_single_series(series_name):
         selected_series = suggestions[0]
         st.success(f"✓ Using: {selected_series}")
 
-        # Show cover images
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            # Try to get volume 1 cover from OpenLibrary
-            isbn = get_volume_1_isbn(selected_series)
-            volume_cover_url = None
-            series_cover_url = None
+        # Show cover images in a card
+        with st.container():
+            col1, col2 = st.columns([1, 3])
+            with col1:
+                # Try to get volume 1 cover from OpenLibrary
+                isbn = get_volume_1_isbn(selected_series)
+                volume_cover_url = None
+                series_cover_url = None
 
-            if isbn:
-                volume_cover_url = get_openlibrary_cover_by_isbn(isbn)
+                if isbn:
+                    volume_cover_url = get_openlibrary_cover_by_isbn(isbn)
 
-            # Get series cover from OpenLibrary
-            series_cover_url = get_openlibrary_series_cover(selected_series)
+                # Get series cover from OpenLibrary
+                series_cover_url = get_openlibrary_series_cover(selected_series)
 
-            # Display cover image(s)
-            if volume_cover_url and series_cover_url and volume_cover_url != series_cover_url:
-                # Show both covers if they're different
-                st.image(volume_cover_url, width=80, caption=f"Volume 1")
-                st.image(series_cover_url, width=80, caption=f"Series")
-            elif volume_cover_url:
-                # Show volume 1 cover
-                st.image(volume_cover_url, width=100, caption=selected_series)
-            elif series_cover_url:
-                # Show series cover
-                st.image(series_cover_url, width=100, caption=selected_series)
-            else:
-                # No covers available from OpenLibrary
-                st.markdown("📚")
-                st.caption("No cover available")
+                # Display cover image(s)
+                if volume_cover_url and series_cover_url and volume_cover_url != series_cover_url:
+                    # Show both covers if they're different
+                    st.image(volume_cover_url, width=80, caption=f"Volume 1")
+                    st.image(series_cover_url, width=80, caption=f"Series")
+                elif volume_cover_url:
+                    # Show volume 1 cover
+                    st.image(volume_cover_url, width=120, caption=selected_series)
+                elif series_cover_url:
+                    # Show series cover
+                    st.image(series_cover_url, width=120, caption=selected_series)
+                else:
+                    # No covers available from OpenLibrary
+                    st.markdown("📚")
+                    st.caption("No cover available")
 
-        with col2:
-            if st.button("✓ Confirm and Add Volumes", type="primary"):
-                get_volume_input(series_name, selected_series)
+            with col2:
+                st.subheader(selected_series)
+                if st.button("✓ Confirm and Add Volumes", type="primary", use_container_width=True):
+                    get_volume_input(series_name, selected_series)
 
 
 def get_volume_input(original_name, confirmed_name):
