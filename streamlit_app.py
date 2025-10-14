@@ -81,7 +81,7 @@ def get_volume_1_isbn(series_name: str) -> Optional[str]:
 
 def display_duck_animation():
     """Display animated duck with GIF"""
-    st.image('duck_coffee.gif', use_column_width=True)
+    st.image('https://media.giphy.com/media/WzA4Vj6V8UOEX10jMj/giphy.gif', use_container_width=True)
 
 
 def calculate_elapsed_time(start_time):
@@ -561,7 +561,7 @@ def show_book_details_modal(book: BookInfo):
         # Display cover image if available
         if book.cover_image_url:
             try:
-                st.image(book.cover_image_url, use_column_width=True, caption="Cover Image")
+                st.image(book.cover_image_url, use_container_width=True, caption="Cover Image")
             except Exception as e:
                 st.error(f"Could not load cover image: {e}")
                 st.write("**Cover:** Image unavailable")
