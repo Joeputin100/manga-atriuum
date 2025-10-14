@@ -1,0 +1,6 @@
+# Google Books API Configuration
+# Get your API key from: https://console.cloud.google.com/apis/library/books.googleapis.com
+
+[google_books]
+# Replace with your actual Google Books API key
+api_key = "YOUR_GOOGLE_BOOKS_API_KEY_HERE"

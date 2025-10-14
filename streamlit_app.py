@@ -32,7 +32,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import existing core logic
 from manga_lookup import (
-    BookInfo, DeepSeekAPI, DataValidator, ProjectState,
+    BookInfo, DeepSeekAPI, DataValidator, ProjectState, GoogleBooksAPI,
     parse_volume_range, generate_sequential_barcodes, process_book_data
 )
 
@@ -454,9 +454,10 @@ def process_single_volume(series_name, volume, project_state):
     """Process a single volume and return book info"""
     try:
         deepseek_api = DeepSeekAPI()
+        google_books_api = GoogleBooksAPI()
         book_data = deepseek_api.get_book_info(series_name, volume, project_state)
         if book_data:
-            book = process_book_data(book_data, volume)
+            book = process_book_data(book_data, volume, google_books_api, project_state)
             return book, None
         else:
             return None, f"Volume {volume} not found"
@@ -614,21 +615,21 @@ def display_results():
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        if st.button("📚 Export MARC Records", type="primary", use_container_width=True):
-            try:
-                filename = f"manga_marc_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mrc"
-                export_books_to_marc(st.session_state.all_books, filename, "M")
+        try:
+            filename = f"manga_marc_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mrc"
+            export_books_to_marc(st.session_state.all_books, filename, "M")
 
-                with open(filename, "rb") as file:
-                    st.download_button(
-                        label="📚 Download MARC File",
-                        data=file,
-                        file_name=filename,
-                        mime="application/marc",
-                        use_container_width=True
-                    )
-            except Exception as e:
-                st.error(f"Error exporting MARC: {e}")
+            with open(filename, "rb") as file:
+                st.download_button(
+                    label="📚 Export & Download MARC Records",
+                    data=file,
+                    file_name=filename,
+                    mime="application/marc",
+                    use_container_width=True,
+                    type="primary"
+                )
+        except Exception as e:
+            st.error(f"Error exporting MARC: {e}")
 
     with col2:
         # JSON export
