@@ -45,6 +45,15 @@ A comprehensive Python script that uses DeepSeek API for manga series lookup, co
 - **Cached Data**: Uses previously fetched data when available
 - **User Feedback**: Clear error messages and progress indicators
 
+### 8. Google Books API Integration
+- **Cover Image Lazy Loading**: Uses keyless Google Books API to fetch cover images
+- **Series Confirmation**: Shows 📷 indicator for series with available covers
+- **Volume Covers**: Automatically fetches cover images for individual volumes using ISBN
+- **Prefetching**: Automatically prefetches cover images for all cached series names and ISBNs
+- **URL Caching**: Stores cover image URLs in project state for fast retrieval
+- **Graceful Degradation**: Silently fails if Google Books API is unavailable
+- **No API Key Required**: Uses keyless queries for maximum accessibility
+
 ## 🧪 Comprehensive Testing
 
 Created `test_comprehensive.py` that validates:
@@ -122,6 +131,10 @@ manga_lookup_tool/
 ✅ Formats author names as "Last, First M."
 ✅ Implements rate limiting aligned with API policy
 ✅ Creates project state JSON for session recovery
+✅ Integrates Google Books API for lazy loading cover images
+✅ Shows cover image indicators in series confirmation and results
+✅ Prefetches cover images for all cached series names and ISBNs
+✅ Implements cover image URL caching for fast retrieval
 
 ## 📊 Performance Features
 

@@ -12,6 +12,7 @@ import json
 import re
 import time
 import requests
+import tomllib
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
@@ -66,6 +67,7 @@ class ProjectState:
             "last_search": None,
             "total_books_found": 0,
             "cached_responses": {},
+            "cached_cover_images": {},
             "start_time": datetime.now().isoformat()
         }
 
@@ -114,6 +116,40 @@ class ProjectState:
         self.state["last_search"] = search_record
 
         self.save_state()
+
+    def cache_cover_image(self, key: str, cover_url: str):
+        """Cache a cover image URL"""
+        if cover_url:
+            self.state["cached_cover_images"][key] = cover_url
+            self.save_state()
+
+    def get_cached_cover_image(self, key: str) -> Optional[str]:
+        """Get cached cover image URL"""
+        return self.state["cached_cover_images"].get(key)
+
+    def get_cached_series_names(self) -> List[str]:
+        """Get all unique series names from cached responses"""
+        series_names = set()
+        for api_call in self.state["api_calls"]:
+            try:
+                response_data = json.loads(api_call["response"])
+                if "series_name" in response_data:
+                    series_names.add(response_data["series_name"])
+            except json.JSONDecodeError:
+                continue
+        return list(series_names)
+
+    def get_cached_isbns(self) -> List[str]:
+        """Get all unique ISBNs from cached responses"""
+        isbns = set()
+        for api_call in self.state["api_calls"]:
+            try:
+                response_data = json.loads(api_call["response"])
+                if "isbn_13" in response_data and response_data["isbn_13"]:
+                    isbns.add(response_data["isbn_13"])
+            except json.JSONDecodeError:
+                continue
+        return list(isbns)
 
 class DeepSeekAPI:
     """Handles DeepSeek API interactions with rate limiting and error handling"""
@@ -346,6 +382,133 @@ class DeepSeekAPI:
             # If we can't get info, just return None
             return None
 
+class GoogleBooksAPI:
+    """Handles Google Books API interactions for cover image retrieval using keyless queries"""
+
+    def __init__(self):
+        self.base_url = "https://www.googleapis.com/books/v1/volumes"
+
+    def get_cover_image_url(self, isbn: str, project_state: Optional[ProjectState] = None) -> Optional[str]:
+        """Get cover image URL for a book by ISBN using keyless Google Books API"""
+        if not isbn:
+            return None
+
+        # Check cache first if project_state is provided
+        if project_state:
+            cached_url = project_state.get_cached_cover_image(f"isbn:{isbn}")
+            if cached_url:
+                return cached_url
+
+        # Construct the keyless API URL
+        url = f"{self.base_url}?q=isbn:{isbn}&maxResults=1"
+
+        try:
+            # Make the keyless HTTP request
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+
+            if data.get('totalItems', 0) == 0:
+                return None
+
+            volume_info = data['items'][0]['volumeInfo']
+            image_links = volume_info.get('imageLinks', {})
+
+            # Get the small thumbnail cover image URL
+            cover_url = image_links.get('smallThumbnail')
+
+            # If small thumbnail not available, try other sizes
+            if not cover_url:
+                for size in ['thumbnail', 'small', 'medium', 'large', 'extraLarge']:
+                    if size in image_links:
+                        cover_url = image_links[size]
+                        break
+
+            return cover_url
+
+        except requests.exceptions.RequestException:
+            # Silently fail - cover images are optional
+            return None
+        except Exception:
+            # Silently fail - cover images are optional
+            return None
+
+    def get_series_cover_image(self, series_name: str, volume_number: int = 1, project_state: Optional[ProjectState] = None) -> Optional[str]:
+        """Get cover image URL for a manga series by searching for the first volume using keyless Google Books API"""
+        # Check cache first if project_state is provided
+        if project_state:
+            cached_url = project_state.get_cached_cover_image(f"series:{series_name}")
+            if cached_url:
+                return cached_url
+
+        # Search for the series with volume 1
+        query = f'intitle:\"{series_name}\" \"volume {volume_number}\" manga'
+        url = f"{self.base_url}?q={query}&maxResults=1"
+
+        try:
+            # Make the keyless HTTP request
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+
+            if data.get('totalItems', 0) == 0:
+                return None
+
+            volume_info = data['items'][0]['volumeInfo']
+            image_links = volume_info.get('imageLinks', {})
+
+            # Get the small thumbnail cover image URL
+            cover_url = image_links.get('smallThumbnail')
+
+            # If small thumbnail not available, try other sizes
+            if not cover_url:
+                for size in ['thumbnail', 'small', 'medium', 'large', 'extraLarge']:
+                    if size in image_links:
+                        cover_url = image_links[size]
+                        break
+
+            return cover_url
+
+        except requests.exceptions.RequestException:
+            # Silently fail - cover images are optional
+            return None
+        except Exception:
+            # Silently fail - cover images are optional
+            return None
+
+    def prefetch_cover_images(self, project_state: ProjectState) -> Dict[str, str]:
+        """Prefetch cover images for all cached series names and ISBNs using keyless Google Books API"""
+        prefetched_covers = {}
+
+        # Prefetch for cached series names
+        cached_series = project_state.get_cached_series_names()
+        rprint(f"[cyan]Prefetching cover images for {len(cached_series)} cached series...[/cyan]")
+
+        for series_name in cached_series:
+            series_key = f"series:{series_name}"
+            # Check if already cached
+            if not project_state.get_cached_cover_image(series_key):
+                cover_url = self.get_series_cover_image(series_name)
+                if cover_url:
+                    project_state.cache_cover_image(series_key, cover_url)
+                    prefetched_covers[series_key] = cover_url
+
+        # Prefetch for cached ISBNs
+        cached_isbns = project_state.get_cached_isbns()
+        rprint(f"[cyan]Prefetching cover images for {len(cached_isbns)} cached ISBNs...[/cyan]")
+
+        for isbn in cached_isbns:
+            isbn_key = f"isbn:{isbn}"
+            # Check if already cached
+            if not project_state.get_cached_cover_image(isbn_key):
+                cover_url = self.get_cover_image_url(isbn)
+                if cover_url:
+                    project_state.cache_cover_image(isbn_key, cover_url)
+                    prefetched_covers[isbn_key] = cover_url
+
+        rprint(f"[green]✓ Prefetched {len(prefetched_covers)} cover images[/green]")
+        return prefetched_covers
+
 class DataValidator:
     """Handles data validation and formatting"""
 
@@ -459,7 +622,7 @@ def generate_sequential_barcodes(start_barcode: str, count: int) -> List[str]:
     return barcodes
 
 
-def process_book_data(raw_data: Dict, volume_number: int) -> BookInfo:
+def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Optional[GoogleBooksAPI] = None, project_state: Optional[ProjectState] = None) -> BookInfo:
     """Process raw API data into structured BookInfo"""
     warnings = []
 
@@ -530,8 +693,14 @@ def process_book_data(raw_data: Dict, volume_number: int) -> BookInfo:
     else:
         genres = genres_raw
 
-    # Extract cover image URL if available
+    # Extract cover image URL if available from DeepSeek data
     cover_image_url = raw_data.get("cover_image_url")
+
+    # If no cover image from DeepSeek and Google Books API is available, try to fetch it
+    if not cover_image_url and google_books_api:
+        isbn = raw_data.get("isbn_13")
+        if isbn:
+            cover_image_url = google_books_api.get_cover_image_url(isbn, project_state=project_state)
 
     return BookInfo(
         series_name=series_name,
@@ -559,8 +728,9 @@ def display_text_list(books: List[BookInfo], console: Console):
     for i, book in enumerate(books, 1):
         formatted_authors = DataValidator.format_authors_list(book.authors)
 
-        # Show basic info with barcode
-        console.print(f"\n[bold]{i}. Volume {book.volume_number}: {book.book_title}[/bold]")
+        # Show basic info with barcode and cover image indicator
+        cover_indicator = " 📷" if book.cover_image_url else ""
+        console.print(f"\n[bold]{i}. Volume {book.volume_number}: {book.book_title}{cover_indicator}[/bold]")
         console.print(f"   Authors: {formatted_authors}")
         console.print(f"   Barcode: [cyan]{book.barcode}[/cyan]")
 
@@ -572,7 +742,8 @@ def display_text_list(books: List[BookInfo], console: Console):
             ("Copyright Year", book.copyright_year is not None),
             ("Description", bool(book.description)),
             ("Physical Description", bool(book.physical_description)),
-            ("Genres", bool(book.genres))
+            ("Genres", bool(book.genres)),
+            ("Cover Image", bool(book.cover_image_url))
         ]
 
         status_line = "   Fields: "
@@ -719,6 +890,10 @@ def main():
     try:
         # Initialize APIs
         deepseek_api = DeepSeekAPI()
+        google_books_api = GoogleBooksAPI()
+
+        # Prefetch cover images for cached data using keyless API
+        google_books_api.prefetch_cover_images(project_state)
 
         # Get starting barcode
         rprint("\n[bold]Barcode Configuration[/bold]")
@@ -770,10 +945,20 @@ def main():
                 for i, suggestion in enumerate(suggestions, 1):
                     # Get additional info for each suggestion
                     series_info = deepseek_api._get_series_info(suggestion)
+
+                    # Try to get cover image for series (check cache first)
+                    cover_image_url = google_books_api.get_series_cover_image(suggestion, project_state=project_state)
+
                     if series_info:
-                        rprint(f"{i}. {suggestion} - {series_info}")
+                        if cover_image_url:
+                            rprint(f"{i}. {suggestion} - {series_info} 📷")
+                        else:
+                            rprint(f"{i}. {suggestion} - {series_info}")
                     else:
-                        rprint(f"{i}. {suggestion}")
+                        if cover_image_url:
+                            rprint(f"{i}. {suggestion} 📷")
+                        else:
+                            rprint(f"{i}. {suggestion}")
 
                 rprint(f"\n{len(suggestions) + 1}. [yellow]Look Again[/yellow] - Search for more options")
                 rprint(f"{len(suggestions) + 2}. [red]Skip[/red] - Skip this series")
@@ -828,7 +1013,7 @@ def main():
 
                 book_data = deepseek_api.get_book_info(series_name, volume, project_state)
                 if book_data:
-                    book = process_book_data(book_data, volume)
+                    book = process_book_data(book_data, volume, google_books_api, project_state)
                     series_books.append(book)
 
                     # Show warnings if any

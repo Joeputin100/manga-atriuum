@@ -8,6 +8,7 @@ A Python script that helps you find manga series information by prompting for se
 - **Volume Range Support**: Search for multiple volumes at once
 - **Interactive Rich TUI**: Clickable row interface with navigation controls
 - **Comprehensive Book Data**: Includes all fields: series name, volume number, book title, authors, MSRP, ISBN-13, publisher, copyright year, description, physical description, genres
+- **Cover Image Integration**: Lazy loading of cover images using Google Books API
 - **Title Formatting**: Automatically shifts leading articles to the end ("The Last of the Mohicans" → "Last of the Mohicans, The")
 - **Author Formatting**: Formats names as "Last, First M." with comma-separation for multiple authors
 - **Advanced State Management**: Tracks API calls, caches responses, and enables session recovery
@@ -64,6 +65,7 @@ The script will:
 
 - **DeepSeek API Key**: Set `DEEPSEEK_API_KEY` in `.env` file
 - **Data Source**: Uses DeepSeek API for all book information with "grounded deep research"
+- **Cover Images**: Uses keyless Google Books API for lazy loading cover images
 
 ## Project Structure
 
