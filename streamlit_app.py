@@ -505,9 +505,6 @@ def process_series():
             st.session_state.processing_state['current_volume'] = volume
             st.session_state.processing_state['progress'] = i + 1
 
-            # Force rerun to update progress display
-            st.rerun()
-
             try:
                 book, error = future.result()
                 if book:
