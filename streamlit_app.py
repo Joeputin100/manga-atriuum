@@ -65,6 +65,8 @@ def initialize_session_state():
         st.session_state.selected_series = None
     if 'original_series_name' not in st.session_state:
         st.session_state.original_series_name = None
+    if 'start_barcode' not in st.session_state:
+        st.session_state.start_barcode = "T000001"
 
 
 def get_volume_1_isbn(series_name: str) -> Optional[str]:
