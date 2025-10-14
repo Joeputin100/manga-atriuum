@@ -163,16 +163,16 @@ def series_input_form():
     """Multi-series input form"""
     st.header("📚 Manga Series Input")
 
-    # Starting barcode - only show if not already set
-    if 'start_barcode' not in st.session_state or not st.session_state.start_barcode:
-        st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
-        start_barcode = st.text_input(
-            "Starting Barcode",
-            placeholder="Enter starting barcode",
-            help="Enter starting barcode (e.g., T000001 or MANGA001)"
-        )
-        if start_barcode:
-            st.session_state.start_barcode = start_barcode
+    # Starting barcode - always show with current value
+    st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
+    start_barcode = st.text_input(
+        "Starting Barcode",
+        value=st.session_state.start_barcode,
+        placeholder="Enter starting barcode",
+        help="Enter starting barcode (e.g., T000001 or MANGA001)"
+    )
+    if start_barcode and start_barcode != st.session_state.start_barcode:
+        st.session_state.start_barcode = start_barcode
 
     # Series input section
     st.subheader("Add Series")
