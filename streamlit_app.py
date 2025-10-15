@@ -611,14 +611,14 @@ def show_book_details_modal(book: BookInfo):
 
         if not book.cover_image_url:
 
-        with st.spinner("Fetching cover image..."):
-
-            cover_url = fetch_cover_for_book(book)
-
-            if cover_url:
-
-                book.cover_image_url = cover_url
-
+            with st.spinner("Fetching cover image..."):
+    
+                cover_url = fetch_cover_for_book(book)
+    
+                if cover_url:
+    
+                        book.cover_image_url = cover_url
+    
                 st.success("Cover image fetched!")
         if book.cover_image_url:
             try:
