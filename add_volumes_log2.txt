@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/projects/manga_lookup_tool/add_missing_volumes.py", line 17, in <module>
+    ProjectState = DeepSeekAPI.ProjectState
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'DeepSeekAPI' has no attribute 'ProjectState'

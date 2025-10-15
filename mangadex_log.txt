@@ -1,0 +1,114 @@
+Starting MangaDex cover image download...
+Found 28 series in database
+Searching MangaDex for 'Deadman Wonderland'...
+Found cover: https://uploads.mangadex.org/covers/b96e5e23-0017-4e89-a582-ddaa261bd21d/fa606719-a616-47f3-8ce8-bb31b8642242.jpg
+✓ Downloaded cover for 'Deadman Wonderland' from MangaDex
+Updated DB: Deadman Wonderland -> /images/Deadman_Wonderland_mangadex.jpg
+Searching MangaDex for 'Boruto: Naruto The Next Generation'...
+Found cover: https://uploads.mangadex.org/covers/46e530ce-0766-4cbd-b005-5e6fb0ba5e71/143198b5-58bd-49dd-b8d9-6060e8528e61.jpg
+✓ Downloaded cover for 'Boruto: Naruto The Next Generation' from MangaDex
+Updated DB: Boruto: Naruto The Next Generation -> /images/Boruto_Naruto_The_Next_Generation_mangadex.jpg
+Searching MangaDex for 'Silent Voice, A'...
+Found cover: https://uploads.mangadex.org/covers/4bde51e5-e420-45a4-98e9-7405bf2d59ff/2f8d133a-cf64-442a-9c79-cde975f6ae0c.jpg
+✓ Downloaded cover for 'Silent Voice, A' from MangaDex
+Updated DB: Silent Voice, A -> /images/Silent_Voice_A_mangadex.jpg
+Searching MangaDex for 'Show-ha Shoten'...
+Found cover: https://uploads.mangadex.org/covers/d880ae9a-f400-4ff7-9251-ba3de6bed450/93c35262-0a65-477d-9754-0c58a8616862.jpg
+✓ Downloaded cover for 'Show-ha Shoten' from MangaDex
+Updated DB: Show-ha Shoten -> /images/Show-ha_Shoten_mangadex.jpg
+Searching MangaDex for 'Black Butler'...
+Found cover: https://uploads.mangadex.org/covers/5c151924-f2b6-4d3e-8dba-3a64adc8e205/ec860254-e762-4d84-9d12-9ed1092757d9.jpg
+✓ Downloaded cover for 'Black Butler' from MangaDex
+Updated DB: Black Butler -> /images/Black_Butler_mangadex.jpg
+Searching MangaDex for 'Tokyo Ghoul'...
+Found cover: https://uploads.mangadex.org/covers/6a1d1cb1-ecd5-40d9-89ff-9d88e40b136b/040e8ae9-4ddd-49d2-8986-56782b391714.jpg
+✓ Downloaded cover for 'Tokyo Ghoul' from MangaDex
+Updated DB: Tokyo Ghoul -> /images/Tokyo_Ghoul_mangadex.jpg
+Searching MangaDex for 'Black Clover'...
+Found cover: https://uploads.mangadex.org/covers/e7eabe96-aa17-476f-b431-2497d5e9d060/4e184bfe-62d4-408d-a3fb-459420dc3714.jpg
+✓ Downloaded cover for 'Black Clover' from MangaDex
+Updated DB: Black Clover -> /images/Black_Clover_mangadex.jpg
+Searching MangaDex for 'Mob Psycho 100'...
+Found cover: https://uploads.mangadex.org/covers/a812538c-8ea0-41d6-a503-217e09e0a1a5/ab788be9-7681-49e9-ab55-aaa0bf74f6b3.png
+✓ Downloaded cover for 'Mob Psycho 100' from MangaDex
+Updated DB: Mob Psycho 100 -> /images/Mob_Psycho_100_mangadex.jpg
+Searching MangaDex for 'Assassination Classroom'...
+Found cover: https://uploads.mangadex.org/covers/333f4d22-7753-4e3b-b0da-0a69b2cdce4f/ad3292cf-416c-4d05-9e7a-78432c45fe35.jpg
+✓ Downloaded cover for 'Assassination Classroom' from MangaDex
+Updated DB: Assassination Classroom -> /images/Assassination_Classroom_mangadex.jpg
+Searching MangaDex for 'One Piece'...
+Found cover: https://uploads.mangadex.org/covers/a1c7c817-4e59-43b7-9365-09675a149a6f/2f4aca53-64c7-46ac-ae85-3bc9b3169890.png
+✓ Downloaded cover for 'One Piece' from MangaDex
+Updated DB: One Piece -> /images/One_Piece_mangadex.jpg
+Searching MangaDex for 'Haikyuu!!'...
+Found cover: https://uploads.mangadex.org/covers/c38e3024-3761-48e1-be0b-80ab91cb6d84/04ef4f27-e9b4-4b05-8af4-76552e4c0870.png
+✓ Downloaded cover for 'Haikyuu!!' from MangaDex
+Updated DB: Haikyuu!! -> /images/Haikyuu_mangadex.jpg
+Searching MangaDex for 'Attack on Titan'...
+Found cover: https://uploads.mangadex.org/covers/3897cb14-8609-408a-87fe-eeefb9072227/a640137a-bf99-4f12-922a-0fa285312245.jpg
+✓ Downloaded cover for 'Attack on Titan' from MangaDex
+Updated DB: Attack on Titan -> /images/Attack_on_Titan_mangadex.jpg
+Searching MangaDex for 'To Your Eternity'...
+Found cover: https://uploads.mangadex.org/covers/645ed5e1-9a81-4771-9088-8e8265c4bd42/39ff539d-a5eb-4fd9-96df-a3efb7e61f99.png
+✓ Downloaded cover for 'To Your Eternity' from MangaDex
+Updated DB: To Your Eternity -> /images/To_Your_Eternity_mangadex.jpg
+Searching MangaDex for 'Boruto: Two Blue Vortex'...
+Found cover: https://uploads.mangadex.org/covers/0b094aab-0cfb-4837-a49b-7267bdb86bec/e5d8ba4b-917b-4b9a-9e40-706076ce874c.jpg
+✓ Downloaded cover for 'Boruto: Two Blue Vortex' from MangaDex
+Updated DB: Boruto: Two Blue Vortex -> /images/Boruto_Two_Blue_Vortex_mangadex.jpg
+Searching MangaDex for 'Tokyo Ghoul:re'...
+Found cover: https://uploads.mangadex.org/covers/59f47645-66a9-443e-8228-788313c3ae3c/c41d1081-cdb2-4c90-8028-61844823515b.jpg
+✓ Downloaded cover for 'Tokyo Ghoul:re' from MangaDex
+Updated DB: Tokyo Ghoul:re -> /images/Tokyo_Ghoulre_mangadex.jpg
+Searching MangaDex for 'Boruto: Naruto Next Generations'...
+Found cover: https://uploads.mangadex.org/covers/46e530ce-0766-4cbd-b005-5e6fb0ba5e71/143198b5-58bd-49dd-b8d9-6060e8528e61.jpg
+✓ Downloaded cover for 'Boruto: Naruto Next Generations' from MangaDex
+Updated DB: Boruto: Naruto Next Generations -> /images/Boruto_Naruto_Next_Generations_mangadex.jpg
+Searching MangaDex for 'Attack on Titan: Before the Fall'...
+Found cover: https://uploads.mangadex.org/covers/d5a3d9cb-b1ad-4ba1-9a92-a7569cb600f2/9c7e0258-2f56-4431-9ce0-da4e10d53d1a.jpg
+✓ Downloaded cover for 'Attack on Titan: Before the Fall' from MangaDex
+Updated DB: Attack on Titan: Before the Fall -> /images/Attack_on_Titan_Before_the_Fall_mangadex.jpg
+Searching MangaDex for 'Akira'...
+Found cover: https://uploads.mangadex.org/covers/f5c25341-d6ff-4585-8548-3a48fc7654d9/438d03b1-6c51-4917-af6c-149da41d6e1c.jpg
+✓ Downloaded cover for 'Akira' from MangaDex
+Updated DB: Akira -> /images/Akira_mangadex.jpg
+Searching MangaDex for 'Show-ha Shoten!'...
+Found cover: https://uploads.mangadex.org/covers/d880ae9a-f400-4ff7-9251-ba3de6bed450/93c35262-0a65-477d-9754-0c58a8616862.jpg
+✓ Downloaded cover for 'Show-ha Shoten!' from MangaDex
+Updated DB: Show-ha Shoten! -> /images/Show-ha_Shoten_mangadex.jpg
+Searching MangaDex for 'Naruto'...
+Found cover: https://uploads.mangadex.org/covers/6b1eb93e-473a-4ab3-9922-1a66d2a29a4a/bb223226-a5ca-457b-8a10-ad3ecaea66be.jpg
+✓ Downloaded cover for 'Naruto' from MangaDex
+Updated DB: Naruto -> /images/Naruto_mangadex.jpg
+Searching MangaDex for 'Noragami: Stray God'...
+Found cover: https://uploads.mangadex.org/covers/e5ce88e2-8c46-482d-8acf-5c6d5a64a585/d8009398-6a12-473f-9af9-541b5eef50b6.jpg
+✓ Downloaded cover for 'Noragami: Stray God' from MangaDex
+Updated DB: Noragami: Stray God -> /images/Noragami_Stray_God_mangadex.jpg
+Searching MangaDex for 'Death Note'...
+Found cover: https://uploads.mangadex.org/covers/75ee72ab-c6bf-4b87-badd-de839156934c/d6555598-8202-477d-acde-303202cb3475.jpg
+✓ Downloaded cover for 'Death Note' from MangaDex
+Updated DB: Death Note -> /images/Death_Note_mangadex.jpg
+Searching MangaDex for 'Blue Exorcist'...
+Found cover: https://uploads.mangadex.org/covers/3ee952f1-45c7-4c39-aea2-7df7676606d4/a934d746-c570-4311-a891-848697dd3f60.jpg
+✓ Downloaded cover for 'Blue Exorcist' from MangaDex
+Updated DB: Blue Exorcist -> /images/Blue_Exorcist_mangadex.jpg
+Searching MangaDex for 'Cells At Work'...
+Found cover: https://uploads.mangadex.org/covers/768cded0-80ac-4c0d-b29b-cc28fc224d70/f80b97ac-e27e-47e1-b4f6-4d4f510ef833.jpg
+✓ Downloaded cover for 'Cells At Work' from MangaDex
+Updated DB: Cells At Work -> /images/Cells_At_Work_mangadex.jpg
+Searching MangaDex for 'Barefoot Gen: A Cartoon Story of Hiroshima'...
+✗ No results found for 'Barefoot Gen: A Cartoon Story of Hiroshima'
+Searching MangaDex for 'Golden Kamuy'...
+Found cover: https://uploads.mangadex.org/covers/738c875c-1a67-4365-862f-50ade14f8133/b3e7e375-ad72-4c7e-9ed0-80546356d68b.jpg
+✓ Downloaded cover for 'Golden Kamuy' from MangaDex
+Updated DB: Golden Kamuy -> /images/Golden_Kamuy_mangadex.jpg
+Searching MangaDex for 'One Punch Man'...
+Found cover: https://uploads.mangadex.org/covers/d8a959f7-648e-4c8d-8f23-f1f3f8e129f3/a93c2126-b728-458e-811c-e6ce2d30865e.jpg
+✓ Downloaded cover for 'One Punch Man' from MangaDex
+Updated DB: One Punch Man -> /images/One_Punch_Man_mangadex.jpg
+Searching MangaDex for 'Bleach'...
+Found cover: https://uploads.mangadex.org/covers/a460ab18-22c1-47eb-a08a-9ee85fe37ec8/7c8f9203-2b82-41f2-beb3-e7fb00e151e2.jpg
+✓ Downloaded cover for 'Bleach' from MangaDex
+Updated DB: Bleach -> /images/Bleach_mangadex.jpg
+
+Completed! Downloaded covers for 27/28 series

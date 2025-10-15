@@ -1,0 +1,1358 @@
+🔍 Analyzing current volume coverage...
+Found 28 series with existing volumes
+Found 398 missing volumes across 24 series
+
+📚 Processing Boruto: Naruto Next Generations - 8 missing volumes
+  Fetching Boruto: Naruto Next Generations Volume 11...
+🔍 Making API call for volume 11
+Error fetching data for volume 11: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Boruto: Naruto Next Generations Vol. 11
+  Fetching Boruto: Naruto Next Generations Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added Boruto: Naruto Next Generations Vol. 12
+  Fetching Boruto: Naruto Next Generations Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added Boruto: Naruto Next Generations Vol. 13
+  Fetching Boruto: Naruto Next Generations Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added Boruto: Naruto Next Generations Vol. 14
+  Fetching Boruto: Naruto Next Generations Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added Boruto: Naruto Next Generations Vol. 15
+  Fetching Boruto: Naruto Next Generations Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added Boruto: Naruto Next Generations Vol. 16
+  Fetching Boruto: Naruto Next Generations Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added Boruto: Naruto Next Generations Vol. 17
+  Fetching Boruto: Naruto Next Generations Volume 18...
+🔍 Making API call for volume 18
+Error fetching data for volume 18: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Boruto: Naruto Next Generations Vol. 18
+
+📚 Processing Assassination Classroom - 11 missing volumes
+  Fetching Assassination Classroom Volume 11...
+🔍 Making API call for volume 11
+    ✓ Added Assassination Classroom Vol. 11
+  Fetching Assassination Classroom Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added Assassination Classroom Vol. 12
+  Fetching Assassination Classroom Volume 13...
+🔍 Making API call for volume 13
+    ✓ Added Assassination Classroom Vol. 13
+  Fetching Assassination Classroom Volume 14...
+🔍 Making API call for volume 14
+    ✓ Added Assassination Classroom Vol. 14
+  Fetching Assassination Classroom Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added Assassination Classroom Vol. 15
+  Fetching Assassination Classroom Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added Assassination Classroom Vol. 16
+  Fetching Assassination Classroom Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added Assassination Classroom Vol. 17
+  Fetching Assassination Classroom Volume 18...
+📚 Using cached data for volume 18
+    ✓ Added Assassination Classroom Vol. 18
+  Fetching Assassination Classroom Volume 19...
+📚 Using cached data for volume 19
+    ✓ Added Assassination Classroom Vol. 19
+  Fetching Assassination Classroom Volume 20...
+📚 Using cached data for volume 20
+    ✓ Added Assassination Classroom Vol. 20
+  Fetching Assassination Classroom Volume 21...
+📚 Using cached data for volume 21
+    ✓ Added Assassination Classroom Vol. 21
+
+📚 Processing Death Note - 8 missing volumes
+  Fetching Death Note Volume 6...
+📚 Using cached data for volume 6
+    ✓ Added Death Note Vol. 6
+  Fetching Death Note Volume 7...
+📚 Using cached data for volume 7
+    ✓ Added Death Note Vol. 7
+  Fetching Death Note Volume 8...
+📚 Using cached data for volume 8
+    ✓ Added Death Note Vol. 8
+  Fetching Death Note Volume 9...
+📚 Using cached data for volume 9
+    ✓ Added Death Note Vol. 9
+  Fetching Death Note Volume 10...
+📚 Using cached data for volume 10
+    ✓ Added Death Note Vol. 10
+  Fetching Death Note Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added Death Note Vol. 11
+  Fetching Death Note Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added Death Note Vol. 12
+  Fetching Death Note Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added Death Note Vol. 13
+
+📚 Processing Naruto - 20 missing volumes
+  Fetching Naruto Volume 49...
+📚 Using cached data for volume 49
+    ✓ Added Naruto Vol. 49
+  Fetching Naruto Volume 50...
+📚 Using cached data for volume 50
+    ✓ Added Naruto Vol. 50
+  Fetching Naruto Volume 51...
+📚 Using cached data for volume 51
+    ✓ Added Naruto Vol. 51
+  Fetching Naruto Volume 52...
+📚 Using cached data for volume 52
+    ✓ Added Naruto Vol. 52
+  Fetching Naruto Volume 53...
+📚 Using cached data for volume 53
+    ✓ Added Naruto Vol. 53
+  Fetching Naruto Volume 54...
+📚 Using cached data for volume 54
+    ✓ Added Naruto Vol. 54
+  Fetching Naruto Volume 55...
+📚 Using cached data for volume 55
+    ✓ Added Naruto Vol. 55
+  Fetching Naruto Volume 56...
+📚 Using cached data for volume 56
+    ✓ Added Naruto Vol. 56
+  Fetching Naruto Volume 57...
+📚 Using cached data for volume 57
+    ✓ Added Naruto Vol. 57
+  Fetching Naruto Volume 58...
+📚 Using cached data for volume 58
+    ✓ Added Naruto Vol. 58
+  Fetching Naruto Volume 59...
+🔍 Making API call for volume 59
+Error fetching data for volume 59: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Naruto Vol. 59
+  Fetching Naruto Volume 60...
+🔍 Making API call for volume 60
+Error fetching data for volume 60: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Naruto Vol. 60
+  Fetching Naruto Volume 61...
+🔍 Making API call for volume 61
+    ✓ Added Naruto Vol. 61
+  Fetching Naruto Volume 62...
+📚 Using cached data for volume 62
+    ✓ Added Naruto Vol. 62
+  Fetching Naruto Volume 63...
+📚 Using cached data for volume 63
+    ✓ Added Naruto Vol. 63
+  Fetching Naruto Volume 64...
+📚 Using cached data for volume 64
+    ✓ Added Naruto Vol. 64
+  Fetching Naruto Volume 65...
+📚 Using cached data for volume 65
+    ✓ Added Naruto Vol. 65
+  Fetching Naruto Volume 66...
+🔍 Making API call for volume 66
+Error fetching data for volume 66: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Naruto Vol. 66
+  Fetching Naruto Volume 67...
+🔍 Making API call for volume 67
+    ✓ Added Naruto Vol. 67
+  Fetching Naruto Volume 68...
+🔍 Making API call for volume 68
+    ✓ Added Naruto Vol. 68
+
+📚 Processing Cells At Work - 3 missing volumes
+  Fetching Cells At Work Volume 6...
+🔍 Making API call for volume 6
+    ✓ Added Cells At Work Vol. 6
+  Fetching Cells At Work Volume 7...
+📚 Using cached data for volume 7
+    ✓ Added Cells At Work Vol. 7
+  Fetching Cells At Work Volume 8...
+🔍 Making API call for volume 8
+Error fetching data for volume 8: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Cells At Work Vol. 8
+
+📚 Processing One Piece - 97 missing volumes
+  Fetching One Piece Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added One Piece Vol. 11
+  Fetching One Piece Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added One Piece Vol. 12
+  Fetching One Piece Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added One Piece Vol. 13
+  Fetching One Piece Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added One Piece Vol. 14
+  Fetching One Piece Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added One Piece Vol. 15
+  Fetching One Piece Volume 16...
+🔍 Making API call for volume 16
+    ✓ Added One Piece Vol. 16
+  Fetching One Piece Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added One Piece Vol. 17
+  Fetching One Piece Volume 18...
+📚 Using cached data for volume 18
+    ✓ Added One Piece Vol. 18
+  Fetching One Piece Volume 19...
+📚 Using cached data for volume 19
+    ✓ Added One Piece Vol. 19
+  Fetching One Piece Volume 20...
+📚 Using cached data for volume 20
+    ✓ Added One Piece Vol. 20
+  Fetching One Piece Volume 21...
+📚 Using cached data for volume 21
+    ✓ Added One Piece Vol. 21
+  Fetching One Piece Volume 22...
+🔍 Making API call for volume 22
+    ✓ Added One Piece Vol. 22
+  Fetching One Piece Volume 23...
+🔍 Making API call for volume 23
+    ✓ Added One Piece Vol. 23
+  Fetching One Piece Volume 24...
+🔍 Making API call for volume 24
+    ✓ Added One Piece Vol. 24
+  Fetching One Piece Volume 25...
+🔍 Making API call for volume 25
+    ✓ Added One Piece Vol. 25
+  Fetching One Piece Volume 26...
+📚 Using cached data for volume 26
+    ✓ Added One Piece Vol. 26
+  Fetching One Piece Volume 27...
+📚 Using cached data for volume 27
+    ✓ Added One Piece Vol. 27
+  Fetching One Piece Volume 28...
+📚 Using cached data for volume 28
+    ✓ Added One Piece Vol. 28
+  Fetching One Piece Volume 29...
+🔍 Making API call for volume 29
+    ✓ Added One Piece Vol. 29
+  Fetching One Piece Volume 30...
+📚 Using cached data for volume 30
+    ✓ Added One Piece Vol. 30
+  Fetching One Piece Volume 31...
+📚 Using cached data for volume 31
+    ✓ Added One Piece Vol. 31
+  Fetching One Piece Volume 32...
+📚 Using cached data for volume 32
+    ✓ Added One Piece Vol. 32
+  Fetching One Piece Volume 33...
+📚 Using cached data for volume 33
+    ✓ Added One Piece Vol. 33
+  Fetching One Piece Volume 34...
+📚 Using cached data for volume 34
+    ✓ Added One Piece Vol. 34
+  Fetching One Piece Volume 35...
+📚 Using cached data for volume 35
+    ✓ Added One Piece Vol. 35
+  Fetching One Piece Volume 36...
+📚 Using cached data for volume 36
+    ✓ Added One Piece Vol. 36
+  Fetching One Piece Volume 37...
+📚 Using cached data for volume 37
+    ✓ Added One Piece Vol. 37
+  Fetching One Piece Volume 38...
+📚 Using cached data for volume 38
+    ✓ Added One Piece Vol. 38
+  Fetching One Piece Volume 39...
+📚 Using cached data for volume 39
+    ✓ Added One Piece Vol. 39
+  Fetching One Piece Volume 40...
+📚 Using cached data for volume 40
+    ✓ Added One Piece Vol. 40
+  Fetching One Piece Volume 41...
+📚 Using cached data for volume 41
+    ✓ Added One Piece Vol. 41
+  Fetching One Piece Volume 42...
+📚 Using cached data for volume 42
+    ✓ Added One Piece Vol. 42
+  Fetching One Piece Volume 43...
+📚 Using cached data for volume 43
+    ✓ Added One Piece Vol. 43
+  Fetching One Piece Volume 44...
+📚 Using cached data for volume 44
+    ✓ Added One Piece Vol. 44
+  Fetching One Piece Volume 45...
+📚 Using cached data for volume 45
+    ✓ Added One Piece Vol. 45
+  Fetching One Piece Volume 46...
+📚 Using cached data for volume 46
+    ✓ Added One Piece Vol. 46
+  Fetching One Piece Volume 47...
+📚 Using cached data for volume 47
+    ✓ Added One Piece Vol. 47
+  Fetching One Piece Volume 48...
+📚 Using cached data for volume 48
+    ✓ Added One Piece Vol. 48
+  Fetching One Piece Volume 49...
+📚 Using cached data for volume 49
+    ✓ Added One Piece Vol. 49
+  Fetching One Piece Volume 50...
+📚 Using cached data for volume 50
+    ✓ Added One Piece Vol. 50
+  Fetching One Piece Volume 51...
+🔍 Making API call for volume 51
+    ✓ Added One Piece Vol. 51
+  Fetching One Piece Volume 52...
+🔍 Making API call for volume 52
+    ✓ Added One Piece Vol. 52
+  Fetching One Piece Volume 53...
+📚 Using cached data for volume 53
+    ✓ Added One Piece Vol. 53
+  Fetching One Piece Volume 54...
+📚 Using cached data for volume 54
+    ✓ Added One Piece Vol. 54
+  Fetching One Piece Volume 55...
+🔍 Making API call for volume 55
+    ✓ Added One Piece Vol. 55
+  Fetching One Piece Volume 56...
+📚 Using cached data for volume 56
+    ✓ Added One Piece Vol. 56
+  Fetching One Piece Volume 57...
+📚 Using cached data for volume 57
+    ✓ Added One Piece Vol. 57
+  Fetching One Piece Volume 58...
+🔍 Making API call for volume 58
+Error fetching data for volume 58: Expecting ',' delimiter: line 4 column 43 
+(char 97)
+    ✗ Failed to fetch One Piece Vol. 58
+  Fetching One Piece Volume 59...
+📚 Using cached data for volume 59
+    ✓ Added One Piece Vol. 59
+  Fetching One Piece Volume 60...
+📚 Using cached data for volume 60
+    ✓ Added One Piece Vol. 60
+  Fetching One Piece Volume 61...
+📚 Using cached data for volume 61
+    ✓ Added One Piece Vol. 61
+  Fetching One Piece Volume 62...
+📚 Using cached data for volume 62
+    ✓ Added One Piece Vol. 62
+  Fetching One Piece Volume 63...
+📚 Using cached data for volume 63
+    ✓ Added One Piece Vol. 63
+  Fetching One Piece Volume 64...
+📚 Using cached data for volume 64
+    ✓ Added One Piece Vol. 64
+  Fetching One Piece Volume 65...
+📚 Using cached data for volume 65
+    ✓ Added One Piece Vol. 65
+  Fetching One Piece Volume 66...
+🔍 Making API call for volume 66
+    ✓ Added One Piece Vol. 66
+  Fetching One Piece Volume 67...
+🔍 Making API call for volume 67
+    ✓ Added One Piece Vol. 67
+  Fetching One Piece Volume 68...
+🔍 Making API call for volume 68
+    ✓ Added One Piece Vol. 68
+  Fetching One Piece Volume 69...
+📚 Using cached data for volume 69
+    ✓ Added One Piece Vol. 69
+  Fetching One Piece Volume 70...
+🔍 Making API call for volume 70
+    ✓ Added One Piece Vol. 70
+  Fetching One Piece Volume 71...
+🔍 Making API call for volume 71
+    ✓ Added One Piece Vol. 71
+  Fetching One Piece Volume 72...
+📚 Using cached data for volume 72
+    ✓ Added One Piece Vol. 72
+  Fetching One Piece Volume 73...
+📚 Using cached data for volume 73
+    ✓ Added One Piece Vol. 73
+  Fetching One Piece Volume 74...
+📚 Using cached data for volume 74
+    ✓ Added One Piece Vol. 74
+  Fetching One Piece Volume 75...
+📚 Using cached data for volume 75
+    ✓ Added One Piece Vol. 75
+  Fetching One Piece Volume 76...
+📚 Using cached data for volume 76
+    ✓ Added One Piece Vol. 76
+  Fetching One Piece Volume 77...
+🔍 Making API call for volume 77
+    ✓ Added One Piece Vol. 77
+  Fetching One Piece Volume 78...
+📚 Using cached data for volume 78
+    ✓ Added One Piece Vol. 78
+  Fetching One Piece Volume 79...
+📚 Using cached data for volume 79
+    ✓ Added One Piece Vol. 79
+  Fetching One Piece Volume 80...
+🔍 Making API call for volume 80
+    ✓ Added One Piece Vol. 80
+  Fetching One Piece Volume 81...
+📚 Using cached data for volume 81
+    ✓ Added One Piece Vol. 81
+  Fetching One Piece Volume 82...
+🔍 Making API call for volume 82
+    ✓ Added One Piece Vol. 82
+  Fetching One Piece Volume 83...
+🔍 Making API call for volume 83
+    ✓ Added One Piece Vol. 83
+  Fetching One Piece Volume 84...
+🔍 Making API call for volume 84
+    ✓ Added One Piece Vol. 84
+  Fetching One Piece Volume 85...
+📚 Using cached data for volume 85
+    ✓ Added One Piece Vol. 85
+  Fetching One Piece Volume 86...
+📚 Using cached data for volume 86
+    ✓ Added One Piece Vol. 86
+  Fetching One Piece Volume 87...
+🔍 Making API call for volume 87
+    ✓ Added One Piece Vol. 87
+  Fetching One Piece Volume 88...
+🔍 Making API call for volume 88
+    ✓ Added One Piece Vol. 88
+  Fetching One Piece Volume 89...
+📚 Using cached data for volume 89
+    ✓ Added One Piece Vol. 89
+  Fetching One Piece Volume 90...
+📚 Using cached data for volume 90
+    ✓ Added One Piece Vol. 90
+  Fetching One Piece Volume 91...
+📚 Using cached data for volume 91
+    ✓ Added One Piece Vol. 91
+  Fetching One Piece Volume 92...
+🔍 Making API call for volume 92
+    ✓ Added One Piece Vol. 92
+  Fetching One Piece Volume 93...
+📚 Using cached data for volume 93
+    ✓ Added One Piece Vol. 93
+  Fetching One Piece Volume 94...
+📚 Using cached data for volume 94
+    ✓ Added One Piece Vol. 94
+  Fetching One Piece Volume 95...
+🔍 Making API call for volume 95
+    ✓ Added One Piece Vol. 95
+  Fetching One Piece Volume 96...
+🔍 Making API call for volume 96
+    ✓ Added One Piece Vol. 96
+  Fetching One Piece Volume 97...
+📚 Using cached data for volume 97
+    ✓ Added One Piece Vol. 97
+  Fetching One Piece Volume 98...
+📚 Using cached data for volume 98
+    ✓ Added One Piece Vol. 98
+  Fetching One Piece Volume 99...
+🔍 Making API call for volume 99
+    ✓ Added One Piece Vol. 99
+  Fetching One Piece Volume 103...
+🔍 Making API call for volume 103
+    ✓ Added One Piece Vol. 103
+  Fetching One Piece Volume 104...
+📚 Using cached data for volume 104
+    ✓ Added One Piece Vol. 104
+  Fetching One Piece Volume 105...
+📚 Using cached data for volume 105
+    ✓ Added One Piece Vol. 105
+  Fetching One Piece Volume 106...
+📚 Using cached data for volume 106
+    ✓ Added One Piece Vol. 106
+  Fetching One Piece Volume 107...
+📚 Using cached data for volume 107
+    ✓ Added One Piece Vol. 107
+  Fetching One Piece Volume 108...
+📚 Using cached data for volume 108
+    ✓ Added One Piece Vol. 108
+  Fetching One Piece Volume 109...
+📚 Using cached data for volume 109
+    ✓ Added One Piece Vol. 109
+  Fetching One Piece Volume 110...
+🔍 Making API call for volume 110
+Error fetching data for volume 110: Expecting value: line 1 column 1 (char 0)
+    ✗ Failed to fetch One Piece Vol. 110
+
+📚 Processing Barefoot Gen: A Cartoon Story of Hiroshima - 9 missing volumes
+  Fetching Barefoot Gen: A Cartoon Story of Hiroshima Volume 1...
+📚 Using cached data for volume 1
+    ✓ Added Barefoot Gen: A Cartoon Story of Hiroshima Vol. 1
+  Fetching Barefoot Gen: A Cartoon Story of Hiroshima Volume 2...
+📚 Using cached data for volume 2
+    ✓ Added Barefoot Gen: A Cartoon Story of Hiroshima Vol. 2
+  Fetching Barefoot Gen: A Cartoon Story of Hiroshima Volume 3...
+📚 Using cached data for volume 3
+    ✓ Added Barefoot Gen: A Cartoon Story of Hiroshima Vol. 3
+  Fetching Barefoot Gen: A Cartoon Story of Hiroshima Volume 4...
+📚 Using cached data for volume 4
+    ✓ Added Barefoot Gen: A Cartoon Story of Hiroshima Vol. 4
+  Fetching Barefoot Gen: A Cartoon Story of Hiroshima Volume 5...
+📚 Using cached data for volume 5
+    ✓ Added Barefoot Gen: A Cartoon Story of Hiroshima Vol. 5
+  Fetching Barefoot Gen: A Cartoon Story of Hiroshima Volume 6...
+📚 Using cached data for volume 6
+    ✓ Added Barefoot Gen: A Cartoon Story of Hiroshima Vol. 6
+  Fetching Barefoot Gen: A Cartoon Story of Hiroshima Volume 7...
+📚 Using cached data for volume 7
+    ✓ Added Barefoot Gen: A Cartoon Story of Hiroshima Vol. 7
+  Fetching Barefoot Gen: A Cartoon Story of Hiroshima Volume 8...
+📚 Using cached data for volume 8
+    ✓ Added Barefoot Gen: A Cartoon Story of Hiroshima Vol. 8
+  Fetching Barefoot Gen: A Cartoon Story of Hiroshima Volume 9...
+📚 Using cached data for volume 9
+    ✓ Added Barefoot Gen: A Cartoon Story of Hiroshima Vol. 9
+
+📚 Processing Boruto: Naruto The Next Generation - 8 missing volumes
+  Fetching Boruto: Naruto The Next Generation Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added Boruto: Naruto The Next Generation Vol. 11
+  Fetching Boruto: Naruto The Next Generation Volume 12...
+🔍 Making API call for volume 12
+    ✓ Added Boruto: Naruto The Next Generation Vol. 12
+  Fetching Boruto: Naruto The Next Generation Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added Boruto: Naruto The Next Generation Vol. 13
+  Fetching Boruto: Naruto The Next Generation Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added Boruto: Naruto The Next Generation Vol. 14
+  Fetching Boruto: Naruto The Next Generation Volume 15...
+🔍 Making API call for volume 15
+    ✓ Added Boruto: Naruto The Next Generation Vol. 15
+  Fetching Boruto: Naruto The Next Generation Volume 16...
+🔍 Making API call for volume 16
+Error fetching data for volume 16: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Boruto: Naruto The Next Generation Vol. 16
+  Fetching Boruto: Naruto The Next Generation Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added Boruto: Naruto The Next Generation Vol. 17
+  Fetching Boruto: Naruto The Next Generation Volume 18...
+🔍 Making API call for volume 18
+    ✓ Added Boruto: Naruto The Next Generation Vol. 18
+
+📚 Processing Bleach - 20 missing volumes
+  Fetching Bleach Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added Bleach Vol. 11
+  Fetching Bleach Volume 12...
+🔍 Making API call for volume 12
+Error fetching data for volume 12: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Bleach Vol. 12
+  Fetching Bleach Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added Bleach Vol. 13
+  Fetching Bleach Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added Bleach Vol. 14
+  Fetching Bleach Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added Bleach Vol. 15
+  Fetching Bleach Volume 16...
+🔍 Making API call for volume 16
+    ✓ Added Bleach Vol. 16
+  Fetching Bleach Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added Bleach Vol. 17
+  Fetching Bleach Volume 18...
+📚 Using cached data for volume 18
+    ✓ Added Bleach Vol. 18
+  Fetching Bleach Volume 19...
+📚 Using cached data for volume 19
+    ✓ Added Bleach Vol. 19
+  Fetching Bleach Volume 20...
+📚 Using cached data for volume 20
+    ✓ Added Bleach Vol. 20
+  Fetching Bleach Volume 21...
+🔍 Making API call for volume 21
+    ✓ Added Bleach Vol. 21
+  Fetching Bleach Volume 22...
+🔍 Making API call for volume 22
+    ✓ Added Bleach Vol. 22
+  Fetching Bleach Volume 23...
+🔍 Making API call for volume 23
+Error fetching data for volume 23: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Bleach Vol. 23
+  Fetching Bleach Volume 24...
+📚 Using cached data for volume 24
+    ✓ Added Bleach Vol. 24
+  Fetching Bleach Volume 25...
+📚 Using cached data for volume 25
+    ✓ Added Bleach Vol. 25
+  Fetching Bleach Volume 26...
+📚 Using cached data for volume 26
+    ✓ Added Bleach Vol. 26
+  Fetching Bleach Volume 27...
+📚 Using cached data for volume 27
+    ✓ Added Bleach Vol. 27
+  Fetching Bleach Volume 28...
+📚 Using cached data for volume 28
+    ✓ Added Bleach Vol. 28
+  Fetching Bleach Volume 29...
+📚 Using cached data for volume 29
+    ✓ Added Bleach Vol. 29
+  Fetching Bleach Volume 30...
+📚 Using cached data for volume 30
+    ✓ Added Bleach Vol. 30
+
+📚 Processing Black Clover - 23 missing volumes
+  Fetching Black Clover Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added Black Clover Vol. 11
+  Fetching Black Clover Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added Black Clover Vol. 12
+  Fetching Black Clover Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added Black Clover Vol. 13
+  Fetching Black Clover Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added Black Clover Vol. 14
+  Fetching Black Clover Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added Black Clover Vol. 15
+  Fetching Black Clover Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added Black Clover Vol. 16
+  Fetching Black Clover Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added Black Clover Vol. 17
+  Fetching Black Clover Volume 18...
+📚 Using cached data for volume 18
+    ✓ Added Black Clover Vol. 18
+  Fetching Black Clover Volume 19...
+📚 Using cached data for volume 19
+    ✓ Added Black Clover Vol. 19
+  Fetching Black Clover Volume 20...
+📚 Using cached data for volume 20
+    ✓ Added Black Clover Vol. 20
+  Fetching Black Clover Volume 21...
+📚 Using cached data for volume 21
+    ✓ Added Black Clover Vol. 21
+  Fetching Black Clover Volume 22...
+📚 Using cached data for volume 22
+    ✓ Added Black Clover Vol. 22
+  Fetching Black Clover Volume 23...
+📚 Using cached data for volume 23
+    ✓ Added Black Clover Vol. 23
+  Fetching Black Clover Volume 24...
+📚 Using cached data for volume 24
+    ✓ Added Black Clover Vol. 24
+  Fetching Black Clover Volume 25...
+📚 Using cached data for volume 25
+    ✓ Added Black Clover Vol. 25
+  Fetching Black Clover Volume 26...
+📚 Using cached data for volume 26
+    ✓ Added Black Clover Vol. 26
+  Fetching Black Clover Volume 27...
+📚 Using cached data for volume 27
+    ✓ Added Black Clover Vol. 27
+  Fetching Black Clover Volume 28...
+📚 Using cached data for volume 28
+    ✓ Added Black Clover Vol. 28
+  Fetching Black Clover Volume 29...
+📚 Using cached data for volume 29
+    ✓ Added Black Clover Vol. 29
+  Fetching Black Clover Volume 30...
+📚 Using cached data for volume 30
+    ✓ Added Black Clover Vol. 30
+  Fetching Black Clover Volume 31...
+📚 Using cached data for volume 31
+    ✓ Added Black Clover Vol. 31
+  Fetching Black Clover Volume 32...
+📚 Using cached data for volume 32
+    ✓ Added Black Clover Vol. 32
+  Fetching Black Clover Volume 33...
+📚 Using cached data for volume 33
+    ✓ Added Black Clover Vol. 33
+
+📚 Processing Akira - 4 missing volumes
+  Fetching Akira Volume 3...
+📚 Using cached data for volume 3
+    ✓ Added Akira Vol. 3
+  Fetching Akira Volume 4...
+📚 Using cached data for volume 4
+    ✓ Added Akira Vol. 4
+  Fetching Akira Volume 5...
+📚 Using cached data for volume 5
+    ✓ Added Akira Vol. 5
+  Fetching Akira Volume 6...
+📚 Using cached data for volume 6
+    ✓ Added Akira Vol. 6
+
+📚 Processing Noragami: Stray God - 17 missing volumes
+  Fetching Noragami: Stray God Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added Noragami: Stray God Vol. 11
+  Fetching Noragami: Stray God Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added Noragami: Stray God Vol. 12
+  Fetching Noragami: Stray God Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added Noragami: Stray God Vol. 13
+  Fetching Noragami: Stray God Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added Noragami: Stray God Vol. 14
+  Fetching Noragami: Stray God Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added Noragami: Stray God Vol. 15
+  Fetching Noragami: Stray God Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added Noragami: Stray God Vol. 16
+  Fetching Noragami: Stray God Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added Noragami: Stray God Vol. 17
+  Fetching Noragami: Stray God Volume 18...
+📚 Using cached data for volume 18
+    ✓ Added Noragami: Stray God Vol. 18
+  Fetching Noragami: Stray God Volume 19...
+📚 Using cached data for volume 19
+    ✓ Added Noragami: Stray God Vol. 19
+  Fetching Noragami: Stray God Volume 20...
+📚 Using cached data for volume 20
+    ✓ Added Noragami: Stray God Vol. 20
+  Fetching Noragami: Stray God Volume 21...
+📚 Using cached data for volume 21
+    ✓ Added Noragami: Stray God Vol. 21
+  Fetching Noragami: Stray God Volume 22...
+📚 Using cached data for volume 22
+    ✓ Added Noragami: Stray God Vol. 22
+  Fetching Noragami: Stray God Volume 23...
+🔍 Making API call for volume 23
+Error fetching data for volume 23: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Noragami: Stray God Vol. 23
+  Fetching Noragami: Stray God Volume 24...
+📚 Using cached data for volume 24
+    ✓ Added Noragami: Stray God Vol. 24
+  Fetching Noragami: Stray God Volume 25...
+📚 Using cached data for volume 25
+    ✓ Added Noragami: Stray God Vol. 25
+  Fetching Noragami: Stray God Volume 26...
+📚 Using cached data for volume 26
+    ✓ Added Noragami: Stray God Vol. 26
+  Fetching Noragami: Stray God Volume 27...
+🔍 Making API call for volume 27
+Error fetching data for volume 27: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Noragami: Stray God Vol. 27
+
+📚 Processing To Your Eternity - 8 missing volumes
+  Fetching To Your Eternity Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added To Your Eternity Vol. 11
+  Fetching To Your Eternity Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added To Your Eternity Vol. 12
+  Fetching To Your Eternity Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added To Your Eternity Vol. 13
+  Fetching To Your Eternity Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added To Your Eternity Vol. 14
+  Fetching To Your Eternity Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added To Your Eternity Vol. 15
+  Fetching To Your Eternity Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added To Your Eternity Vol. 16
+  Fetching To Your Eternity Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added To Your Eternity Vol. 17
+  Fetching To Your Eternity Volume 18...
+📚 Using cached data for volume 18
+    ✓ Added To Your Eternity Vol. 18
+
+📚 Processing Golden Kamuy - 21 missing volumes
+  Fetching Golden Kamuy Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added Golden Kamuy Vol. 11
+  Fetching Golden Kamuy Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added Golden Kamuy Vol. 12
+  Fetching Golden Kamuy Volume 13...
+🔍 Making API call for volume 13
+    ✓ Added Golden Kamuy Vol. 13
+  Fetching Golden Kamuy Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added Golden Kamuy Vol. 14
+  Fetching Golden Kamuy Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added Golden Kamuy Vol. 15
+  Fetching Golden Kamuy Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added Golden Kamuy Vol. 16
+  Fetching Golden Kamuy Volume 17...
+🔍 Making API call for volume 17
+    ✓ Added Golden Kamuy Vol. 17
+  Fetching Golden Kamuy Volume 18...
+📚 Using cached data for volume 18
+    ✓ Added Golden Kamuy Vol. 18
+  Fetching Golden Kamuy Volume 19...
+📚 Using cached data for volume 19
+    ✓ Added Golden Kamuy Vol. 19
+  Fetching Golden Kamuy Volume 20...
+📚 Using cached data for volume 20
+    ✓ Added Golden Kamuy Vol. 20
+  Fetching Golden Kamuy Volume 21...
+📚 Using cached data for volume 21
+    ✓ Added Golden Kamuy Vol. 21
+  Fetching Golden Kamuy Volume 22...
+📚 Using cached data for volume 22
+    ✓ Added Golden Kamuy Vol. 22
+  Fetching Golden Kamuy Volume 23...
+📚 Using cached data for volume 23
+    ✓ Added Golden Kamuy Vol. 23
+  Fetching Golden Kamuy Volume 24...
+📚 Using cached data for volume 24
+    ✓ Added Golden Kamuy Vol. 24
+  Fetching Golden Kamuy Volume 25...
+📚 Using cached data for volume 25
+    ✓ Added Golden Kamuy Vol. 25
+  Fetching Golden Kamuy Volume 26...
+📚 Using cached data for volume 26
+    ✓ Added Golden Kamuy Vol. 26
+  Fetching Golden Kamuy Volume 27...
+📚 Using cached data for volume 27
+    ✓ Added Golden Kamuy Vol. 27
+  Fetching Golden Kamuy Volume 28...
+📚 Using cached data for volume 28
+    ✓ Added Golden Kamuy Vol. 28
+  Fetching Golden Kamuy Volume 29...
+📚 Using cached data for volume 29
+    ✓ Added Golden Kamuy Vol. 29
+  Fetching Golden Kamuy Volume 30...
+📚 Using cached data for volume 30
+    ✓ Added Golden Kamuy Vol. 30
+  Fetching Golden Kamuy Volume 31...
+📚 Using cached data for volume 31
+    ✓ Added Golden Kamuy Vol. 31
+
+📚 Processing Black Butler - 22 missing volumes
+  Fetching Black Butler Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added Black Butler Vol. 11
+  Fetching Black Butler Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added Black Butler Vol. 12
+  Fetching Black Butler Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added Black Butler Vol. 13
+  Fetching Black Butler Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added Black Butler Vol. 14
+  Fetching Black Butler Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added Black Butler Vol. 15
+  Fetching Black Butler Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added Black Butler Vol. 16
+  Fetching Black Butler Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added Black Butler Vol. 17
+  Fetching Black Butler Volume 18...
+📚 Using cached data for volume 18
+    ✓ Added Black Butler Vol. 18
+  Fetching Black Butler Volume 19...
+📚 Using cached data for volume 19
+    ✓ Added Black Butler Vol. 19
+  Fetching Black Butler Volume 20...
+📚 Using cached data for volume 20
+    ✓ Added Black Butler Vol. 20
+  Fetching Black Butler Volume 21...
+📚 Using cached data for volume 21
+    ✓ Added Black Butler Vol. 21
+  Fetching Black Butler Volume 22...
+📚 Using cached data for volume 22
+    ✓ Added Black Butler Vol. 22
+  Fetching Black Butler Volume 23...
+📚 Using cached data for volume 23
+    ✓ Added Black Butler Vol. 23
+  Fetching Black Butler Volume 24...
+📚 Using cached data for volume 24
+    ✓ Added Black Butler Vol. 24
+  Fetching Black Butler Volume 25...
+📚 Using cached data for volume 25
+    ✓ Added Black Butler Vol. 25
+  Fetching Black Butler Volume 26...
+📚 Using cached data for volume 26
+    ✓ Added Black Butler Vol. 26
+  Fetching Black Butler Volume 27...
+📚 Using cached data for volume 27
+    ✓ Added Black Butler Vol. 27
+  Fetching Black Butler Volume 28...
+📚 Using cached data for volume 28
+    ✓ Added Black Butler Vol. 28
+  Fetching Black Butler Volume 29...
+📚 Using cached data for volume 29
+    ✓ Added Black Butler Vol. 29
+  Fetching Black Butler Volume 30...
+📚 Using cached data for volume 30
+    ✓ Added Black Butler Vol. 30
+  Fetching Black Butler Volume 31...
+📚 Using cached data for volume 31
+    ✓ Added Black Butler Vol. 31
+  Fetching Black Butler Volume 32...
+📚 Using cached data for volume 32
+    ✓ Added Black Butler Vol. 32
+
+📚 Processing Show-ha Shoten! - 2 missing volumes
+  Fetching Show-ha Shoten! Volume 3...
+📚 Using cached data for volume 3
+    ✓ Added Show-ha Shoten! Vol. 3
+  Fetching Show-ha Shoten! Volume 5...
+📚 Using cached data for volume 5
+    ✓ Added Show-ha Shoten! Vol. 5
+
+📚 Processing Show-ha Shoten - 4 missing volumes
+  Fetching Show-ha Shoten Volume 1...
+📚 Using cached data for volume 1
+    ✓ Added Show-ha Shoten Vol. 1
+  Fetching Show-ha Shoten Volume 2...
+📚 Using cached data for volume 2
+    ✓ Added Show-ha Shoten Vol. 2
+  Fetching Show-ha Shoten Volume 4...
+📚 Using cached data for volume 4
+    ✓ Added Show-ha Shoten Vol. 4
+  Fetching Show-ha Shoten Volume 6...
+📚 Using cached data for volume 6
+    ✓ Added Show-ha Shoten Vol. 6
+
+📚 Processing Haikyuu!! - 35 missing volumes
+  Fetching Haikyuu!! Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added Haikyuu!! Vol. 11
+  Fetching Haikyuu!! Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added Haikyuu!! Vol. 12
+  Fetching Haikyuu!! Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added Haikyuu!! Vol. 13
+  Fetching Haikyuu!! Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added Haikyuu!! Vol. 14
+  Fetching Haikyuu!! Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added Haikyuu!! Vol. 15
+  Fetching Haikyuu!! Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added Haikyuu!! Vol. 16
+  Fetching Haikyuu!! Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added Haikyuu!! Vol. 17
+  Fetching Haikyuu!! Volume 18...
+📚 Using cached data for volume 18
+    ✓ Added Haikyuu!! Vol. 18
+  Fetching Haikyuu!! Volume 19...
+📚 Using cached data for volume 19
+    ✓ Added Haikyuu!! Vol. 19
+  Fetching Haikyuu!! Volume 20...
+📚 Using cached data for volume 20
+    ✓ Added Haikyuu!! Vol. 20
+  Fetching Haikyuu!! Volume 21...
+📚 Using cached data for volume 21
+    ✓ Added Haikyuu!! Vol. 21
+  Fetching Haikyuu!! Volume 22...
+📚 Using cached data for volume 22
+    ✓ Added Haikyuu!! Vol. 22
+  Fetching Haikyuu!! Volume 23...
+📚 Using cached data for volume 23
+    ✓ Added Haikyuu!! Vol. 23
+  Fetching Haikyuu!! Volume 24...
+📚 Using cached data for volume 24
+    ✓ Added Haikyuu!! Vol. 24
+  Fetching Haikyuu!! Volume 25...
+📚 Using cached data for volume 25
+    ✓ Added Haikyuu!! Vol. 25
+  Fetching Haikyuu!! Volume 26...
+🔍 Making API call for volume 26
+    ✓ Added Haikyuu!! Vol. 26
+  Fetching Haikyuu!! Volume 27...
+🔍 Making API call for volume 27
+    ✓ Added Haikyuu!! Vol. 27
+  Fetching Haikyuu!! Volume 28...
+📚 Using cached data for volume 28
+    ✓ Added Haikyuu!! Vol. 28
+  Fetching Haikyuu!! Volume 29...
+🔍 Making API call for volume 29
+    ✓ Added Haikyuu!! Vol. 29
+  Fetching Haikyuu!! Volume 30...
+📚 Using cached data for volume 30
+    ✓ Added Haikyuu!! Vol. 30
+  Fetching Haikyuu!! Volume 31...
+📚 Using cached data for volume 31
+    ✓ Added Haikyuu!! Vol. 31
+  Fetching Haikyuu!! Volume 32...
+📚 Using cached data for volume 32
+    ✓ Added Haikyuu!! Vol. 32
+  Fetching Haikyuu!! Volume 33...
+🔍 Making API call for volume 33
+    ✓ Added Haikyuu!! Vol. 33
+  Fetching Haikyuu!! Volume 34...
+📚 Using cached data for volume 34
+    ✓ Added Haikyuu!! Vol. 34
+  Fetching Haikyuu!! Volume 35...
+🔍 Making API call for volume 35
+    ✓ Added Haikyuu!! Vol. 35
+  Fetching Haikyuu!! Volume 36...
+📚 Using cached data for volume 36
+    ✓ Added Haikyuu!! Vol. 36
+  Fetching Haikyuu!! Volume 37...
+🔍 Making API call for volume 37
+    ✓ Added Haikyuu!! Vol. 37
+  Fetching Haikyuu!! Volume 38...
+🔍 Making API call for volume 38
+    ✓ Added Haikyuu!! Vol. 38
+  Fetching Haikyuu!! Volume 39...
+📚 Using cached data for volume 39
+    ✓ Added Haikyuu!! Vol. 39
+  Fetching Haikyuu!! Volume 40...
+🔍 Making API call for volume 40
+    ✓ Added Haikyuu!! Vol. 40
+  Fetching Haikyuu!! Volume 41...
+🔍 Making API call for volume 41
+Error fetching data for volume 41: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Haikyuu!! Vol. 41
+  Fetching Haikyuu!! Volume 42...
+📚 Using cached data for volume 42
+    ✓ Added Haikyuu!! Vol. 42
+  Fetching Haikyuu!! Volume 43...
+🔍 Making API call for volume 43
+    ✓ Added Haikyuu!! Vol. 43
+  Fetching Haikyuu!! Volume 44...
+📚 Using cached data for volume 44
+    ✓ Added Haikyuu!! Vol. 44
+  Fetching Haikyuu!! Volume 45...
+📚 Using cached data for volume 45
+    ✓ Added Haikyuu!! Vol. 45
+
+📚 Processing Blue Exorcist - 17 missing volumes
+  Fetching Blue Exorcist Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added Blue Exorcist Vol. 11
+  Fetching Blue Exorcist Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added Blue Exorcist Vol. 12
+  Fetching Blue Exorcist Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added Blue Exorcist Vol. 13
+  Fetching Blue Exorcist Volume 14...
+🔍 Making API call for volume 14
+Error fetching data for volume 14: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Blue Exorcist Vol. 14
+  Fetching Blue Exorcist Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added Blue Exorcist Vol. 15
+  Fetching Blue Exorcist Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added Blue Exorcist Vol. 16
+  Fetching Blue Exorcist Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added Blue Exorcist Vol. 17
+  Fetching Blue Exorcist Volume 18...
+📚 Using cached data for volume 18
+    ✓ Added Blue Exorcist Vol. 18
+  Fetching Blue Exorcist Volume 19...
+🔍 Making API call for volume 19
+    ✓ Added Blue Exorcist Vol. 19
+  Fetching Blue Exorcist Volume 20...
+📚 Using cached data for volume 20
+    ✓ Added Blue Exorcist Vol. 20
+  Fetching Blue Exorcist Volume 21...
+🔍 Making API call for volume 21
+Error fetching data for volume 21: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Blue Exorcist Vol. 21
+  Fetching Blue Exorcist Volume 22...
+📚 Using cached data for volume 22
+    ✓ Added Blue Exorcist Vol. 22
+  Fetching Blue Exorcist Volume 23...
+📚 Using cached data for volume 23
+    ✓ Added Blue Exorcist Vol. 23
+  Fetching Blue Exorcist Volume 24...
+📚 Using cached data for volume 24
+    ✓ Added Blue Exorcist Vol. 24
+  Fetching Blue Exorcist Volume 25...
+🔍 Making API call for volume 25
+    ✓ Added Blue Exorcist Vol. 25
+  Fetching Blue Exorcist Volume 26...
+🔍 Making API call for volume 26
+Error fetching data for volume 26: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Blue Exorcist Vol. 26
+  Fetching Blue Exorcist Volume 27...
+📚 Using cached data for volume 27
+    ✓ Added Blue Exorcist Vol. 27
+
+📚 Processing One Punch Man - 16 missing volumes
+  Fetching One Punch Man Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added One Punch Man Vol. 11
+  Fetching One Punch Man Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added One Punch Man Vol. 12
+  Fetching One Punch Man Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added One Punch Man Vol. 13
+  Fetching One Punch Man Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added One Punch Man Vol. 14
+  Fetching One Punch Man Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added One Punch Man Vol. 15
+  Fetching One Punch Man Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added One Punch Man Vol. 16
+  Fetching One Punch Man Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added One Punch Man Vol. 17
+  Fetching One Punch Man Volume 18...
+📚 Using cached data for volume 18
+    ✓ Added One Punch Man Vol. 18
+  Fetching One Punch Man Volume 19...
+📚 Using cached data for volume 19
+    ✓ Added One Punch Man Vol. 19
+  Fetching One Punch Man Volume 20...
+📚 Using cached data for volume 20
+    ✓ Added One Punch Man Vol. 20
+  Fetching One Punch Man Volume 21...
+🔍 Making API call for volume 21
+Error fetching data for volume 21: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch One Punch Man Vol. 21
+  Fetching One Punch Man Volume 22...
+📚 Using cached data for volume 22
+    ✓ Added One Punch Man Vol. 22
+  Fetching One Punch Man Volume 23...
+🔍 Making API call for volume 23
+Error fetching data for volume 23: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch One Punch Man Vol. 23
+  Fetching One Punch Man Volume 24...
+🔍 Making API call for volume 24
+    ✓ Added One Punch Man Vol. 24
+  Fetching One Punch Man Volume 25...
+🔍 Making API call for volume 25
+Error fetching data for volume 25: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch One Punch Man Vol. 25
+  Fetching One Punch Man Volume 26...
+📚 Using cached data for volume 26
+    ✓ Added One Punch Man Vol. 26
+
+📚 Processing Mob Psycho 100 - 6 missing volumes
+  Fetching Mob Psycho 100 Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added Mob Psycho 100 Vol. 11
+  Fetching Mob Psycho 100 Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added Mob Psycho 100 Vol. 12
+  Fetching Mob Psycho 100 Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added Mob Psycho 100 Vol. 13
+  Fetching Mob Psycho 100 Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added Mob Psycho 100 Vol. 14
+  Fetching Mob Psycho 100 Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added Mob Psycho 100 Vol. 15
+  Fetching Mob Psycho 100 Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added Mob Psycho 100 Vol. 16
+
+📚 Processing Attack on Titan - 24 missing volumes
+  Fetching Attack on Titan Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added Attack on Titan Vol. 11
+  Fetching Attack on Titan Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added Attack on Titan Vol. 12
+  Fetching Attack on Titan Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added Attack on Titan Vol. 13
+  Fetching Attack on Titan Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added Attack on Titan Vol. 14
+  Fetching Attack on Titan Volume 15...
+📚 Using cached data for volume 15
+    ✓ Added Attack on Titan Vol. 15
+  Fetching Attack on Titan Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added Attack on Titan Vol. 16
+  Fetching Attack on Titan Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added Attack on Titan Vol. 17
+  Fetching Attack on Titan Volume 18...
+🔍 Making API call for volume 18
+    ✓ Added Attack on Titan Vol. 18
+  Fetching Attack on Titan Volume 19...
+🔍 Making API call for volume 19
+Error fetching data for volume 19: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Attack on Titan Vol. 19
+  Fetching Attack on Titan Volume 20...
+📚 Using cached data for volume 20
+    ✓ Added Attack on Titan Vol. 20
+  Fetching Attack on Titan Volume 21...
+🔍 Making API call for volume 21
+Error fetching data for volume 21: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Attack on Titan Vol. 21
+  Fetching Attack on Titan Volume 22...
+🔍 Making API call for volume 22
+Error fetching data for volume 22: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Attack on Titan Vol. 22
+  Fetching Attack on Titan Volume 23...
+🔍 Making API call for volume 23
+    ✓ Added Attack on Titan Vol. 23
+  Fetching Attack on Titan Volume 24...
+📚 Using cached data for volume 24
+    ✓ Added Attack on Titan Vol. 24
+  Fetching Attack on Titan Volume 25...
+📚 Using cached data for volume 25
+    ✓ Added Attack on Titan Vol. 25
+  Fetching Attack on Titan Volume 26...
+📚 Using cached data for volume 26
+    ✓ Added Attack on Titan Vol. 26
+  Fetching Attack on Titan Volume 27...
+📚 Using cached data for volume 27
+    ✓ Added Attack on Titan Vol. 27
+  Fetching Attack on Titan Volume 28...
+📚 Using cached data for volume 28
+    ✓ Added Attack on Titan Vol. 28
+  Fetching Attack on Titan Volume 29...
+📚 Using cached data for volume 29
+    ✓ Added Attack on Titan Vol. 29
+  Fetching Attack on Titan Volume 30...
+🔍 Making API call for volume 30
+Error fetching data for volume 30: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Attack on Titan Vol. 30
+  Fetching Attack on Titan Volume 31...
+🔍 Making API call for volume 31
+    ✓ Added Attack on Titan Vol. 31
+  Fetching Attack on Titan Volume 32...
+🔍 Making API call for volume 32
+    ✓ Added Attack on Titan Vol. 32
+  Fetching Attack on Titan Volume 33...
+🔍 Making API call for volume 33
+Error fetching data for volume 33: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Attack on Titan Vol. 33
+  Fetching Attack on Titan Volume 34...
+📚 Using cached data for volume 34
+    ✓ Added Attack on Titan Vol. 34
+
+📚 Processing Attack on Titan: Before the Fall - 7 missing volumes
+  Fetching Attack on Titan: Before the Fall Volume 11...
+🔍 Making API call for volume 11
+Error fetching data for volume 11: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Attack on Titan: Before the Fall Vol. 11
+  Fetching Attack on Titan: Before the Fall Volume 12...
+📚 Using cached data for volume 12
+    ✓ Added Attack on Titan: Before the Fall Vol. 12
+  Fetching Attack on Titan: Before the Fall Volume 13...
+🔍 Making API call for volume 13
+    ✓ Added Attack on Titan: Before the Fall Vol. 13
+  Fetching Attack on Titan: Before the Fall Volume 14...
+📚 Using cached data for volume 14
+    ✓ Added Attack on Titan: Before the Fall Vol. 14
+  Fetching Attack on Titan: Before the Fall Volume 15...
+🔍 Making API call for volume 15
+Error fetching data for volume 15: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Attack on Titan: Before the Fall Vol. 15
+  Fetching Attack on Titan: Before the Fall Volume 16...
+📚 Using cached data for volume 16
+    ✓ Added Attack on Titan: Before the Fall Vol. 16
+  Fetching Attack on Titan: Before the Fall Volume 17...
+📚 Using cached data for volume 17
+    ✓ Added Attack on Titan: Before the Fall Vol. 17
+
+📚 Processing Deadman Wonderland - 8 missing volumes
+  Fetching Deadman Wonderland Volume 6...
+🔍 Making API call for volume 6
+    ✓ Added Deadman Wonderland Vol. 6
+  Fetching Deadman Wonderland Volume 7...
+🔍 Making API call for volume 7
+    ✓ Added Deadman Wonderland Vol. 7
+  Fetching Deadman Wonderland Volume 8...
+📚 Using cached data for volume 8
+    ✓ Added Deadman Wonderland Vol. 8
+  Fetching Deadman Wonderland Volume 9...
+🔍 Making API call for volume 9
+Error fetching data for volume 9: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Deadman Wonderland Vol. 9
+  Fetching Deadman Wonderland Volume 10...
+🔍 Making API call for volume 10
+Error fetching data for volume 10: HTTPSConnectionPool(host='api.deepseek.com', 
+port=443): Max retries exceeded with url: /v1/chat/completions (Caused by 
+SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in 
+violation of protocol (_ssl.c:1010)')))
+    ✗ Failed to fetch Deadman Wonderland Vol. 10
+  Fetching Deadman Wonderland Volume 11...
+📚 Using cached data for volume 11
+    ✓ Added Deadman Wonderland Vol. 11
+  Fetching Deadman Wonderland Volume 12...
+🔍 Making API call for volume 12
+    ✓ Added Deadman Wonderland Vol. 12
+  Fetching Deadman Wonderland Volume 13...
+📚 Using cached data for volume 13
+    ✓ Added Deadman Wonderland Vol. 13
+
+🎉 Completed! Added 369 missing volumes

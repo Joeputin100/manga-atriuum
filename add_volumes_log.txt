@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/projects/manga_lookup_tool/add_missing_volumes.py", line 16, in <module>
+    from manga_lookup import DeepSeekAPI, DataValidator, GoogleBooksAPI, process_book_data
+  File "/data/data/com.termux/files/home/projects/manga_lookup_tool/manga_lookup.py", line 48
+    class DeepSeekAPI:
+    ^^^^^
+IndentationError: expected an indented block after class definition on line 47
