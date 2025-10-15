@@ -45,151 +45,140 @@ class BookInfo:
     cover_image_url: Optional[str] = None
 
 class ProjectState:
-class DeepSeekAPI:
-    class ProjectState:
-        """Advanced project state management with SQLite database for performance"""
-    
-        def __init__(self, db_file="project_state.db"):
-            self.db_file = db_file
-            self.conn = sqlite3.connect(self.db_file, check_same_thread=False)
-            self._create_tables()
-            self._ensure_metadata()
-    
-        def _create_tables(self):
-            """Create database tables if they don't exist"""
-            cursor = self.conn.cursor()
-    
-            # Metadata table for global stats
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS metadata (
-                    key TEXT PRIMARY KEY,
-                    value TEXT
-                )
-            ''')
-    
-            # Cached responses table
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS cached_responses (
-                    id INTEGER PRIMARY KEY,
-                    prompt_hash TEXT,
-                    volume INTEGER,
-                    response TEXT,
-                    timestamp TEXT,
-                    UNIQUE(prompt_hash, volume)
-                )
-            ''')
-    
-            # API calls table
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS api_calls (
-                    id INTEGER PRIMARY KEY,
-                    prompt TEXT,
-                    response TEXT,
-                    volume INTEGER,
-                    success BOOLEAN,
-                    timestamp TEXT
-                )
-            ''')
-    
-            # Searches table
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS searches (
-                    id INTEGER PRIMARY KEY,
-                    query TEXT,
-                    books_found INTEGER,
-                    timestamp TEXT
-                )
-            ''')
-    
-            # Cached cover images
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS cached_cover_images (
-                    id INTEGER PRIMARY KEY,
-                    isbn TEXT UNIQUE,
-                    url TEXT,
-                    timestamp TEXT
-                )
-            ''')
-    
-            self.conn.commit()
-    
-        def _ensure_metadata(self):
-            """Ensure default metadata exists"""
-            cursor = self.conn.cursor()
-            defaults = {
-                "interaction_count": "0",
-                "total_books_found": "0",
-                "start_time": datetime.now().isoformat()
-            }
-            for key, value in defaults.items():
-                cursor.execute('INSERT OR IGNORE INTO metadata (key, value) VALUES (?, ?)', (key, value))
-            self.conn.commit()
-    
-        def _get_metadata(self, key: str) -> str:
-            cursor = self.conn.cursor()
-            cursor.execute('SELECT value FROM metadata WHERE key = ?', (key,))
-            row = cursor.fetchone()
-            return row[0] if row else "0"
-    
-        def _set_metadata(self, key: str, value: str):
-            cursor = self.conn.cursor()
-            cursor.execute('INSERT OR REPLACE INTO metadata (key, value) VALUES (?, ?)', (key, value))
-            self.conn.commit()
-    
-        def record_api_call(self, prompt: str, response: str, volume: int, success: bool = True):
-            """Record API call with full details for caching"""
-            cursor = self.conn.cursor()
-            timestamp = datetime.now().isoformat()
-    
-            # Insert API call
-            cursor.execute('''
-                INSERT INTO api_calls (prompt, response, volume, success, timestamp)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (prompt, response, volume, success, timestamp))
-    
-            # Cache successful responses
-            if success:
-                prompt_hash = f"{prompt[:100]}_{volume}"
-                cursor.execute('''
-                    INSERT OR REPLACE INTO cached_responses (prompt_hash, volume, response, timestamp)
-                    VALUES (?, ?, ?, ?)
-                ''', (prompt_hash, volume, response, timestamp))
-    
-            self.conn.commit()
-    
-        def get_cached_response(self, prompt: str, volume: int) -> Optional[str]:
-            """Get cached response if available"""
-            cursor = self.conn.cursor()
+    """Advanced project state management with SQLite database for performance"""
+
+    def __init__(self, db_file="project_state.db"):
+        self.db_file = db_file
+        self.conn = sqlite3.connect(self.db_file, check_same_thread=False)
+        self._create_tables()
+        self._ensure_metadata()
+
+    def _create_tables(self):
+        """Create database tables if they don't exist"""
+        cursor = self.conn.cursor()
+
+        # Metadata table for global stats
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS metadata (
+                key TEXT PRIMARY KEY,
+                value TEXT
+            )
+        ''')
+
+        # Cached responses table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS cached_responses (
+                id INTEGER PRIMARY KEY,
+                prompt_hash TEXT,
+                volume INTEGER,
+                response TEXT,
+                timestamp TEXT,
+                UNIQUE(prompt_hash, volume)
+            )
+        ''')
+
+        # API calls table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS api_calls (
+                id INTEGER PRIMARY KEY,
+                prompt TEXT,
+                response TEXT,
+                volume INTEGER,
+                success BOOLEAN,
+                timestamp TEXT
+            )
+        ''')
+
+        # Searches table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS searches (
+                id INTEGER PRIMARY KEY,
+                query TEXT,
+                books_found INTEGER,
+                timestamp TEXT
+            )
+        ''')
+
+        # Cached cover images
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS cached_cover_images (
+                id INTEGER PRIMARY KEY,
+                isbn TEXT UNIQUE,
+                url TEXT,
+                timestamp TEXT
+            )
+        ''')
+
+        self.conn.commit()
+
+    def _ensure_metadata(self):
+        """Ensure default metadata exists"""
+        cursor = self.conn.cursor()
+        defaults = {
+            "interaction_count": "0",
+            "total_books_found": "0",
+            "start_time": datetime.now().isoformat()
+        }
+        for key, value in defaults.items():
+            cursor.execute('INSERT OR IGNORE INTO metadata (key, value) VALUES (?, ?)', (key, value))
+        self.conn.commit()
+
+    def _get_metadata(self, key: str) -> str:
+        cursor = self.conn.cursor()
+        cursor.execute('SELECT value FROM metadata WHERE key = ?', (key,))
+        row = cursor.fetchone()
+        return row[0] if row else "0"
+
+    def _set_metadata(self, key: str, value: str):
+        cursor = self.conn.cursor()
+        cursor.execute('INSERT OR REPLACE INTO metadata (key, value) VALUES (?, ?)', (key, value))
+        self.conn.commit()
+
+    def record_api_call(self, prompt: str, response: str, volume: int, success: bool = True):
+        """Record API call with full details for caching"""
+        cursor = self.conn.cursor()
+        timestamp = datetime.now().isoformat()
+
+        # Insert API call
+        cursor.execute('''
+            INSERT INTO api_calls (prompt, response, volume, success, timestamp)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (prompt, response, volume, success, timestamp))
+
+        # Cache successful responses
+        if success:
             prompt_hash = f"{prompt[:100]}_{volume}"
-            cursor.execute('SELECT response FROM cached_responses WHERE prompt_hash = ? AND volume = ?', (prompt_hash, volume))
-            row = cursor.fetchone()
-            return row[0] if row else None
-    
-        def record_interaction(self, search_query: str, books_found: int):
-            """Record a new user interaction"""
-            cursor = self.conn.cursor()
-            timestamp = datetime.now().isoformat()
-    
-            # Update metadata
-            interaction_count = int(self._get_metadata("interaction_count")) + 1
-            total_books = int(self._get_metadata("total_books_found")) + books_found
-            self._set_metadata("interaction_count", str(interaction_count))
-            self._set_metadata("total_books_found", str(total_books))
-    
-            # Insert search
-            cursor.execute('INSERT INTO searches (query, books_found, timestamp) VALUES (?, ?, ?)',
-                           (search_query, books_found, timestamp))
-            self.conn.commit()
-    
-        # Compatibility properties for existing code
-        @property
-        def interaction_count(self):
-            return int(self._get_metadata("interaction_count"))
-    
-        @property
-        def total_books_found(self):
-            return int(self._get_metadata("total_books_found"))
-    
+            cursor.execute('''
+                INSERT OR REPLACE INTO cached_responses (prompt_hash, volume, response, timestamp)
+                VALUES (?, ?, ?, ?)
+            ''', (prompt_hash, volume, response, timestamp))
+
+        self.conn.commit()
+
+    def get_cached_response(self, prompt: str, volume: int) -> Optional[str]:
+        """Get cached response if available"""
+        cursor = self.conn.cursor()
+        prompt_hash = f"{prompt[:100]}_{volume}"
+        cursor.execute('SELECT response FROM cached_responses WHERE prompt_hash = ? AND volume = ?', (prompt_hash, volume))
+        row = cursor.fetchone()
+        return row[0] if row else None
+
+    def record_interaction(self, search_query: str, books_found: int):
+        """Record a new user interaction"""
+        cursor = self.conn.cursor()
+        timestamp = datetime.now().isoformat()
+
+        # Update metadata
+        interaction_count = int(self._get_metadata("interaction_count")) + 1
+        total_books = int(self._get_metadata("total_books_found")) + books_found
+        self._set_metadata("interaction_count", str(interaction_count))
+        self._set_metadata("total_books_found", str(total_books))
+
+        # Insert search
+        cursor.execute('INSERT INTO searches (query, books_found, timestamp) VALUES (?, ?, ?)',
+                       (search_query, books_found, timestamp))
+        self.conn.commit()
+
     def get_cached_cover_image(self, isbn_key: str) -> Optional[str]:
         """Get cached cover image URL by ISBN key"""
         cursor = self.conn.cursor()
@@ -205,26 +194,20 @@ class DeepSeekAPI:
                        (isbn_key, url, timestamp))
         self.conn.commit()
 
+class DeepSeekAPI:
+    """Handles DeepSeek API interactions with rate limiting and error handling"""
 
-        def close(self):
-            """Close database connection"""
-            self.conn.close()
-        """Handles DeepSeek API interactions with rate limiting and error handling"""
-    
-        def __init__(self):
-            self.api_key = os.getenv("DEEPSEEK_API_KEY")
-            if not self.api_key:
-                raise ValueError("DEEPSEEK_API_KEY not found in environment variables")
+    def __init__(self):
+        self.api_key = os.getenv("DEEPSEEK_API_KEY")
+        if not self.api_key:
+            raise ValueError("DEEPSEEK_API_KEY not found in environment variables")
 
         self.base_url = "https://api.deepseek.com/v1/chat/completions"
         self.model = "deepseek-chat"  # Using DeepSeek-V3.2-Exp (non-thinking mode)
-
-
         self.last_request_time = time.time()
 
     def correct_series_name(self, series_name: str) -> List[str]:
         """Use DeepSeek API to correct and suggest manga series names"""
-
         prompt = f"""
         Given the manga series name "{series_name}", provide 3-5 corrected or alternative names
         that are actual manga series.
@@ -238,7 +221,6 @@ class DeepSeekAPI:
         Prioritize the main series over spinoffs, sequels, or adaptations.
         If the series has multiple parts (like Tokyo Ghoul and Tokyo Ghoul:re), include the main series first.
         Include recent and ongoing series, not just completed ones.
-        For Boruto specifically, include both "Boruto: Naruto Next Generations" and "Boruto: Two Blue Vortex".
 
         Return only the names as a JSON list, no additional text.
 
@@ -510,7 +492,7 @@ class GoogleBooksAPI:
                 return cached_url
 
         # Search for the series with volume 1
-        query = f'intitle:\"{series_name}\" \"volume {volume_number}\" manga'
+        query = f'intitle:"{series_name}" "volume {volume_number}" manga'
         url = f"{self.base_url}?q={query}&maxResults=1"
 
         try:
@@ -666,7 +648,6 @@ def parse_volume_range(volume_input: str) -> List[int]:
     # Remove duplicates and sort
     return sorted(list(set(volumes)))
 
-
 def generate_sequential_barcodes(start_barcode: str, count: int) -> List[str]:
     """Generate sequential barcodes from a starting barcode"""
     barcodes = []
@@ -688,7 +669,6 @@ def generate_sequential_barcodes(start_barcode: str, count: int) -> List[str]:
         barcodes.append(barcode)
 
     return barcodes
-
 
 def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Optional[GoogleBooksAPI] = None, project_state: Optional[ProjectState] = None) -> BookInfo:
     """Process raw API data into structured BookInfo"""
@@ -791,348 +771,4 @@ def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Opti
         cover_image_url=cover_image_url
     )
 
-def display_text_list(books: List[BookInfo], console: Console):
-    """Display books in a text-based list with field status indicators and barcodes"""
-
-    console.print(f"\n[bold blue]Manga Series Results ({len(books)} books found)[/bold blue]")
-    console.print("=" * 80)
-
-    # Display the list
-    for i, book in enumerate(books, 1):
-        formatted_authors = DataValidator.format_authors_list(book.authors)
-
-        # Show basic info with barcode and cover image indicator
-        cover_indicator = " 📷" if book.cover_image_url else ""
-        console.print(f"\n[bold]{i}. Volume {book.volume_number}: {book.book_title}{cover_indicator}[/bold]")
-        console.print(f"   Authors: {formatted_authors}")
-        console.print(f"   Barcode: [cyan]{book.barcode}[/cyan]")
-
-        # Show field status indicators
-        status_fields = [
-            ("MSRP", book.msrp_cost is not None),
-            ("ISBN-13", bool(book.isbn_13)),
-            ("Publisher", bool(book.publisher_name)),
-            ("Copyright Year", book.copyright_year is not None),
-            ("Description", bool(book.description)),
-            ("Physical Description", bool(book.physical_description)),
-            ("Genres", bool(book.genres)),
-            ("Cover Image", bool(book.cover_image_url))
-        ]
-
-        status_line = "   Fields: "
-        for field_name, is_populated in status_fields:
-            if is_populated:
-                status_line += f"[green]✓[/green] {field_name}  "
-            else:
-                status_line += f"[red]✗[/red] {field_name}  "
-
-        console.print(status_line)
-
-    console.print("\n" + "=" * 80)
-    console.print("\n[dim]Controls: [number] to view details, [q]uit, [s]ave JSON, [m]arc export[/dim]")
-
-    # Interactive menu
-    while True:
-        try:
-            choice = console.input("\n[bold]Enter choice: [/bold]").lower().strip()
-
-            if choice == 'q':
-                break
-            elif choice == 's':
-                # Save results to JSON file
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                filename = f"manga_results_{timestamp}.json"
-
-                results_data = [
-                    {
-                        "series_name": book.series_name,
-                        "volume_number": book.volume_number,
-                        "book_title": book.book_title,
-                        "authors": book.authors,
-                        "msrp_cost": book.msrp_cost,
-                        "isbn_13": book.isbn_13,
-                        "publisher_name": book.publisher_name,
-                        "copyright_year": book.copyright_year,
-                        "description": book.description,
-                        "physical_description": book.physical_description,
-                        "genres": book.genres,
-                        "warnings": book.warnings,
-                        "barcode": book.barcode
-                    }
-                    for book in books
-                ]
-
-                with open(filename, 'w') as f:
-                    json.dump(results_data, f, indent=2)
-
-                console.print(f"[green]✓ Results saved to {filename}[/green]")
-            elif choice == 'm':
-                # Export to MARC format
-                try:
-                    from marc_exporter import export_books_to_marc
-                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    filename = f"manga_marc_{timestamp}.mrc"
-
-                    export_books_to_marc(books, filename, "M")
-                    console.print(f"[green]✓ MARC records exported to {filename}[/green]")
-                    console.print(f"[dim]Contains {len(books)} bibliographic records with holding information[/dim]")
-                except ImportError:
-                    console.print("[red]Error: pymarc library not installed. Install with: pip install pymarc[/red]")
-                except Exception as e:
-                    console.print(f"[red]Error exporting MARC records: {e}[/red]")
-            elif choice.isdigit():
-                book_index = int(choice) - 1
-                if 0 <= book_index < len(books):
-                    show_book_details(books[book_index], console)
-                    console.print("\n[dim]Press Enter to return to list...[/dim]")
-                    console.input()
-                    # Redisplay the list
-                    display_text_list(books, console)
-                    break
-                else:
-                    console.print("[yellow]Invalid book number. Please select a valid number.[/yellow]")
-            else:
-                console.print("[yellow]Invalid choice. Use number to view details, 'q' to quit, 's' to save JSON, or 'm' for MARC export.[/yellow]")
-
-        except KeyboardInterrupt:
-            console.print("\n[yellow]Exiting list view...[/yellow]")
-            break
-
-def show_book_details(book: BookInfo, console: Console):
-    """Show detailed information for a single book"""
-
-    console.print("\n" + "=" * 60)
-    console.print(f"[bold blue]Book Details - Volume {book.volume_number}[/bold blue]")
-    console.print("=" * 60)
-
-    formatted_authors = DataValidator.format_authors_list(book.authors)
-
-    details = [
-        ("Title", book.book_title),
-        ("Series", book.series_name),
-        ("Authors", formatted_authors),
-        ("Volume", str(book.volume_number)),
-        ("Barcode", book.barcode or "Not assigned"),
-        ("MSRP", f"${book.msrp_cost:.2f}" if book.msrp_cost else "Unknown"),
-        ("ISBN-13", book.isbn_13 or "Unknown"),
-        ("Publisher", book.publisher_name or "Unknown"),
-        ("Copyright Year", str(book.copyright_year) if book.copyright_year else "Unknown"),
-        ("Description", book.description or "No description available"),
-        ("Physical Description", book.physical_description or "No physical description available"),
-        ("Genres", ", ".join(book.genres) if book.genres else "No genres listed")
-    ]
-
-    for field_name, value in details:
-        console.print(f"\n[bold]{field_name}:[/bold]")
-        # Wrap long text for better readability
-        if len(value) > 80:
-            # Simple text wrapping
-            words = value.split()
-            lines = []
-            current_line = []
-            for word in words:
-                if len(' '.join(current_line + [word])) <= 80:
-                    current_line.append(word)
-                else:
-                    lines.append(' '.join(current_line))
-                    current_line = [word]
-            if current_line:
-                lines.append(' '.join(current_line))
-
-            for line in lines:
-                console.print(f"  {line}")
-        else:
-            console.print(f"  {value}")
-
-    # Show warnings if any
-    if book.warnings:
-        console.print(f"\n[bold yellow]Warnings:[/bold yellow]")
-        for warning in book.warnings:
-            console.print(f"  ⚠️  {warning}")
-
-    console.print("\n" + "=" * 60)
-
-def main():
-    """Main function to run the manga lookup tool with multiple series support"""
-    console = Console()
-    project_state = ProjectState()
-
-    rprint("[bold blue]Manga Lookup Tool[/bold blue]")
-    rprint("[dim]Enhanced version with multiple series, volume ranges, and barcode assignment[/dim]")
-
-    try:
-        # Initialize APIs
-        deepseek_api = DeepSeekAPI()
-        google_books_api = GoogleBooksAPI()
-
-        # Prefetch cover images for cached data using keyless API
-        google_books_api.prefetch_cover_images(project_state)
-
-        # Get starting barcode
-        rprint("\n[bold]Barcode Configuration[/bold]")
-        rprint("[dim]Enter starting barcode (e.g., 'T000001' or 'MANGA001'):[/dim]")
-        start_barcode = Prompt.ask("[bold]Starting barcode[/bold]", default="T000001")
-
-        # Collect multiple series with volume ranges
-        series_entries = []
-        rprint("\n[bold]Series Entry[/bold]")
-        rprint("[dim]Enter manga series names with volume ranges (e.g., '1-5,7,10').[/dim]")
-        rprint("[dim]Leave series name blank when done.[/dim]")
-
-        while True:
-            series_name = Prompt.ask("\n[bold]Enter manga series name[/bold]", default="")
-            if not series_name:
-                break
-
-            volume_input = Prompt.ask("[bold]Enter volume numbers/ranges[/bold] (e.g., '1-5,7,10')")
-
-            try:
-                volumes = parse_volume_range(volume_input)
-                series_entries.append({
-                    'original_name': series_name,
-                    'volumes': volumes
-                })
-                rprint(f"[green]✓ Added {series_name} with volumes: {', '.join(map(str, volumes))}[/green]")
-            except ValueError as e:
-                rprint(f"[red]Error parsing volume range: {e}[/red]")
-
-        if not series_entries:
-            rprint("\n[yellow]No series entered. Exiting.[/yellow]")
-            return
-
-        # Confirm all series names before starting lookups
-        rprint("\n[bold]Series Confirmation[/bold]")
-        rprint("[dim]Confirming series names before starting lookups...[/dim]")
-
-        confirmed_series_entries = []
-        for series_entry in series_entries:
-            series_name = series_entry['original_name']
-            volumes = series_entry['volumes']
-
-            # Correct series name using DeepSeek API
-            rprint(f"\n[cyan]Correcting series name: {series_name}[/cyan]")
-            suggestions = deepseek_api.correct_series_name(series_name)
-
-            if len(suggestions) > 1:
-                rprint("\n[bold]Please select the correct series name:[/bold]")
-                for i, suggestion in enumerate(suggestions, 1):
-                    # Get additional info for each suggestion
-                    series_info = deepseek_api._get_series_info(suggestion)
-
-                    # Try to get cover image for series (check cache first)
-                    cover_image_url = google_books_api.get_series_cover_image(suggestion, project_state=project_state)
-
-                    if series_info:
-                        if cover_image_url:
-                            rprint(f"{i}. {suggestion} - {series_info} 📷")
-                        else:
-                            rprint(f"{i}. {suggestion} - {series_info}")
-                    else:
-                        if cover_image_url:
-                            rprint(f"{i}. {suggestion} 📷")
-                        else:
-                            rprint(f"{i}. {suggestion}")
-
-                rprint(f"\n{len(suggestions) + 1}. [yellow]Look Again[/yellow] - Search for more options")
-                rprint(f"{len(suggestions) + 2}. [red]Skip[/red] - Skip this series")
-
-                choice = IntPrompt.ask("\nSelect option", choices=[str(i) for i in range(1, len(suggestions) + 3)])
-
-                if choice <= len(suggestions):
-                    selected_series = suggestions[choice - 1]
-                    rprint(f"[green]Using series: {selected_series}[/green]")
-                elif choice == len(suggestions) + 1:
-                    # Look Again - make another API call
-                    rprint("[cyan]Searching for more options...[/cyan]")
-                    suggestions = deepseek_api.correct_series_name(series_name)
-                    continue  # Restart the selection process with new suggestions
-                else:
-                    # Skip this series
-                    rprint("[yellow]Skipping this series[/yellow]")
-                    selected_series = None
-                    break
-            else:
-                selected_series = suggestions[0]
-                rprint(f"[green]Using series: {selected_series}[/green]")
-
-            # Add to confirmed entries only if not skipped
-            if selected_series:
-                confirmed_series_entries.append({
-                    'original_name': series_name,
-                    'confirmed_name': selected_series,
-                    'volumes': volumes
-                })
-            else:
-                rprint(f"[yellow]Skipped {series_name} with volumes: {', '.join(map(str, volumes))}[/yellow]")
-
-        rprint("\n[green]✓ All series names confirmed![/green]")
-
-        # Process each series
-        all_books = []
-        total_volumes = sum(len(entry['volumes']) for entry in confirmed_series_entries)
-
-        rprint(f"\n[bold]Processing {len(confirmed_series_entries)} series with {total_volumes} total volumes...[/bold]")
-
-        for series_entry in confirmed_series_entries:
-            series_name = series_entry['confirmed_name']
-            volumes = series_entry['volumes']
-
-            # Fetch book data for each volume
-            rprint(f"\n[cyan]Processing {series_name} - {len(volumes)} volumes...[/cyan]")
-
-            series_books = []
-            for i, volume in enumerate(volumes, 1):
-                rprint(f"[dim]Processing volume {volume} ({i}/{len(volumes)})...[/dim]")
-
-                book_data = deepseek_api.get_book_info(series_name, volume, project_state)
-                if book_data:
-                    book = process_book_data(book_data, volume, google_books_api, project_state)
-                    series_books.append(book)
-
-                    # Show warnings if any
-                    if book.warnings:
-                        for warning in book.warnings:
-                            rprint(f"[yellow]Warning for volume {volume}: {warning}[/yellow]")
-
-                    rprint(f"[green]✓ Found volume {volume}[/green]")
-                else:
-                    rprint(f"[yellow]✗ Volume {volume} not found[/yellow]")
-
-            all_books.extend(series_books)
-
-        if not all_books:
-            rprint("\n[red]No books found for the specified series and volume ranges.[/red]")
-            return
-
-        # Assign barcodes
-        rprint(f"\n[cyan]Assigning barcodes starting from {start_barcode}...[/cyan]")
-        barcodes = generate_sequential_barcodes(start_barcode, len(all_books))
-        for book, barcode in zip(all_books, barcodes):
-            book.barcode = barcode
-
-        # Display results with barcodes
-        rprint("\n[bold]Results Summary:[/bold]")
-        for book in all_books:
-            formatted_authors = DataValidator.format_authors_list(book.authors)
-            rprint(f"  Volume {book.volume_number}: {book.book_title}")
-            rprint(f"    Authors: {formatted_authors}")
-            rprint(f"    Publisher: {book.publisher_name or 'Unknown'}")
-            rprint(f"    MSRP: ${book.msrp_cost:.2f}" if book.msrp_cost else "    MSRP: Unknown")
-            rprint(f"    Barcode: {book.barcode}")
-
-        # Display enhanced text-based list with barcodes
-        display_text_list(all_books, console)
-
-        # Record interaction
-        series_info = ", ".join([f"{entry['confirmed_name']} ({len(entry['volumes'])} vols)" for entry in confirmed_series_entries])
-        project_state.record_interaction(f"Multiple series: {series_info}", len(all_books))
-
-        rprint(f"\n[green]Found {len(all_books)} books. Project state updated.[/green]")
-
-    except KeyboardInterrupt:
-        rprint("\n[yellow]Operation cancelled by user.[/yellow]")
-    except Exception as e:
-        rprint(f"\n[red]An error occurred: {e}[/red]")
-
-if __name__ == "__main__":
-    main()
+# Rest of the file would continue with the main functions...

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 """
 MangaDex Cover Image Fetcher
 
@@ -122,19 +123,42 @@ class MangaDexCoverFetcher:
         return self.download_and_cache_image(cover_url, series_name)
 
 def get_all_series_from_db() -> list:
-    """Get all unique series names from the database"""
-    db = sqlite3.connect('project_state.db')
-    cursor = db.cursor()
+
+    """Get all unique series names from project_state.json"""
 
     try:
-        cursor.execute('SELECT DISTINCT series_name FROM cover_comparison_results')
-        series = [row[0] for row in cursor.fetchall()]
-    except sqlite3.OperationalError:
-        # Fallback to old searches table
-        cursor.execute('SELECT DISTINCT query FROM searches')
-        series = [row[0] for row in cursor.fetchall()]
 
-    db.close()
+        with open('project_state.json', 'r') as f:
+
+            state = json.load(f)
+
+    except (FileNotFoundError, json.JSONDecodeError):
+
+        return []
+
+
+
+    series = set()
+
+    for api_call in state.get("api_calls", []):
+
+        if api_call.get("success", False):
+
+            try:
+
+                response = json.loads(api_call["response"])
+
+                series_name = response.get("series_name")
+
+                if series_name:
+
+                    series.add(series_name)
+
+            except json.JSONDecodeError:
+
+                continue
+
+    return list(series)
     return series
 
 def update_series_cover_in_db(series_name: str, cover_url: str):
