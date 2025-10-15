@@ -607,19 +607,13 @@ def show_book_details_modal(book: BookInfo):
 
     with col1:
         # Display cover image if available
-    # Fetch cover if not available
-
+        # Fetch cover if not available
         if not book.cover_image_url:
-
             with st.spinner("Fetching cover image..."):
-    
                 cover_url = fetch_cover_for_book(book)
-    
                 if cover_url:
-    
-                        book.cover_image_url = cover_url
-    
-                st.success("Cover image fetched!")
+                    book.cover_image_url = cover_url
+                    st.success("Cover image fetched!")
         if book.cover_image_url:
             try:
                 st.image(book.cover_image_url, use_container_width=True, caption="Cover Image")
