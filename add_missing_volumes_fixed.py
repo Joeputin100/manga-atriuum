@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Add Missing Volumes for All Series
+Add Missing Volumes with Incremental Saves
 
 This script identifies missing volumes for all series in the database
 and fetches their data using the DeepSeek API with retry logic.
+Saves to database after each successful addition to prevent data loss.
 """
 
 import os
@@ -150,6 +151,9 @@ def main():
                 if book:
                     print(f"    ✓ Added {series} Vol. {volume}")
                     added_count += 1
+                    # Save incrementally to prevent data loss
+                    with open('project_state.json', 'w') as f:
+                        json.dump(project_state.state, f, indent=2)
                 else:
                     print(f"    ✗ Failed to process {series} Vol. {volume}")
             else:

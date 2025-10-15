@@ -609,7 +609,7 @@ def show_book_details_modal(book: BookInfo):
         # Display cover image if available
     # Fetch cover if not available
 
-    if not book.cover_image_url:
+        if not book.cover_image_url:
 
         with st.spinner("Fetching cover image..."):
 
