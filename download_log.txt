@@ -1,0 +1,400 @@
+🚀 Starting cover image download for all manga data
+============================================================
+📚 Downloading series cover images...
+Found 28 unique series
+✓ Already cached: Akira
+✓ Already cached: Mob Psycho 100
+✓ Already cached: To Your Eternity
+✓ Already cached: Tokyo Ghoul
+✓ Already cached: Show-ha Shoten!
+✓ Already cached: Barefoot Gen: A Cartoon Story of Hiroshima
+✓ Already cached: Blue Exorcist
+✓ Already cached: Tokyo Ghoul:re
+✓ Already cached: Noragami: Stray God
+✓ Already cached: Golden Kamuy
+✓ Already cached: Black Clover
+✓ Already cached: Assassination Classroom
+✓ Already cached: Attack on Titan
+✓ Already cached: Silent Voice, A
+✓ Already cached: Show-ha Shoten
+✓ Already cached: Boruto: Two Blue Vortex
+✓ Already cached: Black Butler
+✓ Already cached: Boruto: Naruto The Next Generation
+✓ Already cached: One Piece
+✓ Already cached: Boruto: Naruto Next Generations
+✓ Already cached: Deadman Wonderland
+✓ Already cached: One Punch Man
+✓ Already cached: Cells At Work
+✓ Already cached: Haikyuu!!
+✓ Already cached: Bleach
+✓ Already cached: Naruto
+✓ Already cached: Attack on Titan: Before the Fall
+✓ Already cached: Death Note
+✓ Downloaded 0 series covers
+
+📖 Downloading volume cover images...
+Found 277 volumes with ISBN
+✓ Already cached: Tokyo Ghoul Vol. 1
+✓ Already cached: Tokyo Ghoul Vol. 2
+✓ Already cached: Tokyo Ghoul Vol. 3
+✓ Already cached: Tokyo Ghoul Vol. 4
+✓ Already cached: Tokyo Ghoul Vol. 5
+✓ Already cached: Tokyo Ghoul Vol. 6
+✓ Already cached: Tokyo Ghoul Vol. 7
+✓ Already cached: Tokyo Ghoul Vol. 8
+✓ Already cached: Tokyo Ghoul Vol. 9
+✓ Already cached: Tokyo Ghoul Vol. 10
+✓ Already cached: Tokyo Ghoul Vol. 11
+✓ Already cached: Tokyo Ghoul Vol. 12
+✓ Already cached: Tokyo Ghoul Vol. 13
+✓ Already cached: Tokyo Ghoul Vol. 14
+✓ Already cached: Boruto: Naruto Next Generations Vol. 1
+✓ Already cached: Boruto: Naruto Next Generations Vol. 2
+✓ Already cached: Boruto: Naruto Next Generations Vol. 3
+✓ Already cached: Boruto: Naruto Next Generations Vol. 4
+✓ Already cached: Boruto: Naruto Next Generations Vol. 5
+✓ Already cached: Boruto: Naruto Next Generations Vol. 6
+✓ Already cached: Boruto: Naruto Next Generations Vol. 7
+✓ Already cached: Boruto: Naruto Next Generations Vol. 8
+✓ Already cached: Boruto: Naruto Next Generations Vol. 9
+✓ Already cached: Boruto: Naruto Next Generations Vol. 10
+✓ Already cached: Assassination Classroom Vol. 1
+✓ Already cached: Assassination Classroom Vol. 2
+✓ Already cached: Assassination Classroom Vol. 3
+✓ Already cached: Assassination Classroom Vol. 4
+✓ Already cached: Assassination Classroom Vol. 5
+✓ Already cached: Assassination Classroom Vol. 6
+✓ Already cached: Assassination Classroom Vol. 7
+✓ Already cached: Assassination Classroom Vol. 8
+✓ Already cached: Assassination Classroom Vol. 9
+✓ Already cached: Assassination Classroom Vol. 10
+Fetching cover for: Tokyo Ghoul:re Vol. 1 (ISBN: 9781421583064)
+✗ Failed to get cover for: Tokyo Ghoul:re Vol. 1
+✓ Already cached: Tokyo Ghoul:re Vol. 2
+✓ Already cached: Tokyo Ghoul:re Vol. 3
+✓ Already cached: Tokyo Ghoul:re Vol. 4
+✓ Already cached: Tokyo Ghoul:re Vol. 5
+✓ Already cached: Tokyo Ghoul:re Vol. 6
+✓ Already cached: Tokyo Ghoul:re Vol. 7
+✓ Already cached: Tokyo Ghoul:re Vol. 8
+✓ Already cached: Tokyo Ghoul:re Vol. 9
+Fetching cover for: Death Note Vol. 1 (ISBN: 9781421501680)
+✗ Failed to get cover for: Death Note Vol. 1
+Fetching cover for: Death Note Vol. 2 (ISBN: 9781421501680)
+✗ Failed to get cover for: Death Note Vol. 2
+Fetching cover for: Death Note Vol. 3 (ISBN: 9781421501680)
+✗ Failed to get cover for: Death Note Vol. 3
+Fetching cover for: Silent Voice, A Vol. 1 (ISBN: 9781632360561)
+✗ Failed to get cover for: Silent Voice, A Vol. 1
+Fetching cover for: Silent Voice, A Vol. 2 (ISBN: 9781632360561)
+✗ Failed to get cover for: Silent Voice, A Vol. 2
+Fetching cover for: Silent Voice, A Vol. 3 (ISBN: 9781632360561)
+✗ Failed to get cover for: Silent Voice, A Vol. 3
+✓ Already cached: Tokyo Ghoul:re Vol. 10
+✓ Already cached: Tokyo Ghoul:re Vol. 11
+✓ Already cached: Tokyo Ghoul:re Vol. 12
+✓ Already cached: Tokyo Ghoul:re Vol. 13
+✓ Already cached: Tokyo Ghoul:re Vol. 14
+✓ Already cached: Tokyo Ghoul:re Vol. 15
+✓ Already cached: Tokyo Ghoul:re Vol. 16
+Fetching cover for: Naruto Vol. 1 (ISBN: 9781569319000)
+✗ Failed to get cover for: Naruto Vol. 1
+Fetching cover for: Naruto Vol. 2 (ISBN: 9781569319000)
+✗ Failed to get cover for: Naruto Vol. 2
+✓ Already cached: Death Note Vol. 4
+✓ Already cached: Death Note Vol. 5
+✓ Already cached: Silent Voice, A Vol. 4
+✓ Already cached: Silent Voice, A Vol. 5
+✓ Already cached: Cells At Work Vol. 1
+✓ Already cached: Cells At Work Vol. 2
+Fetching cover for: Cells At Work Vol. 3 (ISBN: 9781626923660)
+Fetching cover for: Cells At Work Vol. 4 (ISBN: 9781626923668)
+✓ Already cached: Cells At Work Vol. 5
+Fetching cover for: One Piece Vol. 100 (ISBN: 9781974726092)
+Fetching cover for: One Piece Vol. 101 (ISBN: 9781974726095)
+Fetching cover for: One Piece Vol. 102 (ISBN: 9781974727985)
+Fetching cover for: Barefoot Gen: A Cartoon Story of Hiroshima Vol. 10 (ISBN: 9780867196630)
+✗ Failed to get cover for: Barefoot Gen: A Cartoon Story of Hiroshima Vol. 10
+Fetching cover for: One Piece Vol. 1 (ISBN: 9781569319017)
+✗ Failed to get cover for: One Piece Vol. 1
+Fetching cover for: Naruto Vol. 3 (ISBN: 9781569319000)
+✗ Failed to get cover for: Naruto Vol. 3
+Fetching cover for: Naruto Vol. 4 (ISBN: 9781569319000)
+✗ Failed to get cover for: Naruto Vol. 4
+Fetching cover for: Naruto Vol. 5 (ISBN: 9781569319000)
+✗ Failed to get cover for: Naruto Vol. 5
+Fetching cover for: Naruto Vol. 6 (ISBN: 9781569319000)
+✗ Failed to get cover for: Naruto Vol. 6
+Fetching cover for: Naruto Vol. 7 (ISBN: 9781569319000)
+✗ Failed to get cover for: Naruto Vol. 7
+Fetching cover for: Naruto Vol. 8 (ISBN: 9781421502414)
+✗ Failed to get cover for: Naruto Vol. 8
+Fetching cover for: Naruto Vol. 9 (ISBN: 9781421502410)
+✗ Failed to get cover for: Naruto Vol. 9
+Fetching cover for: Naruto Vol. 10 (ISBN: 9781421502417)
+✗ Failed to get cover for: Naruto Vol. 10
+Fetching cover for: Naruto Vol. 11 (ISBN: 9781421502410)
+✗ Failed to get cover for: Naruto Vol. 11
+Fetching cover for: Naruto Vol. 12 (ISBN: 9781421502410)
+✗ Failed to get cover for: Naruto Vol. 12
+Fetching cover for: Naruto Vol. 13 (ISBN: 9781421502410)
+✗ Failed to get cover for: Naruto Vol. 13
+Fetching cover for: Naruto Vol. 14 (ISBN: 9781421502417)
+✗ Failed to get cover for: Naruto Vol. 14
+Fetching cover for: Naruto Vol. 15 (ISBN: 9781421502417)
+✗ Failed to get cover for: Naruto Vol. 15
+Fetching cover for: Naruto Vol. 16 (ISBN: 9781421502417)
+✗ Failed to get cover for: Naruto Vol. 16
+Fetching cover for: Naruto Vol. 17 (ISBN: 9781421510869)
+Fetching cover for: Naruto Vol. 18 (ISBN: 9781421510863)
+Fetching cover for: Naruto Vol. 19 (ISBN: 9781421518613)
+✗ Failed to get cover for: Naruto Vol. 19
+Fetching cover for: Naruto Vol. 20 (ISBN: 9781421510866)
+Fetching cover for: Naruto Vol. 21 (ISBN: 9781421518583)
+✗ Failed to get cover for: Naruto Vol. 21
+Fetching cover for: Naruto Vol. 22 (ISBN: 9781421518613)
+✗ Failed to get cover for: Naruto Vol. 22
+Fetching cover for: Naruto Vol. 23 (ISBN: 9781421518613)
+✗ Failed to get cover for: Naruto Vol. 23
+Fetching cover for: Naruto Vol. 24 (ISBN: 9781421518616)
+✗ Failed to get cover for: Naruto Vol. 24
+Fetching cover for: Naruto Vol. 25 (ISBN: 9781421518583)
+✗ Failed to get cover for: Naruto Vol. 25
+Fetching cover for: Naruto Vol. 26 (ISBN: 9781421518613)
+✗ Failed to get cover for: Naruto Vol. 26
+Fetching cover for: Naruto Vol. 27 (ISBN: 9781421513359)
+✗ Failed to get cover for: Naruto Vol. 27
+Fetching cover for: Naruto Vol. 28 (ISBN: 9781421518616)
+✗ Failed to get cover for: Naruto Vol. 28
+Fetching cover for: Naruto Vol. 29 (ISBN: 9781421518613)
+✗ Failed to get cover for: Naruto Vol. 29
+Fetching cover for: Naruto Vol. 30 (ISBN: 9781421518613)
+✗ Failed to get cover for: Naruto Vol. 30
+Fetching cover for: Naruto Vol. 31 (ISBN: 9781421518613)
+✗ Failed to get cover for: Naruto Vol. 31
+Fetching cover for: Naruto Vol. 32 (ISBN: 9781421518663)
+✗ Failed to get cover for: Naruto Vol. 32
+Fetching cover for: Naruto Vol. 33 (ISBN: 9781421518613)
+✗ Failed to get cover for: Naruto Vol. 33
+Fetching cover for: Naruto Vol. 34 (ISBN: 9781421521720)
+✗ Failed to get cover for: Naruto Vol. 34
+Fetching cover for: Naruto Vol. 35 (ISBN: 9781421518613)
+✗ Failed to get cover for: Naruto Vol. 35
+Fetching cover for: Naruto Vol. 36 (ISBN: 9781421521710)
+Fetching cover for: Naruto Vol. 37 (ISBN: 9781421518613)
+✗ Failed to get cover for: Naruto Vol. 37
+Fetching cover for: Naruto Vol. 38 (ISBN: 9781421518613)
+✗ Failed to get cover for: Naruto Vol. 38
+Fetching cover for: Naruto Vol. 39 (ISBN: 9781421518613)
+✗ Failed to get cover for: Naruto Vol. 39
+✓ Already cached: Naruto Vol. 40
+Fetching cover for: Naruto Vol. 41 (ISBN: 9781421521720)
+✗ Failed to get cover for: Naruto Vol. 41
+Fetching cover for: Naruto Vol. 42 (ISBN: 9781421531319)
+✗ Failed to get cover for: Naruto Vol. 42
+Fetching cover for: Naruto Vol. 43 (ISBN: 9781421532108)
+Fetching cover for: Naruto Vol. 44 (ISBN: 9781421534539)
+✗ Failed to get cover for: Naruto Vol. 44
+Fetching cover for: Naruto Vol. 45 (ISBN: 9781421531319)
+✗ Failed to get cover for: Naruto Vol. 45
+Fetching cover for: Naruto Vol. 46 (ISBN: 9781421534539)
+✗ Failed to get cover for: Naruto Vol. 46
+Fetching cover for: Naruto Vol. 47 (ISBN: 9781421533315)
+Fetching cover for: Naruto Vol. 48 (ISBN: 9781421541628)
+Fetching cover for: Boruto: Two Blue Vortex Vol. 1 (ISBN: 9781974744609)
+Fetching cover for: Boruto: Two Blue Vortex Vol. 2 (ISBN: 9781974747002)
+Fetching cover for: Boruto: Two Blue Vortex Vol. 3 (ISBN: 9781974746495)
+✗ Failed to get cover for: Boruto: Two Blue Vortex Vol. 3
+Fetching cover for: Boruto: Two Blue Vortex Vol. 4 (ISBN: 9781974747145)
+Fetching cover for: Boruto: Two Blue Vortex Vol. 5 (ISBN: 9781974747619)
+Fetching cover for: Boruto: Naruto The Next Generation Vol. 1 (ISBN: 9781421592113)
+✓ Already cached: Boruto: Naruto The Next Generation Vol. 2
+✓ Already cached: Boruto: Naruto The Next Generation Vol. 3
+Fetching cover for: Boruto: Naruto The Next Generation Vol. 4 (ISBN: 9781974701576)
+Fetching cover for: Boruto: Naruto The Next Generation Vol. 5 (ISBN: 9781974701890)
+Fetching cover for: Boruto: Naruto The Next Generation Vol. 6 (ISBN: 9781974701953)
+✓ Already cached: Boruto: Naruto The Next Generation Vol. 7
+Fetching cover for: Boruto: Naruto The Next Generation Vol. 8 (ISBN: 9781974710038)
+Fetching cover for: Boruto: Naruto The Next Generation Vol. 9 (ISBN: 9781974719963)
+Fetching cover for: Boruto: Naruto The Next Generation Vol. 10 (ISBN: 9781974720063)
+Fetching cover for: Bleach Vol. 1 (ISBN: 9781591164418)
+Fetching cover for: Bleach Vol. 2 (ISBN: 9781591164421)
+✗ Failed to get cover for: Bleach Vol. 2
+Fetching cover for: Bleach Vol. 3 (ISBN: 9781591164430)
+✗ Failed to get cover for: Bleach Vol. 3
+Fetching cover for: Bleach Vol. 4 (ISBN: 9781591167515)
+✗ Failed to get cover for: Bleach Vol. 4
+Fetching cover for: Bleach Vol. 5 (ISBN: 9781591168445)
+Fetching cover for: Bleach Vol. 6 (ISBN: 9781591168095)
+✗ Failed to get cover for: Bleach Vol. 6
+Fetching cover for: Bleach Vol. 7 (ISBN: 9781421506137)
+Fetching cover for: Bleach Vol. 8 (ISBN: 9781421506133)
+✓ Already cached: Bleach Vol. 9
+✓ Already cached: Bleach Vol. 10
+Fetching cover for: One Piece Vol. 2 (ISBN: 9781569319208)
+Fetching cover for: One Piece Vol. 3 (ISBN: 9781569319017)
+✗ Failed to get cover for: One Piece Vol. 3
+Fetching cover for: One Piece Vol. 4 (ISBN: 9781569319017)
+✗ Failed to get cover for: One Piece Vol. 4
+Fetching cover for: One Piece Vol. 5 (ISBN: 9781569319017)
+✗ Failed to get cover for: One Piece Vol. 5
+Fetching cover for: One Piece Vol. 6 (ISBN: 9781569319017)
+✗ Failed to get cover for: One Piece Vol. 6
+Fetching cover for: One Piece Vol. 7 (ISBN: 9781569319017)
+✗ Failed to get cover for: One Piece Vol. 7
+Fetching cover for: One Piece Vol. 8 (ISBN: 9781569319017)
+✗ Failed to get cover for: One Piece Vol. 8
+Fetching cover for: One Piece Vol. 9 (ISBN: 9781569319017)
+✗ Failed to get cover for: One Piece Vol. 9
+Fetching cover for: One Piece Vol. 10 (ISBN: 9781421500739)
+✗ Failed to get cover for: One Piece Vol. 10
+Fetching cover for: Black Clover Vol. 1 (ISBN: 9781421587129)
+Fetching cover for: Black Clover Vol. 2 (ISBN: 9781421587169)
+✓ Already cached: Black Clover Vol. 3
+Fetching cover for: Black Clover Vol. 4 (ISBN: 9781421591619)
+Fetching cover for: Black Clover Vol. 5 (ISBN: 9781421591559)
+Fetching cover for: Black Clover Vol. 6 (ISBN: 9781421591675)
+Fetching cover for: Black Clover Vol. 7 (ISBN: 9781421593485)
+✗ Failed to get cover for: Black Clover Vol. 7
+Fetching cover for: Black Clover Vol. 8 (ISBN: 9781421595219)
+✗ Failed to get cover for: Black Clover Vol. 8
+Fetching cover for: Black Clover Vol. 9 (ISBN: 9781974700658)
+Fetching cover for: Black Clover Vol. 10 (ISBN: 9781974700668)
+Fetching cover for: Akira Vol. 1 (ISBN: 9781632364614)
+Fetching cover for: Akira Vol. 2 (ISBN: 9781935429008)
+Fetching cover for: Noragami: Stray God Vol. 1 (ISBN: 9781612629857)
+Fetching cover for: Noragami: Stray God Vol. 2 (ISBN: 9781612629850)
+Fetching cover for: Noragami: Stray God Vol. 3 (ISBN: 9781612629835)
+Fetching cover for: Noragami: Stray God Vol. 4 (ISBN: 9781612629819)
+✓ Already cached: Noragami: Stray God Vol. 5
+Fetching cover for: Noragami: Stray God Vol. 6 (ISBN: 9781626920918)
+✗ Failed to get cover for: Noragami: Stray God Vol. 6
+Fetching cover for: Noragami: Stray God Vol. 7 (ISBN: 9781626920918)
+✗ Failed to get cover for: Noragami: Stray God Vol. 7
+Fetching cover for: Noragami: Stray God Vol. 8 (ISBN: 9781626921768)
+Fetching cover for: Noragami: Stray God Vol. 9 (ISBN: 9781626922138)
+Fetching cover for: Noragami: Stray God Vol. 10 (ISBN: 9781626922788)
+Fetching cover for: Silent Voice, A Vol. 6 (ISBN: 9781632360580)
+✓ Already cached: Silent Voice, A Vol. 7
+Fetching cover for: To Your Eternity Vol. 1 (ISBN: 9781632365744)
+Fetching cover for: To Your Eternity Vol. 2 (ISBN: 9781632365739)
+✓ Already cached: To Your Eternity Vol. 3
+✓ Already cached: To Your Eternity Vol. 4
+Fetching cover for: To Your Eternity Vol. 5 (ISBN: 9781632365738)
+✓ Already cached: To Your Eternity Vol. 6
+Fetching cover for: To Your Eternity Vol. 7 (ISBN: 9781632365733)
+Fetching cover for: To Your Eternity Vol. 8 (ISBN: 9781632365796)
+Fetching cover for: To Your Eternity Vol. 9 (ISBN: 9781632367738)
+Fetching cover for: To Your Eternity Vol. 10 (ISBN: 9781632368738)
+Fetching cover for: Golden Kamuy Vol. 1 (ISBN: 9781421594569)
+✗ Failed to get cover for: Golden Kamuy Vol. 1
+Fetching cover for: Golden Kamuy Vol. 2 (ISBN: 9781421593159)
+Fetching cover for: Golden Kamuy Vol. 3 (ISBN: 9781421594589)
+Fetching cover for: Golden Kamuy Vol. 4 (ISBN: 9781421595889)
+✓ Already cached: Golden Kamuy Vol. 5
+✓ Already cached: Golden Kamuy Vol. 6
+Fetching cover for: Golden Kamuy Vol. 7 (ISBN: 9781421595888)
+Fetching cover for: Golden Kamuy Vol. 8 (ISBN: 9781421595881)
+Fetching cover for: Golden Kamuy Vol. 9 (ISBN: 9781421595885)
+✓ Already cached: Golden Kamuy Vol. 10
+Fetching cover for: Black Butler Vol. 1 (ISBN: 9780316080849)
+Fetching cover for: Black Butler Vol. 2 (ISBN: 9780316084250)
+Fetching cover for: Black Butler Vol. 3 (ISBN: 9780316084260)
+✓ Already cached: Black Butler Vol. 4
+✓ Already cached: Black Butler Vol. 5
+Fetching cover for: Black Butler Vol. 6 (ISBN: 9780316084267)
+Fetching cover for: Black Butler Vol. 7 (ISBN: 9780316084290)
+Fetching cover for: Black Butler Vol. 8 (ISBN: 9780316189858)
+✗ Failed to get cover for: Black Butler Vol. 8
+Fetching cover for: Black Butler Vol. 9 (ISBN: 9780316189858)
+✗ Failed to get cover for: Black Butler Vol. 9
+Fetching cover for: Black Butler Vol. 10 (ISBN: 9780316189856)
+✗ Failed to get cover for: Black Butler Vol. 10
+Fetching cover for: Show-ha Shoten! Vol. 1 (ISBN: 9781974739847)
+Fetching cover for: Show-ha Shoten! Vol. 2 (ISBN: 9781974747149)
+Fetching cover for: Show-ha Shoten Vol. 3 (ISBN: 9781974747835)
+Fetching cover for: Show-ha Shoten! Vol. 4 (ISBN: 9781974747839)
+✓ Already cached: Show-ha Shoten Vol. 5
+✓ Already cached: Show-ha Shoten! Vol. 6
+Fetching cover for: Haikyuu!! Vol. 1 (ISBN: 9781421587660)
+Fetching cover for: Haikyuu!! Vol. 2 (ISBN: 9781421587677)
+Fetching cover for: Haikyuu!! Vol. 3 (ISBN: 9781421577633)
+Fetching cover for: Haikyuu!! Vol. 4 (ISBN: 9781421582671)
+Fetching cover for: Haikyuu!! Vol. 5 (ISBN: 9781421583288)
+✗ Failed to get cover for: Haikyuu!! Vol. 5
+Fetching cover for: Haikyuu!! Vol. 6 (ISBN: 9781421582693)
+Fetching cover for: Haikyuu!! Vol. 7 (ISBN: 9781421582678)
+Fetching cover for: Haikyuu!! Vol. 8 (ISBN: 9781421583288)
+✗ Failed to get cover for: Haikyuu!! Vol. 8
+Fetching cover for: Haikyuu!! Vol. 9 (ISBN: 9781421583288)
+✗ Failed to get cover for: Haikyuu!! Vol. 9
+Fetching cover for: Haikyuu!! Vol. 10 (ISBN: 9781421583288)
+✗ Failed to get cover for: Haikyuu!! Vol. 10
+Fetching cover for: Blue Exorcist Vol. 1 (ISBN: 9781421540806)
+Fetching cover for: Blue Exorcist Vol. 2 (ISBN: 9781421540735)
+Fetching cover for: Blue Exorcist Vol. 3 (ISBN: 9781421540738)
+Fetching cover for: Blue Exorcist Vol. 4 (ISBN: 9781421540668)
+✓ Already cached: Blue Exorcist Vol. 5
+Fetching cover for: Blue Exorcist Vol. 6 (ISBN: 9781421540848)
+Fetching cover for: Blue Exorcist Vol. 7 (ISBN: 9781421554838)
+Fetching cover for: Blue Exorcist Vol. 8 (ISBN: 9781421554798)
+Fetching cover for: Blue Exorcist Vol. 9 (ISBN: 9781421585089)
+✓ Already cached: Blue Exorcist Vol. 10
+Fetching cover for: One Punch Man Vol. 1 (ISBN: 9781421585642)
+Fetching cover for: One Punch Man Vol. 2 (ISBN: 9781421589889)
+Fetching cover for: One Punch Man Vol. 3 (ISBN: 9781421585119)
+Fetching cover for: One Punch Man Vol. 4 (ISBN: 9781421585169)
+✓ Already cached: One Punch Man Vol. 5
+✓ Already cached: One Punch Man Vol. 6
+✓ Already cached: One Punch Man Vol. 7
+✓ Already cached: One Punch Man Vol. 8
+Fetching cover for: One Punch Man Vol. 9 (ISBN: 9781421590411)
+Fetching cover for: One Punch Man Vol. 10 (ISBN: 9781421590409)
+Fetching cover for: Mob Psycho 100 Vol. 1 (ISBN: 9781612629656)
+✗ Failed to get cover for: Mob Psycho 100 Vol. 1
+Fetching cover for: Mob Psycho 100 Vol. 2 (ISBN: 9781612628246)
+Fetching cover for: Mob Psycho 100 Vol. 3 (ISBN: 9781612629858)
+Fetching cover for: Mob Psycho 100 Vol. 4 (ISBN: 9781421595228)
+✗ Failed to get cover for: Mob Psycho 100 Vol. 4
+Fetching cover for: Mob Psycho 100 Vol. 5 (ISBN: 9781421595641)
+Fetching cover for: Mob Psycho 100 Vol. 6 (ISBN: 9781421595229)
+✗ Failed to get cover for: Mob Psycho 100 Vol. 6
+Fetching cover for: Mob Psycho 100 Vol. 7 (ISBN: 9781421595228)
+✗ Failed to get cover for: Mob Psycho 100 Vol. 7
+Fetching cover for: Mob Psycho 100 Vol. 8 (ISBN: 9781421595221)
+✗ Failed to get cover for: Mob Psycho 100 Vol. 8
+Fetching cover for: Mob Psycho 100 Vol. 9 (ISBN: 9781421595221)
+✗ Failed to get cover for: Mob Psycho 100 Vol. 9
+Fetching cover for: Mob Psycho 100 Vol. 10 (ISBN: 9781421598253)
+Fetching cover for: Attack on Titan Vol. 1 (ISBN: 9781612620244)
+Fetching cover for: Attack on Titan Vol. 2 (ISBN: 9781612620242)
+Fetching cover for: Attack on Titan Vol. 3 (ISBN: 9781612620241)
+Fetching cover for: Attack on Titan Vol. 4 (ISBN: 9781612622541)
+✓ Already cached: Attack on Titan Vol. 5
+✓ Already cached: Attack on Titan Vol. 6
+Fetching cover for: Attack on Titan Vol. 7 (ISBN: 9781612622551)
+Fetching cover for: Attack on Titan Vol. 8 (ISBN: 9781612622557)
+✓ Already cached: Attack on Titan Vol. 9
+Fetching cover for: Attack on Titan Vol. 10 (ISBN: 9781612622543)
+Fetching cover for: Attack on Titan: Before the Fall Vol. 1 (ISBN: 9780316339456)
+Fetching cover for: Attack on Titan: Before the Fall Vol. 2 (ISBN: 9781612629431)
+✗ Failed to get cover for: Attack on Titan: Before the Fall Vol. 2
+Fetching cover for: Attack on Titan: Before the Fall Vol. 3 (ISBN: 9781612629618)
+✗ Failed to get cover for: Attack on Titan: Before the Fall Vol. 3
+Fetching cover for: Attack on Titan: Before the Fall Vol. 4 (ISBN: 9781612629798)
+Fetching cover for: Attack on Titan: Before the Fall Vol. 5 (ISBN: 9781612629748)
+Fetching cover for: Attack on Titan: Before the Fall Vol. 6 (ISBN: 9781612629758)
+✓ Already cached: Attack on Titan: Before the Fall Vol. 7
+Fetching cover for: Attack on Titan: Before the Fall Vol. 8 (ISBN: 9781612629745)
+✓ Already cached: Attack on Titan: Before the Fall Vol. 9
+Fetching cover for: Attack on Titan: Before the Fall Vol. 10 (ISBN: 9781642750193)
+Fetching cover for: Deadman Wonderland Vol. 1 (ISBN: 9780316183141)
+✓ Already cached: Deadman Wonderland Vol. 2
+Fetching cover for: Deadman Wonderland Vol. 3 (ISBN: 9780316220660)
+✗ Failed to get cover for: Deadman Wonderland Vol. 3
+Fetching cover for: Deadman Wonderland Vol. 4 (ISBN: 9780316220660)
+✗ Failed to get cover for: Deadman Wonderland Vol. 4
+Fetching cover for: Deadman Wonderland Vol. 5 (ISBN: 9780316225466)
+✓ Downloaded 106 volume covers
+
+🎉 Cover download completed!

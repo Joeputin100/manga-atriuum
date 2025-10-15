@@ -38,6 +38,13 @@ from manga_lookup import (
 
 # Import MARC exporter
 from marc_exporter import export_books_to_marc
+# Import cover fetchers
+
+from google_books_client import GoogleBooksClient
+
+from mal_cover_fetcher import MALCoverFetcher
+
+from mangadex_cover_fetcher import MangaDexCoverFetcher
 
 
 def initialize_session_state():
@@ -492,7 +499,7 @@ def process_series():
             all_volumes.append((series_name, volume))
 
     # Process volumes with threading
-    with ThreadPoolExecutor(max_workers=3) as executor:
+    with ThreadPoolExecutor(max_workers=15) as executor:
         # Submit all tasks
         future_to_volume = {
             executor.submit(process_single_volume, series_name, volume, st.session_state.project_state): (series_name, volume)
@@ -507,6 +514,7 @@ def process_series():
             st.session_state.processing_state['current_series'] = series_name
             st.session_state.processing_state['current_volume'] = volume
             st.session_state.processing_state['progress'] = i + 1
+
 
             try:
                 book, error = future.result()
@@ -524,6 +532,7 @@ def process_series():
         book.barcode = barcode
 
     st.session_state.all_books = all_books
+    st.rerun()  # Update UI after processing
     st.session_state.processing_state['is_processing'] = False
 
     # Record interaction
@@ -546,6 +555,45 @@ def process_series():
     st.rerun()  # Final rerun to show results
 
 
+def fetch_cover_for_book(book: BookInfo) -> Optional[str]:
+
+    """Fetch cover image for a book if not cached"""
+
+    # Try Google Books first for volumes
+
+    if book.isbn_13:
+
+        google_client = GoogleBooksClient()
+
+        cover_url = google_client.get_cover_image_url(book.isbn_13)
+
+        if cover_url:
+
+            return cover_url
+
+    
+
+    # Fallback to MAL or MangaDex for series
+
+    mal_fetcher = MALCoverFetcher()
+
+    cover_url = mal_fetcher.fetch_cover_for_series(book.series_name)
+
+    if cover_url:
+
+        return cover_url
+
+    
+
+    # Final fallback to MangaDex
+
+    mangadex_fetcher = MangaDexCoverFetcher()
+
+    cover_url = mangadex_fetcher.fetch_cover_for_series(book.series_name)
+
+    return cover_url
+
+
 def show_book_details_modal(book: BookInfo):
     """Show book details in a modal-like popup with cover image"""
     st.markdown("---")
@@ -559,6 +607,19 @@ def show_book_details_modal(book: BookInfo):
 
     with col1:
         # Display cover image if available
+    # Fetch cover if not available
+
+    if not book.cover_image_url:
+
+        with st.spinner("Fetching cover image..."):
+
+            cover_url = fetch_cover_for_book(book)
+
+            if cover_url:
+
+                book.cover_image_url = cover_url
+
+                st.success("Cover image fetched!")
         if book.cover_image_url:
             try:
                 st.image(book.cover_image_url, use_container_width=True, caption="Cover Image")

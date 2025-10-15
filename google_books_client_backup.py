@@ -20,6 +20,7 @@ class GoogleBooksClient:
 
     def __init__(self):
         self.base_url = "https://www.googleapis.com/books/v1/volumes"
+        self.api_key = os.getenv("GOOGLE_BOOKS_API_KEY")
         self.last_request_time = 0
         self.min_request_interval = 0.1  # 100ms between requests (10 requests/second)
 
@@ -49,11 +50,14 @@ class GoogleBooksClient:
 
         self._rate_limit()
 
-        # Construct the keyless API URL
-        url = f"{self.base_url}?q=isbn:{isbn_13}&maxResults=1"
+        params = {
+            'q': f'isbn:{isbn_13}'
+        }
+        if self.api_key:
+            params['key'] = self.api_key
 
         try:
-            response = requests.get(url, timeout=10)
+            response = requests.get(self.base_url, params=params, timeout=10)
             response.raise_for_status()
 
             data = response.json()
@@ -70,7 +74,7 @@ class GoogleBooksClient:
             image_links = volume_info.get('imageLinks', {})
 
             # Prefer larger images, fall back to smaller ones
-            for image_size in ['extraLarge', 'large', 'medium', 'small', 'thumbnail', 'smallThumbnail']:
+            for image_size in ['extraLarge', 'large', 'medium', 'small', 'thumbnail']:
                 if image_size in image_links:
                     cover_url = image_links[image_size]
                     try:
@@ -90,7 +94,7 @@ class GoogleBooksClient:
                         
                     except Exception as download_error:
                         print(f"Error downloading image for ISBN {isbn_13}: {download_error}")
-                        continue
+                        continue  # Try next size
             
             return None
 
