@@ -90,7 +90,7 @@ def get_volume_1_isbn(series_name: str) -> Optional[str]:
 
 def display_duck_animation():
     """Display animated duck with GIF"""
-    st.image('https://media.giphy.com/media/WzA4Vj6V8UOEX10jMj/giphy.gif', width='stretch')
+    st.image('https://media.giphy.com/media/WzA4Vj6V8UOEX10jMj/giphy.gif', use_container_width=True)
 
 
 def calculate_elapsed_time(start_time):
@@ -105,7 +105,6 @@ def calculate_elapsed_time(start_time):
         minutes = int(elapsed / 60)
         seconds = int(elapsed % 60)
         return f"{minutes}m {seconds}s"
-    else:
         hours = int(elapsed / 3600)
         minutes = int((elapsed % 3600) / 60)
         return f"{hours}h {minutes}m"
@@ -127,7 +126,6 @@ def calculate_eta(start_time, progress, total):
             return f"{int(eta_seconds)} seconds"
         elif eta_seconds < 3600:
             return f"{int(eta_seconds/60)} minutes"
-        else:
             return f"{int(eta_seconds/3600)} hours"
     return "Calculating..."
 
@@ -164,101 +162,123 @@ def display_progress_section():
     # Current task info
     if state['current_series']:
         st.info(f"Processing: **{state['current_series']}** - Volume **{state['current_volume']}**")
-
-
 def series_input_form():
-    """Multi-series input form"""
-    st.header("📚 Manga Series Input")
+    
+    
+        """Multi-series input form"""
+        st.header("📚 Manga Series Input")
+    
+        # Starting barcode - always show with current value
+        st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
+        start_barcode = st.text_input(
+            "Starting Barcode",
+            value=st.session_state.start_barcode,
+            placeholder="Enter starting barcode",
+            help="Enter starting barcode (e.g., T000001 or MANGA001)",
+            use_container_width=True
+        )
+        if start_barcode and start_barcode != st.session_state.start_barcode:
+            st.session_state.start_barcode = start_barcode
+    
+        # Series input section
+        st.subheader("Add Series")
+    
+        with st.form("series_form", clear_on_submit=True):
+            # Make series name entry ordinal
+            series_count = len(st.session_state.series_entries) + 1
 
-    # Starting barcode - always show with current value
-    st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
-    start_barcode = st.text_input(
-        "Starting Barcode",
-        value=st.session_state.start_barcode,
-        placeholder="Enter starting barcode",
-        help="Enter starting barcode (e.g., T000001 or MANGA001)"
-    )
-    if start_barcode and start_barcode != st.session_state.start_barcode:
-        st.session_state.start_barcode = start_barcode
-
-    # Series input section
-    st.subheader("Add Series")
-
-    with st.form("series_form", clear_on_submit=True):
-        # Make series name entry ordinal
-        series_count = len(st.session_state.series_entries) + 1
-        ordinal_text = "First" if series_count == 1 else "Second" if series_count == 2 else "Third" if series_count == 3 else f"{series_count}th"
-
-        series_name = st.text_input(f"Enter {ordinal_text} Series Name")
-
-        submitted = st.form_submit_button("Confirm Series Name")
-
-        if submitted and series_name:
-            # Store the series name for confirmation
-            st.session_state.pending_series_name = series_name
-            st.rerun()
-
-    # Display current series with cyan background
-    if st.session_state.series_entries:
-        st.markdown("""
-        <style>
-        .cyan-background {
-            background-color: #e0f7fa;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #80deea;
-            margin-bottom: 10px;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
-        st.subheader("📋 Current Series")
-
-        for i, entry in enumerate(st.session_state.series_entries):
-            with st.container():
-                st.markdown('<div class="cyan-background">', unsafe_allow_html=True)
-
-                # Series header
-                col1, col2 = st.columns([4, 1])
-                with col1:
-                    st.write(f"**Series {i+1}: {entry['confirmed_name']}**")
-                with col2:
-                    if st.button("🗑️ Remove", key=f"remove_{i}"):
+            series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)", use_container_width=True)
+    
+            submitted = st.form_submit_button("Confirm Series Name")
+    
+            if submitted and series_name:
+                # Store the series name for confirmation
+                st.session_state.pending_series_name = series_name
+                st.rerun()
+    
+        # Display current series with cyan background
+        if st.session_state.series_entries:
+            st.markdown("""
+            <style>
+            .cyan-background {
+                background-color: #e0f7fa;
+                padding: 15px;
+                border-radius: 10px;
+                border: 1px solid #80deea;
+                margin-bottom: 10px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+    
+            # Display series in a grid of cards
+            cols = st.columns(2)  # 2 columns for cards
+            
+            for i, entry in enumerate(st.session_state.series_entries):
+                col_idx = i % 2
+                with cols[col_idx]:
+                    # Alternate card styles
+                    card_class = "manga-card" if i % 2 == 0 else "manga-card-alt"
+                    
+                    # Try to get cover image
+                    cover_url = None
+                    try:
+                        # Create a dummy book object to get series cover
+                        dummy_book = BookInfo(
+                            title="",
+                            authors=[],
+                            isbn_13=None,
+                            series_name=entry["confirmed_name"],
+                            volume_number=1,
+                            description="",
+                            page_count=0,
+                            published_date="",
+                            categories=[],
+                            language="",
+                            publisher=""
+                        )
+                        cover_url = fetch_cover_for_book(dummy_book)
+                    except:
+                        pass
+                    
+                    # Card HTML
+                    card_html = f"""
+                    <div class="{card_class}">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <h4 style="margin: 0; flex-grow: 1;">📚 {entry["confirmed_name"]}</h4>
+                            <span style="font-size: 0.8em;">Vol: {len(entry["volumes"])}</span>
+                        </div>
+                    """
+                    
+                    if cover_url:
+                        card_html += f"""
+                        <div style="text-align: center; margin: 10px 0;">
+                            <img src="{cover_url}" style="max-width: 100px; max-height: 150px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" alt="Cover">
+                        </div>
+                        """
+                    
+                    card_html += f"""
+                        <p style="margin: 5px 0; font-size: 0.9em;">Volumes: {", ".join(map(str, entry["volumes"]))}</p>
+                        <div style="text-align: center; margin-top: 10px;">
+                    """
+                    
+                    st.markdown(card_html, unsafe_allow_html=True)
+                    
+                    # Remove button outside the HTML
+                    if st.button("🗑️ Remove", key=f"remove_{i}", use_container_width=True):
                         st.session_state.series_entries.pop(i)
                         st.rerun()
-
-                # Create table with volume numbers and barcodes
-                if 'all_books' in st.session_state and st.session_state.all_books:
-                    # Get books for this specific series
-                    series_books = [book for book in st.session_state.all_books if book.series_name == entry['confirmed_name']]
-                    if series_books:
-                        # Create table data
-                        table_data = []
-                        for book in series_books:
-                            table_data.append({
-                                'Volume': book.volume_number,
-                                'Barcode': book.barcode if hasattr(book, 'barcode') and book.barcode else 'Pending'
-                            })
-
-                        # Display as table
-                        if table_data:
-                            df = pd.DataFrame(table_data)
-                            st.dataframe(df, width='stretch', hide_index=True)
-                    else:
-                        st.write(f"*Volumes: {', '.join(map(str, entry['volumes']))} (not yet processed)*")
-                else:
-                    st.write(f"*Volumes: {', '.join(map(str, entry['volumes']))} (not yet processed)*")
-
-                st.markdown('</div>', unsafe_allow_html=True)
-
-    # Start processing button
-    if st.session_state.series_entries:
-        if st.button("🚀 Start Lookup", type="primary", width='stretch'):
-            st.session_state.processing_state['is_processing'] = True
-            st.session_state.processing_state['start_time'] = time.time()
-            st.session_state.processing_state['total_volumes'] = sum(
-                len(entry['volumes']) for entry in st.session_state.series_entries
-            )
+                    
+                    st.markdown("</div>", unsafe_allow_html=True)
+                    st.markdown('</div>', unsafe_allow_html=True)
+    
+        # Start processing button
+        if st.session_state.series_entries:
+            if st.button("🚀 Start Lookup", type="primary", use_container_width=True):
+                st.session_state.processing_state['is_processing'] = True
+                st.session_state.processing_state['start_time'] = time.time()
+                st.session_state.processing_state['total_volumes'] = sum(
+                    len(entry['volumes']) for entry in st.session_state.series_entries
+                )
             st.rerun()
 
 
@@ -296,11 +316,10 @@ def confirm_single_series(series_name):
                     # Display series information
                     if series_info:
                         st.write(f"**Info:** {series_info}")
-                    else:
                         st.write("*No additional information available*")
 
                     # Make the entire card clickable
-                    if st.button(f"✓ Select {suggestion}", key=f"select_{i}", width='stretch'):
+                    if st.button(f"✓ Select {suggestion}", key=f"select_{i}", use_container_width=True):
                         # Store selected series for volume input
                         st.session_state.selected_series = suggestion
                         st.session_state.original_series_name = series_name
@@ -311,18 +330,17 @@ def confirm_single_series(series_name):
         # Look Again and Skip options
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🔄 Look Again", width='stretch'):
+            if st.button("🔄 Look Again", use_container_width=True):
                 st.info("Searching for more options...")
                 # Clear pending series to restart
                 st.session_state.pending_series_name = None
                 st.rerun()
 
         with col2:
-            if st.button("⏭️ Skip", width='stretch'):
+            if st.button("⏭️ Skip", use_container_width=True):
                 st.warning(f"Skipped {series_name}")
                 st.session_state.pending_series_name = None
                 st.rerun()
-    else:
         # Single suggestion
         selected_series = suggestions[0]
         st.success(f"✓ Using: {selected_series}")
@@ -343,7 +361,7 @@ def confirm_single_series(series_name):
                 if series_info:
                     st.write(f"**Series Info:** {series_info}")
 
-                if st.button("✓ Confirm and Add Volumes", type="primary", width='stretch'):
+                if st.button("✓ Confirm and Add Volumes", type="primary", use_container_width=True):
                     # Store selected series for volume input
                     st.session_state.selected_series = selected_series
                     st.session_state.original_series_name = series_name
@@ -429,10 +447,8 @@ def confirm_series_names():
             elif selected_option == "Skip":
                 st.warning(f"Skipped {series_name}")
                 continue
-            else:
                 selected_series = selected_option
                 st.success(f"Using: {selected_series}")
-        else:
             # Single suggestion
             selected_series = suggestions[0]
             st.success(f"Using: {selected_series}")
@@ -466,13 +482,11 @@ def process_single_volume(series_name, volume, project_state):
         if book_data:
             book = process_book_data(book_data, volume, google_books_api, project_state)
             return book, None
-        else:
             return None, f"Volume {volume} not found"
     except Exception as e:
         return None, f"Error processing volume {volume}: {str(e)}"
 
 def process_series():
-    st.session_state.processing_state['is_processing'] = True
     """Process all confirmed series with threaded execution for better progress updates"""
     if not st.session_state.series_entries:
         return
@@ -533,6 +547,7 @@ def process_series():
         book.barcode = barcode
 
     st.session_state.all_books = all_books
+    st.rerun()  # Update UI after processing
     st.session_state.processing_state['is_processing'] = False
 
     # Record interaction
@@ -602,25 +617,29 @@ def show_book_details_modal(book: BookInfo):
     # Create columns - adjust ratio based on whether we have a cover image
     if book.cover_image_url:
         col1, col2 = st.columns([1, 2])
-    else:
         col1, col2 = st.columns(2)
 
     with col1:
         # Display cover image if available
-        # Fetch cover if not available
+    # Fetch cover if not available
+
         if not book.cover_image_url:
+
             with st.spinner("Fetching cover image..."):
+    
                 cover_url = fetch_cover_for_book(book)
+    
                 if cover_url:
-                    book.cover_image_url = cover_url
-                    st.success("Cover image fetched!")
+    
+                        book.cover_image_url = cover_url
+    
+                st.success("Cover image fetched!")
         if book.cover_image_url:
             try:
-                st.image(book.cover_image_url, width='stretch', caption="Cover Image")
+                st.image(book.cover_image_url, use_container_width=True, caption="Cover Image")
             except Exception as e:
                 st.error(f"Could not load cover image: {e}")
                 st.write("**Cover:** Image unavailable")
-        else:
             st.write("**Cover:** No image available")
 
     with col2:
@@ -661,6 +680,11 @@ def display_results():
     if not st.session_state.all_books:
         return
 
+    # Celebrate completion with confetti
+    st.balloons()
+
+    st.header("📋 Results")
+
     st.header("📋 Results")
 
     # Export options - moved above the table
@@ -680,7 +704,7 @@ def display_results():
                     data=file,
                     file_name=filename,
                     mime="application/marc",
-                    width='stretch',
+                    use_container_width=True,
                     type="primary"
                 )
         except Exception as e:
@@ -688,7 +712,7 @@ def display_results():
 
     with col2:
         # JSON export
-        if st.button("💾 Export JSON", width='stretch'):
+        if st.button("💾 Export JSON", use_container_width=True):
             results_data = [
                 {
                     "series_name": book.series_name,
@@ -714,7 +738,7 @@ def display_results():
                 data=json_str,
                 file_name=f"manga_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
                 mime="application/json",
-                width='stretch'
+                use_container_width=True
             )
 
     # Display expandable table with Streamlit data table
@@ -750,8 +774,7 @@ def display_results():
         # Create DataFrame and display as table
         if table_data:
             df = pd.DataFrame(table_data)
-            st.dataframe(df, width='stretch', hide_index=True)
-        else:
+            st.dataframe(df, use_container_width=True, hide_index=True)
             st.info("No books found to display")
 
     # Book details modal
@@ -764,7 +787,6 @@ def display_results():
         # Initialize selected book index in session state
         if 'selected_book_index' not in st.session_state:
             st.session_state.selected_book_index = 0
-
         selected_book = st.selectbox(
             "Select a book to view details:",
             options=book_options,
@@ -789,7 +811,50 @@ def display_results():
 
 
 def main():
-    """Main Streamlit app"""
+    # Custom CSS for rounded corners and manga theme
+    st.markdown("""
+    <style>
+    .stButton button {
+        border-radius: 10px !important;
+    }
+    .stTextInput input, .stSelectbox select, .stMultiselect select {
+        border-radius: 8px !important;
+    }
+    .stCard {
+        border-radius: 12px !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+    .manga-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        padding: 15px;
+        margin: 10px 0;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .manga-card-alt {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 12px;
+        padding: 15px;
+        margin: 10px 0;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .manga-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+    .manga-banner h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     st.set_page_config(
         page_title="Manga Lookup Tool",
         page_icon="📚",
@@ -870,33 +935,56 @@ def main():
             - `1-3,7,10-12` → Volumes 1, 2, 3, 7, 10, 11, 12
             """)
 
-    st.title("📚 Manga Lookup Tool")
-    st.markdown("Streamlined web interface for manga series lookup and MARC export")
+    st.markdown("""<div class="manga-banner"><h1>📚 Manga Lookup Tool</h1><p>Streamlined web interface for manga series lookup and MARC export</p></div>""", unsafe_allow_html=True)
 
     # Initialize session state
     initialize_session_state()
 
-    # Main workflow
-    if st.session_state.processing_state['is_processing']:
+    # Main workflow with tabs
+    tab1, tab2, tab3 = st.tabs(["📚 Add Series", "🔍 Confirm", "📊 Results"])
+    
+    with tab1:
+        if st.session_state.processing_state["is_processing"]:
+            st.info("Processing in progress... Check the Confirm tab for details.")
+        elif st.session_state.all_books:
+            st.success("All processing complete! Check the Results tab.")
+        elif st.session_state.confirmed_series:
+            st.info("Series confirmed! Ready to process volumes.")
+        elif st.session_state.selected_series:
+            get_volume_input(st.session_state.original_series_name, st.session_state.selected_series)
+        elif st.session_state.pending_series_name:
+            confirm_single_series(st.session_state.pending_series_name)
+        else:
+            series_input_form()
+    
+    with tab2:
+        if st.session_state.processing_state["is_processing"]:
+            with st.spinner("Processing manga volumes..."):
+                display_progress_section()
+                process_series()
+        elif st.session_state.confirmed_series:
+            confirm_series_names()
+        else:
+            st.info("Add series first in the Add Series tab.")
+    
+    with tab3:
+        if st.session_state.all_books:
+            display_results()
+        else:
+            st.info("No results yet. Complete the workflow in other tabs.")
         # Processing in progress
         st.header("🔄 Processing...")
         display_progress_section()
         process_series()
-    elif st.session_state.all_books:
         # Results available
         display_results()
-    elif st.session_state.confirmed_series:
         # Ready to process
         confirm_series_names()
-    elif st.session_state.selected_series:
         # Volume input phase
         get_volume_input(st.session_state.original_series_name, st.session_state.selected_series)
-    elif st.session_state.pending_series_name:
         # Series confirmation phase
         confirm_single_series(st.session_state.pending_series_name)
-    else:
         # Input phase
-        series_input_form()
 
 
 if __name__ == "__main__":
