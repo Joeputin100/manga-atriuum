@@ -936,6 +936,31 @@ def main():
             """)
 
     st.markdown("""<div class="manga-banner"><h1>📚 Manga Lookup Tool</h1><p>Streamlined web interface for manga series lookup and MARC export</p></div>""", unsafe_allow_html=True)
+    
+    # Debug: Check cache status
+    if st.checkbox("🔍 Check Cache Status", help="Verify cached images are deployed"):
+        cache_dir = "cache"
+        images_dir = os.path.join(cache_dir, "images")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Cache Directory Exists", "✅" if os.path.exists(cache_dir) else "❌")
+            st.metric("Images Directory Exists", "✅" if os.path.exists(images_dir) else "❌")
+        
+        if os.path.exists(images_dir):
+            image_files = [f for f in os.listdir(images_dir) if f.endswith(".jpg")]
+            with col2:
+                st.metric("Cached Images", len(image_files))
+                
+            if image_files:
+                st.subheader("Sample Cached Images")
+                sample_cols = st.columns(min(3, len(image_files)))
+                for i, img_file in enumerate(image_files[:3]):
+                    with sample_cols[i]:
+                        img_path = os.path.join(images_dir, img_file)
+                        st.image(img_path, caption=f"{img_file}", width=100)
+        else:
+            st.error("❌ Cache directory not found! Images may not be deployed properly.")
 
     # Initialize session state
     initialize_session_state()
