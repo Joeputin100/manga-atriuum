@@ -90,7 +90,7 @@ def get_volume_1_isbn(series_name: str) -> Optional[str]:
 
 def display_duck_animation():
     """Display animated duck with GIF"""
-    st.image('https://media.giphy.com/media/WzA4Vj6V8UOEX10jMj/giphy.gif', use_container_width=True)
+    st.image('https://media.giphy.com/media/WzA4Vj6V8UOEX10jMj/giphy.gif', width='stretch')
 
 
 def calculate_elapsed_time(start_time):
@@ -243,7 +243,7 @@ def series_input_form():
                         # Display as table
                         if table_data:
                             df = pd.DataFrame(table_data)
-                            st.dataframe(df, use_container_width=True, hide_index=True)
+                            st.dataframe(df, width='stretch', hide_index=True)
                     else:
                         st.write(f"*Volumes: {', '.join(map(str, entry['volumes']))} (not yet processed)*")
                 else:
@@ -253,7 +253,7 @@ def series_input_form():
 
     # Start processing button
     if st.session_state.series_entries:
-        if st.button("🚀 Start Lookup", type="primary", use_container_width=True):
+        if st.button("🚀 Start Lookup", type="primary", width='stretch'):
             st.session_state.processing_state['is_processing'] = True
             st.session_state.processing_state['start_time'] = time.time()
             st.session_state.processing_state['total_volumes'] = sum(
@@ -300,7 +300,7 @@ def confirm_single_series(series_name):
                         st.write("*No additional information available*")
 
                     # Make the entire card clickable
-                    if st.button(f"✓ Select {suggestion}", key=f"select_{i}", use_container_width=True):
+                    if st.button(f"✓ Select {suggestion}", key=f"select_{i}", width='stretch'):
                         # Store selected series for volume input
                         st.session_state.selected_series = suggestion
                         st.session_state.original_series_name = series_name
@@ -311,14 +311,14 @@ def confirm_single_series(series_name):
         # Look Again and Skip options
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🔄 Look Again", use_container_width=True):
+            if st.button("🔄 Look Again", width='stretch'):
                 st.info("Searching for more options...")
                 # Clear pending series to restart
                 st.session_state.pending_series_name = None
                 st.rerun()
 
         with col2:
-            if st.button("⏭️ Skip", use_container_width=True):
+            if st.button("⏭️ Skip", width='stretch'):
                 st.warning(f"Skipped {series_name}")
                 st.session_state.pending_series_name = None
                 st.rerun()
@@ -343,7 +343,7 @@ def confirm_single_series(series_name):
                 if series_info:
                     st.write(f"**Series Info:** {series_info}")
 
-                if st.button("✓ Confirm and Add Volumes", type="primary", use_container_width=True):
+                if st.button("✓ Confirm and Add Volumes", type="primary", width='stretch'):
                     # Store selected series for volume input
                     st.session_state.selected_series = selected_series
                     st.session_state.original_series_name = series_name
@@ -472,6 +472,7 @@ def process_single_volume(series_name, volume, project_state):
         return None, f"Error processing volume {volume}: {str(e)}"
 
 def process_series():
+    st.session_state.processing_state['is_processing'] = True
     """Process all confirmed series with threaded execution for better progress updates"""
     if not st.session_state.series_entries:
         return
@@ -532,7 +533,6 @@ def process_series():
         book.barcode = barcode
 
     st.session_state.all_books = all_books
-    st.rerun()  # Update UI after processing
     st.session_state.processing_state['is_processing'] = False
 
     # Record interaction
@@ -616,7 +616,7 @@ def show_book_details_modal(book: BookInfo):
                     st.success("Cover image fetched!")
         if book.cover_image_url:
             try:
-                st.image(book.cover_image_url, use_container_width=True, caption="Cover Image")
+                st.image(book.cover_image_url, width='stretch', caption="Cover Image")
             except Exception as e:
                 st.error(f"Could not load cover image: {e}")
                 st.write("**Cover:** Image unavailable")
@@ -680,7 +680,7 @@ def display_results():
                     data=file,
                     file_name=filename,
                     mime="application/marc",
-                    use_container_width=True,
+                    width='stretch',
                     type="primary"
                 )
         except Exception as e:
@@ -688,7 +688,7 @@ def display_results():
 
     with col2:
         # JSON export
-        if st.button("💾 Export JSON", use_container_width=True):
+        if st.button("💾 Export JSON", width='stretch'):
             results_data = [
                 {
                     "series_name": book.series_name,
@@ -714,7 +714,7 @@ def display_results():
                 data=json_str,
                 file_name=f"manga_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
                 mime="application/json",
-                use_container_width=True
+                width='stretch'
             )
 
     # Display expandable table with Streamlit data table
@@ -750,7 +750,7 @@ def display_results():
         # Create DataFrame and display as table
         if table_data:
             df = pd.DataFrame(table_data)
-            st.dataframe(df, use_container_width=True, hide_index=True)
+            st.dataframe(df, width='stretch', hide_index=True)
         else:
             st.info("No books found to display")
 
