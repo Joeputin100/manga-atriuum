@@ -567,31 +567,47 @@ def main():
 
         # Export options
         st.subheader("Export Options")
-        if st.button("Export to MARC", type="primary"):
-            try:
-                import tempfile
-                import os
-                with tempfile.NamedTemporaryFile(mode="w+b", suffix=".mrc", delete=False) as temp_file:
-                    temp_path = temp_file.name
-                    export_books_to_marc(st.session_state.all_books, temp_path)
-                    with open(temp_path, "rb") as f:
-                        marc_data = f.read()
-                    os.unlink(temp_path)
-                st.download_button(
-                    label="Download MARC file",
-                    data=marc_data,
-                    file_name="manga_collection.mrc",
-                    mime="application/octet-stream"
-                )
-            except Exception as e:
-                st.error(f"Export failed: {e}")
-
-        # Clear results and start over
-        if st.button("Start New Lookup"):
-            st.session_state.all_books = []
-            st.session_state.series_entries = []
-            st.session_state.confirmed_series = []
-            st.rerun()
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("Export to MARC", type="primary"):
+                try:
+                    import tempfile
+                    import os
+                    with tempfile.NamedTemporaryFile(mode="w+b", suffix=".mrc", delete=False) as temp_file:
+                        temp_path = temp_file.name
+                        export_books_to_marc(st.session_state.all_books, temp_path)
+                        with open(temp_path, "rb") as f:
+                            marc_data = f.read()
+                        os.unlink(temp_path)
+                    st.download_button(
+                        label="Download MARC file",
+                        data=marc_data,
+                        file_name="manga_collection.mrc",
+                        mime="application/octet-stream"
+                    )
+                except Exception as e:
+                    st.error(f"Export failed: {e}")
+        with col2:
+            if st.button("Download Project State JSON"):
+                try:
+                    import json
+                    state_data = st.session_state.project_state.__dict__  # Get the dict of ProjectState
+                    json_data = json.dumps(state_data, indent=2)
+                    st.download_button(
+                        label="Download JSON file",
+                        data=json_data,
+                        file_name="project_state.json",
+                        mime="application/json"
+                    )
+                except Exception as e:
+                    st.error(f"Export failed: {e}")
+        with col3:
+            # Clear results and start over
+            if st.button("Start New Lookup"):
+                st.session_state.all_books = []
+                st.session_state.series_entries = []
+                st.session_state.confirmed_series = []
+                st.rerun()
 
     else:
         # Show series input form
