@@ -24,10 +24,7 @@ import json
 import time
 import pandas as pd
 from datetime import datetime
-from typing import List, Dict, Optional
-import base64
-import requests
-import threading
+from typing import Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import existing core logic
@@ -163,125 +160,123 @@ def display_progress_section():
     if state['current_series']:
         st.info(f"Processing: **{state['current_series']}** - Volume **{state['current_volume']}**")
 def series_input_form():
-    
-    
-        """Multi-series input form"""
-        st.header("📚 Manga Series Input")
-    
-        # Starting barcode - always show with current value
-        st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
-        start_barcode = st.text_input(
-            "Starting Barcode",
-            value=st.session_state.start_barcode,
-            placeholder="Enter starting barcode",
-            help="Enter starting barcode (e.g., T000001 or MANGA001)",
-        )
-        if start_barcode and start_barcode != st.session_state.start_barcode:
-            st.session_state.start_barcode = start_barcode
-    
-        # Series input section
-        st.subheader("Add Series")
+    """Multi-series input form"""
+    st.header("📚 Manga Series Input")
 
-        # Make series name entry ordinal
-        series_count = len(st.session_state.series_entries) + 1
-        ordinal_text = "1st" if series_count == 1 else "2nd" if series_count == 2 else "3rd" if series_count == 3 else f"{series_count}th"
+    # Starting barcode - always show with current value
+    st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
+    start_barcode = st.text_input(
+        "Starting Barcode",
+        value=st.session_state.start_barcode,
+        placeholder="Enter starting barcode",
+        help="Enter starting barcode (e.g., T000001 or MANGA001)",
+    )
+    if start_barcode and start_barcode != st.session_state.start_barcode:
+        st.session_state.start_barcode = start_barcode
 
-        # Use a simple unique key for the series form
-        with st.form(f"series_form_{series_count}_{len(st.session_state.series_entries)}", clear_on_submit=True):
+    # Series input section
+    st.subheader("Add Series")
 
-            series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
-    
-            submitted = st.form_submit_button("Confirm Series Name")
-    
-            if submitted and series_name:
-                # Store the series name for confirmation
-                st.session_state.pending_series_name = series_name
-                st.rerun()
-    
-        # Display current series with cyan background
-        if st.session_state.series_entries:
-            st.markdown("""
-            <style>
-            .cyan-background {
-                background-color: #e0f7fa;
-                padding: 15px;
-                border-radius: 10px;
-                border: 1px solid #80deea;
-                margin-bottom: 10px;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-    
-            # Display series in a grid of cards
-            cols = st.columns(2)  # 2 columns for cards
-            
-            for i, entry in enumerate(st.session_state.series_entries):
-                col_idx = i % 2
-                with cols[col_idx]:
-                    # Alternate card styles
-                    card_class = "manga-card" if i % 2 == 0 else "manga-card-alt"
-                    
-                    # Try to get cover image
-                    cover_url = None
-                    try:
-                        # Create a dummy book object to get series cover
-                        dummy_book = BookInfo(
-                            title="",
-                            authors=[],
-                            isbn_13=None,
-                            series_name=entry["confirmed_name"],
-                            volume_number=1,
-                            description="",
-                            page_count=0,
-                            published_date="",
-                            categories=[],
-                            language="",
-                            publisher=""
-                        )
-                        cover_url = fetch_cover_for_book(dummy_book)
-                    except:
-                        pass
-                    
-                    # Card HTML
-                    card_html = f"""
-                    <div class="{card_class}">
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <h4 style="margin: 0; flex-grow: 1;">📚 {entry["confirmed_name"]}</h4>
-                            <span style="font-size: 0.8em;">Vol: {len(entry["volumes"])}</span>
-                        </div>
-                    """
-                    
-                    if cover_url:
-                        card_html += f"""
-                        <div style="text-align: center; margin: 10px 0;">
-                            <img src="{cover_url}" style="max-width: 100px; max-height: 150px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" alt="Cover">
-                        </div>
-                        """
-                    
-                    card_html += f"""
-                        <p style="margin: 5px 0; font-size: 0.9em;">Volumes: {", ".join(map(str, entry["volumes"]))}</p>
-                        <div style="text-align: center; margin-top: 10px;">
-                    """
-                    
-                    st.markdown(card_html, unsafe_allow_html=True)
-                    
-                    # Remove button outside the HTML
-                    if st.button("🗑️ Remove", key=f"remove_{i}"):
-                        st.session_state.series_entries.pop(i)
-                        st.rerun()
-                    
-                    st.markdown("</div>", unsafe_allow_html=True)
-                    st.markdown('</div>', unsafe_allow_html=True)
-    
-        # Start processing button
-        if st.session_state.series_entries:
-            if st.button("🚀 Start Lookup", type="primary"):
-                st.session_state.processing_state['is_processing'] = True
-                st.session_state.processing_state['start_time'] = time.time()
-                st.session_state.processing_state['total_volumes'] = sum(
-                    len(entry['volumes']) for entry in st.session_state.series_entries
-                )
+    # Make series name entry ordinal
+    series_count = len(st.session_state.series_entries) + 1
+    ordinal_text = "1st" if series_count == 1 else "2nd" if series_count == 2 else "3rd" if series_count == 3 else f"{series_count}th"
+
+    # Use a simple unique key for the series form
+    with st.form(f"series_form_{series_count}_{len(st.session_state.series_entries)}", clear_on_submit=True):
+
+        series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
+
+        submitted = st.form_submit_button("Confirm Series Name")
+
+        if submitted and series_name:
+            # Store the series name for confirmation
+            st.session_state.pending_series_name = series_name
             st.rerun()
+
+    # Display current series with cyan background
+    if st.session_state.series_entries:
+        st.markdown("""
+        <style>
+        .cyan-background {
+            background-color: #e0f7fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #80deea;
+            margin-bottom: 10px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        # Display series in a grid of cards
+        cols = st.columns(2)  # 2 columns for cards
+
+        for i, entry in enumerate(st.session_state.series_entries):
+            col_idx = i % 2
+            with cols[col_idx]:
+                # Alternate card styles
+                card_class = "manga-card" if i % 2 == 0 else "manga-card-alt"
+
+                # Try to get cover image
+                cover_url = None
+                try:
+                    # Create a dummy book object to get series cover
+                    dummy_book = BookInfo(
+                        title="",
+                        authors=[],
+                        isbn_13=None,
+                        series_name=entry["confirmed_name"],
+                        volume_number=1,
+                        description="",
+                        page_count=0,
+                        published_date="",
+                        categories=[],
+                        language="",
+                        publisher=""
+                    )
+                    cover_url = fetch_cover_for_book(dummy_book)
+                except Exception:
+                    pass
+
+                # Card HTML
+                card_html = f"""
+                <div class="{card_class}">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <h4 style="margin: 0; flex-grow: 1;">📚 {entry["confirmed_name"]}</h4>
+                        <span style="font-size: 0.8em;">Vol: {len(entry["volumes"])}</span>
+                    </div>
+                """
+
+                if cover_url:
+                    card_html += f"""
+                    <div style="text-align: center; margin: 10px 0;">
+                        <img src="{cover_url}" style="max-width: 100px; max-height: 150px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" alt="Cover">
+                    </div>
+                    """
+
+                card_html += f"""
+                    <p style="margin: 5px 0; font-size: 0.9em;">Volumes: {", ".join(map(str, entry["volumes"]))}</p>
+                    <div style="text-align: center; margin-top: 10px;">
+                """
+
+                st.markdown(card_html, unsafe_allow_html=True)
+
+                # Remove button outside the HTML
+                if st.button("🗑️ Remove", key=f"remove_{i}"):
+                    st.session_state.series_entries.pop(i)
+                    st.rerun()
+
+                st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+
+    # Start processing button
+    if st.session_state.series_entries:
+        if st.button("🚀 Start Lookup", type="primary"):
+            st.session_state.processing_state['is_processing'] = True
+            st.session_state.processing_state['start_time'] = time.time()
+            st.session_state.processing_state['total_volumes'] = sum(
+                len(entry['volumes']) for entry in st.session_state.series_entries
+            )
+        st.rerun()
 
 
 def confirm_single_series(series_name):
@@ -578,9 +573,9 @@ def process_series():
     if not st.session_state.series_entries:
         return
 
-    # Initialize API
+    # Initialize API (not used directly in this function but needed for imports)
     try:
-        deepseek_api = DeepSeekAPI()
+        _ = DeepSeekAPI()  # Create instance to verify API is available
     except ValueError as e:
         st.error(f"API configuration error: {e}")
         st.session_state.processing_state['is_processing'] = False
@@ -658,41 +653,23 @@ def process_series():
 
 
 def fetch_cover_for_book(book: BookInfo) -> Optional[str]:
-
     """Fetch cover image for a book if not cached"""
-
     # Try Google Books first for volumes
-
     if book.isbn_13:
-
         google_client = GoogleBooksClient()
-
         cover_url = google_client.get_cover_image_url(book.isbn_13)
-
         if cover_url:
-
             return cover_url
 
-    
-
     # Fallback to MAL or MangaDex for series
-
     mal_fetcher = MALCoverFetcher()
-
     cover_url = mal_fetcher.fetch_cover_for_series(book.series_name)
-
     if cover_url:
-
         return cover_url
 
-    
-
     # Final fallback to MangaDex
-
     mangadex_fetcher = MangaDexCoverFetcher()
-
     cover_url = mangadex_fetcher.fetch_cover_for_series(book.series_name)
-
     return cover_url
 
 
@@ -708,18 +685,12 @@ def show_book_details_modal(book: BookInfo):
 
     with col1:
         # Display cover image if available
-    # Fetch cover if not available
-
+        # Fetch cover if not available
         if not book.cover_image_url:
-
             with st.spinner("Fetching cover image..."):
-    
                 cover_url = fetch_cover_for_book(book)
-    
                 if cover_url:
-    
-                        book.cover_image_url = cover_url
-    
+                    book.cover_image_url = cover_url
                 st.success("Cover image fetched!")
         if book.cover_image_url:
             try:
@@ -727,6 +698,7 @@ def show_book_details_modal(book: BookInfo):
             except Exception as e:
                 st.error(f"Could not load cover image: {e}")
                 st.write("**Cover:** Image unavailable")
+        else:
             st.write("**Cover:** No image available")
 
     with col2:
