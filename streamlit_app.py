@@ -541,33 +541,64 @@ def main():
         # Display results
         st.header("📚 Lookup Results")
 
-        # Sort books by volume number
-        sorted_books = sorted(st.session_state.all_books, key=lambda x: x.volume_number)
+        # Group books by series
+        from collections import defaultdict
+        series_groups = defaultdict(list)
+        for book in st.session_state.all_books:
+            series_groups[book.series_name].append(book)
 
-        # Display each book in a row with columns
-        for book in sorted_books:
-            col1, col2, col3, col4, col5, col6, col7, col8 = st.columns([1, 2, 1, 2, 1, 1, 1, 2])
+        # Sort series and volumes
+        series_colors = ['#f0f8ff', '#fff8dc', '#f5f5f5', '#e6e6fa']
+        color_index = 0
+        for series_name in sorted(series_groups.keys()):
+            books = sorted(series_groups[series_name], key=lambda x: x.volume_number)
 
-            # Cover image
-            cover_url = fetch_cover_for_book(book)
-            if cover_url:
-                col1.image(cover_url, width=80)
-            else:
-                col1.write("No cover")
+            # Series header with background
+            st.markdown(f'<div style="background-color:{series_colors[color_index % len(series_colors)]}; padding:10px; border-radius:5px;"><h3>📚 {series_name}</h3></div>', unsafe_allow_html=True)
+            color_index += 1
 
-            col2.write(f"**{book.series_name}**")
-            col3.write(f"Vol {book.volume_number}")
-            col4.write(book.book_title or 'N/A')
-            col5.write(book.isbn_13 or 'N/A')
-            col6.write(', '.join(book.authors) if book.authors else 'N/A')
-            col7.write(book.publisher_name or 'N/A')
-            col8.write(book.description or 'N/A')
+            # Table header
+            col1, col2, col3, col4, col5, col6 = st.columns([1, 3, 2, 2, 2, 2])
+            col1.write("**Vol**")
+            col2.write("**Cover & Title**")
+            col3.write("**Genre/Subjects**")
+            col4.write("**Desc Summary**")
+            col5.write("**Physical Desc**")
+            col6.write("**MSRP**")
+
+            # Rows
+            row_color = False
+            for book in books:
+                row_bg = '#f9f9f9' if row_color else 'white'
+                st.markdown(f'<div style="background-color:{row_bg}; padding:5px; margin:2px 0; border-radius:3px;">', unsafe_allow_html=True)
+                col1, col2, col3, col4, col5, col6 = st.columns([1, 3, 2, 2, 2, 2])
+                col1.write(str(book.volume_number))
+
+                # Cover and title
+                cover_url = fetch_cover_for_book(book)
+                with col2:
+                    if cover_url:
+                        st.image(cover_url, width=60)
+                    st.write(book.book_title or 'N/A')
+
+                col3.write(", ".join(book.genres) if book.genres else "N/A")
+                desc = book.description or "N/A"
+                col4.write(desc[:100] + "..." if len(desc) > 100 else desc)
+                col5.write(book.physical_description or "N/A")
+                col6.write(f"${book.msrp_cost:.2f}" if book.msrp_cost else "N/A")
+                st.markdown('</div>', unsafe_allow_html=True)
+                row_color = not row_color
+
+            # Warnings
+            warnings = [w for book in books for w in (book.warnings or [])]
+            if warnings:
+                st.warning("Warnings: " + "; ".join(set(warnings)))
 
             st.divider()
 
         # Export options
         st.subheader("Export Options")
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
         with col1:
             if st.button("Export to MARC", type="primary"):
                 try:
@@ -602,12 +633,50 @@ def main():
                 except Exception as e:
                     st.error(f"Export failed: {e}")
         with col3:
+            if st.button("Print Labels"):
+                st.session_state.show_label_form = True
+                st.rerun()
+        with col4:
             # Clear results and start over
             if st.button("Start New Lookup"):
                 st.session_state.all_books = []
                 st.session_state.series_entries = []
                 st.session_state.confirmed_series = []
                 st.rerun()
+
+        st.subheader("Print Labels")
+        with st.form("label_form"):
+            label_id = st.selectbox("Label Identifier", ["A", "B", "C", "D"])
+            clipart = st.selectbox("Clipart", ["None", "Duck", "Mouse", "Cat", "Dog", "Padlock", "Chili Pepper", "Eyeglasses", "Handcuffs"])
+            submitted = st.form_submit_button("Generate Labels")
+            if submitted:
+                # Generate label data
+                from label_generator import generate_pdf_sheet
+                label_data = []
+                for book in st.session_state.all_books:
+                    label_data.append({
+                        'Title': book.book_title or book.series_name,
+                        "Author's Name": ", ".join(book.authors) if book.authors else "Unknown",
+                        'Publication Year': str(book.copyright_year) if book.copyright_year else '',
+                        'Series Title': book.series_name,
+                        'Series Volume': str(book.volume_number),
+                        'Call Number': f"Manga {book.barcode}",
+                        'Holdings Barcode': book.barcode,
+                        'spine_label_id': label_id,
+                        'clipart': clipart
+                    })
+                pdf_data = generate_pdf_sheet(label_data)
+                st.download_button(
+                    label="Download Labels PDF",
+                    data=pdf_data,
+                    file_name="manga_labels.pdf",
+                    mime="application/pdf"
+                )
+                st.session_state.show_label_form = False
+                st.rerun()
+        if st.button("Cancel"):
+            st.session_state.show_label_form = False
+            st.rerun()
 
     else:
         # Show series input form
