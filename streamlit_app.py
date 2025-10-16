@@ -472,7 +472,7 @@ def get_volume_input(original_name, confirmed_name):
     if confirmed_name is None:
         confirmed_name = "unknown_series"
     # Use a combination of original name, confirmed name, and timestamp for uniqueness
-    unique_key = f"volume_form_{original_name}_{confirmed_name}_{int(time.time())}"
+    unique_key = f"volume_form_{original_name}_{confirmed_name}"
     # Sanitize the key to remove any problematic characters
     sanitized_key = "".join(c for c in unique_key if c.isalnum() or c in (' ', '-', '_')).replace(' ', '_')
     with st.form(sanitized_key):
