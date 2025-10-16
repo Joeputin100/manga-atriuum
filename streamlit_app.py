@@ -181,8 +181,9 @@ def series_input_form():
     series_count = len(st.session_state.series_entries) + 1
     ordinal_text = "1st" if series_count == 1 else "2nd" if series_count == 2 else "3rd" if series_count == 3 else f"{series_count}th"
 
-    # Use a simple unique key for the series form
-    with st.form(f"series_form_{series_count}_{len(st.session_state.series_entries)}", clear_on_submit=True):
+    # Use a unique key for the series form with timestamp
+    series_form_key = f"series_form_{series_count}_{len(st.session_state.series_entries)}_{int(time.time())}"
+    with st.form(series_form_key, clear_on_submit=True):
 
         series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
 
@@ -454,11 +455,14 @@ def get_volume_input(original_name, confirmed_name):
     """Get volume input for a confirmed series"""
     st.subheader(f"📚 Add Volumes for {confirmed_name}")
 
-    # Sanitize form key by removing special characters
+    # Create a truly unique form key
     if confirmed_name is None:
         confirmed_name = "unknown_series"
-    sanitized_name = "".join(c for c in confirmed_name if c.isalnum() or c in (' ', '-', '_')).replace(' ', '_')
-    with st.form(f"volume_form_{sanitized_name}"):
+    # Use a combination of original name, confirmed name, and timestamp for uniqueness
+    unique_key = f"volume_form_{original_name}_{confirmed_name}_{int(time.time())}"
+    # Sanitize the key to remove any problematic characters
+    sanitized_key = "".join(c for c in unique_key if c.isalnum() or c in (' ', '-', '_')).replace(' ', '_')
+    with st.form(sanitized_key):
         volume_input = st.text_input(
             "Volume Numbers/Ranges",
             placeholder="e.g., 1-5,7,10 or 17-18-19 (for omnibus)",
