@@ -72,9 +72,166 @@ def initialize_session_state():
         st.session_state.original_series_name = None
     if 'start_barcode' not in st.session_state:
         st.session_state.start_barcode = "T000001"
-
-
+n
 def get_volume_1_isbn(series_name: str) -> Optional[str]:
+    """Get ISBN for volume 1 of a series using DeepSeek API"""
+    try:
+        deepseek_api = DeepSeekAPI()
+        book_data = deepseek_api.get_book_info(series_name, 1, st.session_state.project_state)
+        if book_data and book_data.get('isbn_13'):
+            return book_data['isbn_13']
+        return None
+    except Exception:
+        return None
+
+
+def fetch_cover_for_book(book: BookInfo) -> Optional[str]:
+    """Fetch cover image for a book using available cover fetchers"""
+    
+    # Try MAL first
+    mal_fetcher = MALCoverFetcher()
+    cover_url = mal_fetcher.fetch_cover_for_series(book.series_name)
+    if cover_url:
+        return cover_url
+    
+    # Try MangaDex as fallback
+    mangadex_fetcher = MangaDexCoverFetcher()
+    cover_url = mangadex_fetcher.fetch_cover_for_series(book.series_name)
+    if cover_url:
+        return cover_url
+    
+    # Try Google Books as last resort
+    google_client = GoogleBooksClient()
+    cover_url = google_client.get_cover_image(book.series_name, 1)
+    return cover_url
+
+
+def process_single_volume(series_name, volume, project_state):
+    """Process a single volume and return book info"""
+    try:
+        deepseek_api = DeepSeekAPI()
+        google_books_api = GoogleBooksAPI()
+        book_data = deepseek_api.get_book_info(series_name, volume, project_state)
+        if book_data:
+            book = process_book_data(book_data, volume, google_books_api, project_state)
+            return book, None
+        else:
+            return None, f"Volume {volume} not found"
+    except Exception as e:
+        return None, f"Error processing volume {volume}: {str(e)}"
+
+
+def process_series():
+    """Process all confirmed series with threaded execution for better progress updates"""
+    if not st.session_state.series_entries:
+        return
+
+    # Initialize API (not used directly in this function but needed for imports)
+    try:
+        _ = DeepSeekAPI()  # Create instance to verify API is available
+    except ValueError as e:
+        st.error(f"API configuration error: {e}")
+        st.session_state.processing_state['is_processing'] = False
+        st.rerun()
+        return
+
+    all_books = []
+    errors = []
+
+    # Show initial processing message
+    st.info("🔄 Please wait while we look up your manga volumes...")
+
+    # Create a list of all volumes to process
+    all_volumes = []
+    for series_entry in st.session_state.series_entries:
+        series_name = series_entry['confirmed_name']
+        volumes = series_entry['volumes']
+        for volume in volumes:
+            all_volumes.append((series_name, volume))
+
+    # Process volumes with threading
+    with ThreadPoolExecutor(max_workers=15) as executor:
+        # Submit all tasks
+        future_to_volume = {
+            executor.submit(process_single_volume, series_name, volume, st.session_state.project_state): (series_name, volume)
+            for series_name, volume in all_volumes
+        }
+
+        # Process results as they complete
+        for i, future in enumerate(as_completed(future_to_volume)):
+            series_name, volume = future_to_volume[future]
+
+            # Update progress
+            st.session_state.processing_state['current_series'] = series_name
+            st.session_state.processing_state['current_volume'] = volume
+            st.session_state.processing_state['progress'] = i + 1
+
+            try:
+                book, error = future.result()
+                if book:
+                    all_books.append(book)
+                elif error:
+                    errors.append(error)
+            except Exception as e:
+                errors.append(f"Unexpected error processing {series_name} volume {volume}: {str(e)}")
+
+    # Assign barcodes
+    start_barcode = st.session_state.get('start_barcode', "T000001")
+    barcodes = generate_sequential_barcodes(start_barcode, len(all_books))
+    for book, barcode in zip(all_books, barcodes):
+        book.barcode = barcode
+
+    st.session_state.all_books = all_books
+    st.session_state.processing_state['is_processing'] = False
+
+    # Record interaction
+    series_info = ", ".join([
+        f"{entry['confirmed_name']} ({len(entry['volumes'])} vols)"
+        for entry in st.session_state.series_entries
+    ])
+    st.session_state.project_state.record_interaction(
+        f"Multiple series: {series_info}", len(all_books)
+    )
+
+    # Show results
+    if all_books:
+        st.success(f"✓ Found {len(all_books)} books!")
+    if errors:
+        st.warning(f"⚠️ {len(errors)} volumes had issues:")
+        for error in errors:
+            st.write(f"• {error}")
+
+    st.rerun()  # Final rerun to show results
+    """Process a single volume and return book info"""
+    try:
+        deepseek_api = DeepSeekAPI()
+        google_books_api = GoogleBooksAPI()
+        book_data = deepseek_api.get_book_info(series_name, volume, project_state)
+        if book_data:
+            book = process_book_data(book_data, volume, google_books_api, project_state)
+            return book, None
+        else:
+            return None, f"Volume {volume} not found"
+    except Exception as e:
+        return None, f"Error processing volume {volume}: {str(e)}"
+    """Fetch cover image for a book using available cover fetchers"""
+    
+    # Try MAL first
+    mal_fetcher = MALCoverFetcher()
+    cover_url = mal_fetcher.fetch_cover_for_series(book.series_name)
+    if cover_url:
+        return cover_url
+    
+    # Try MangaDex as fallback
+    mangadex_fetcher = MangaDexCoverFetcher()
+    cover_url = mangadex_fetcher.fetch_cover_for_series(book.series_name)
+    if cover_url:
+        return cover_url
+    
+    # Try Google Books as last resort
+    google_client = GoogleBooksClient()
+    cover_url = google_client.get_cover_image(book.series_name, 1)
+    return cover_url
     """Get ISBN for volume 1 of a series using DeepSeek API"""
     try:
         deepseek_api = DeepSeekAPI()
@@ -237,7 +394,6 @@ def series_input_form():
                         genres=[],
                         warnings=[]
                     )
-            st.rerun()
                     cover_url = fetch_cover_for_book(dummy_book)
                 except Exception:
                         pass
@@ -254,95 +410,54 @@ def series_input_form():
                 if st.button("🗑️ Remove", key=f"remove_{i}"):
                     st.session_state.series_entries.pop(i)
 
-    # Start processing button
+#    # Start processing button
     if st.session_state.series_entries:
         if st.button("🚀 Start Lookup", type="primary"):
-                len(entry['volumes']) for entry in st.session_state.series_entries
-            )
+            # Calculate total volumes
+            
+            # Initialize processing state
+            st.session_state.processing_state = {
+                'is_processing': True,
+                'current_series': None,
+                'current_volume': None,
+                'progress': 0,
+                'total_volumes': total_volumes,
+                'start_time': time.time()
+            }
+            
+            # Start processing
+            total_volumes = sum(len(entry['volumes']) for entry in st.session_state.series_entries)
+            st.session_state.processing_state['total_volumes'] = total_volumes
             st.rerun()
-            )
-            st.rerun()
-            )
-            st.rerun()
-            )
-            st.rerun()
-            )
-            st.rerun()
-        st.rerun()
+
+def main():
+    """Main application logic"""
+    st.title("📚 Manga Lookup Tool")
+    
+    # Initialize session state
+    initialize_session_state()
+    
+    # Handle pending series confirmation
+    if st.session_state.pending_series_name:
+        confirm_single_series(st.session_state.pending_series_name)
+        return
+    
+    # Check if processing
+    if st.session_state.processing_state["is_processing"]:
+        st.header("🔄 Processing Series")
+        
+        # Display progress
+        display_progress_section()
+        
+        # Processing logic
+        process_series()
+        
+        # In a real implementation, this would loop through series and volumes
+        
+    else:
+        # Show series input form
+        series_input_form()
 
 
-def confirm_single_series(series_name):
-    """Confirm a single series name with series information in separate cards"""
-    st.header(f"🔍 Confirm: {series_name}")
-
-    # Initialize DeepSeek API
-    try:
-        deepseek_api = DeepSeekAPI()
-    except ValueError as e:
-        st.error(f"API configuration error: {e}")
-    return
-
-    # Get suggestions
-    suggestions = deepseek_api.correct_series_name(series_name)
-
-    # Debug logging
-    print(f"DEBUG: confirm_single_series called for '{series_name}'")
-    print(f"DEBUG: suggestions returned: {suggestions}")
-    print(f"DEBUG: Number of suggestions: {len(suggestions)}")
-
-    if len(suggestions) > 1:
-        # Multiple suggestions - display in separate cards
-        st.write("Select the correct series name:")
-
-        # Create columns for the cards
-        cols = st.columns(min(3, len(suggestions)))
-
-        for i, suggestion in enumerate(suggestions):
-            with cols[i % len(cols)]:
-                # Create a card container with distinct styling
-                card_colors = [
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                    "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-                    "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-                    "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
-                    "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-                    "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)"
-                ]
-                card_color = card_colors[i % len(card_colors)]
-
-                st.markdown(f"""
-                <div style="
-                    background: {card_color};
-                    border-radius: 12px;
-                    padding: 20px;
-                    margin: 10px 0;
-                    color: white;
-                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-                    border: 2px solid rgba(255, 255, 255, 0.3);
-                ">
-                """, unsafe_allow_html=True)
-
-                # Show title immediately
-                st.subheader(suggestion)
-
-                # Try to get cover image
-                try:
-                    # Create a dummy book object to get series cover
-                    dummy_book = BookInfo(
-                        series_name=suggestion,
-                        volume_number=1,
-                        book_title="",
-                        authors=[],
-                        msrp_cost=None,
-                        isbn_13=None,
-                        publisher_name="",
-                        copyright_year=None,
-                        description="",
-                        physical_description="",
-                        genres=[],
-                        warnings=[]
-                    )
-            st.rerun()
-                    cover_url = fetch_cover_for_book(dummy_book)
-                except Exception:
-                        pass
+if __name__ == "__main__":
+    main()
