@@ -186,7 +186,8 @@ def series_input_form():
         series_count = len(st.session_state.series_entries) + 1
         ordinal_text = "1st" if series_count == 1 else "2nd" if series_count == 2 else "3rd" if series_count == 3 else f"{series_count}th"
 
-        with st.form(f"series_form_{series_count}", clear_on_submit=True):
+        # Use a simple unique key for the series form
+        with st.form(f"series_form_{series_count}_{len(st.session_state.series_entries)}", clear_on_submit=True):
 
             series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
     
@@ -351,8 +352,10 @@ def confirm_single_series(series_name):
                     cover_url = fetch_cover_for_book(dummy_book)
                     if cover_url:
                         st.image(cover_url, width=120)
-                except:
-                    pass
+                    else:
+                        st.caption("📚 No cover available")
+                except Exception as e:
+                    st.caption(f"⚠️ Cover error: {str(e)[:50]}...")
 
                 # Get series information
                 series_info = deepseek_api._get_series_info(suggestion)
@@ -426,10 +429,10 @@ def confirm_single_series(series_name):
                         st.image(cover_url, width=120)
                     else:
                         st.markdown("📚")
-                        st.caption("Manga Series")
-                except:
+                        st.caption("No cover available")
+                except Exception as e:
                     st.markdown("📚")
-                    st.caption("Manga Series")
+                    st.caption(f"Cover error: {str(e)[:30]}...")
 
             with col2:
                 st.subheader(selected_series)
@@ -452,7 +455,9 @@ def get_volume_input(original_name, confirmed_name):
     """Get volume input for a confirmed series"""
     st.subheader(f"📚 Add Volumes for {confirmed_name}")
 
-    with st.form(f"volume_form_{confirmed_name}"):
+    # Sanitize form key by removing special characters
+    sanitized_name = "".join(c for c in confirmed_name if c.isalnum() or c in (' ', '-', '_')).replace(' ', '_')
+    with st.form(f"volume_form_{sanitized_name}"):
         volume_input = st.text_input(
             "Volume Numbers/Ranges",
             placeholder="e.g., 1-5,7,10 or 17-18-19 (for omnibus)",
