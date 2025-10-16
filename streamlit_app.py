@@ -305,27 +305,70 @@ def confirm_single_series(series_name):
 
         for i, suggestion in enumerate(suggestions):
             with cols[i % len(cols)]:
-                # Create a card container
-                with st.container():
-                    # Show title immediately
-                    st.subheader(suggestion)
+                # Create a card container with distinct styling
+                card_colors = [
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                    "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+                    "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+                    "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+                    "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)"
+                ]
+                card_color = card_colors[i % len(card_colors)]
 
-                    # Get series information
-                    series_info = deepseek_api._get_series_info(suggestion)
+                st.markdown(f"""
+                <div style="
+                    background: {card_color};
+                    border-radius: 12px;
+                    padding: 20px;
+                    margin: 10px 0;
+                    color: white;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                    border: 2px solid rgba(255, 255, 255, 0.3);
+                ">
+                """, unsafe_allow_html=True)
 
-                    # Display series information
-                    if series_info:
-                        st.write(f"**Info:** {series_info}")
-                        st.write("*No additional information available*")
+                # Show title immediately
+                st.subheader(suggestion)
 
-                    # Make the entire card clickable
-                    if st.button(f"✓ Select {suggestion}", key=f"select_{i}"):
-                        # Store selected series for volume input
-                        st.session_state.selected_series = suggestion
-                        st.session_state.original_series_name = series_name
-                        st.rerun()
+                # Try to get cover image
+                try:
+                    # Create a dummy book object to get series cover
+                    dummy_book = BookInfo(
+                        title="",
+                        authors=[],
+                        isbn_13=None,
+                        series_name=suggestion,
+                        volume_number=1,
+                        description="",
+                        page_count=0,
+                        published_date="",
+                        categories=[],
+                        language="",
+                        publisher=""
+                    )
+                    cover_url = fetch_cover_for_book(dummy_book)
+                    if cover_url:
+                        st.image(cover_url, width=120)
+                except:
+                    pass
 
-                    st.markdown("---")
+                # Get series information
+                series_info = deepseek_api._get_series_info(suggestion)
+
+                # Display series information
+                if series_info:
+                    st.write(f"**Info:** {series_info}")
+                    st.write("*No additional information available*")
+
+                # Make the entire card clickable
+                if st.button(f"✓ Select {suggestion}", key=f"select_{series_name}_{i}"):
+                    # Store selected series for volume input
+                    st.session_state.selected_series = suggestion
+                    st.session_state.original_series_name = series_name
+                    st.rerun()
+
+                st.markdown("</div>", unsafe_allow_html=True)
 
         # Look Again and Skip options
         col1, col2 = st.columns(2)
@@ -345,13 +388,47 @@ def confirm_single_series(series_name):
         selected_series = suggestions[0]
         st.success(f"✓ Using: {selected_series}")
 
-        # Show series information in a card
+        # Show series information in a card with styling
+        st.markdown("""
+        <div style="
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px 0;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        ">
+        """, unsafe_allow_html=True)
+
         with st.container():
             col1, col2 = st.columns([1, 3])
             with col1:
-                # Display series icon
-                st.markdown("📚")
-                st.caption("Manga Series")
+                # Try to get cover image
+                try:
+                    # Create a dummy book object to get series cover
+                    dummy_book = BookInfo(
+                        title="",
+                        authors=[],
+                        isbn_13=None,
+                        series_name=selected_series,
+                        volume_number=1,
+                        description="",
+                        page_count=0,
+                        published_date="",
+                        categories=[],
+                        language="",
+                        publisher=""
+                    )
+                    cover_url = fetch_cover_for_book(dummy_book)
+                    if cover_url:
+                        st.image(cover_url, width=120)
+                    else:
+                        st.markdown("📚")
+                        st.caption("Manga Series")
+                except:
+                    st.markdown("📚")
+                    st.caption("Manga Series")
 
             with col2:
                 st.subheader(selected_series)
@@ -366,6 +443,8 @@ def confirm_single_series(series_name):
                     st.session_state.selected_series = selected_series
                     st.session_state.original_series_name = series_name
                     st.rerun()
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 def get_volume_input(original_name, confirmed_name):
