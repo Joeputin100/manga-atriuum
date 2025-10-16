@@ -250,11 +250,18 @@ class DeepSeekAPI:
             result = response.json()
             content = result["choices"][0]["message"]["content"]
 
+            # Debug logging
+            print(f"DEBUG: DeepSeek API response status: {response.status_code}")
+            print(f"DEBUG: DeepSeek API response content: {content}")
+
             # Parse JSON response
             suggestions = json.loads(content)
 
             # Filter out any None values from suggestions
             suggestions = [s for s in suggestions if s is not None]
+
+            # Debug logging
+            print(f"DEBUG: Filtered suggestions: {suggestions}")
 
             # Ensure the original series name is included if it's valid
             # Check if the original name is in the suggestions, if not add it

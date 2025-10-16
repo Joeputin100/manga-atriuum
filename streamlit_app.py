@@ -295,6 +295,11 @@ def confirm_single_series(series_name):
     # Get suggestions
     suggestions = deepseek_api.correct_series_name(series_name)
 
+    # Debug logging
+    print(f"DEBUG: confirm_single_series called for '{series_name}'")
+    print(f"DEBUG: suggestions returned: {suggestions}")
+    print(f"DEBUG: Number of suggestions: {len(suggestions)}")
+
     if len(suggestions) > 1:
         # Multiple suggestions - display in separate cards
         st.write("Select the correct series name:")
