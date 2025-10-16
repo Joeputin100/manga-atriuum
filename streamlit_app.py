@@ -429,7 +429,8 @@ def series_input_form():
     if st.session_state.series_entries:
         if st.button("🚀 Start Lookup", type="primary"):
             # Calculate total volumes
-            
+            total_volumes = sum(len(entry['volumes']) for entry in st.session_state.series_entries)
+
             # Initialize processing state
             st.session_state.processing_state = {
                 'is_processing': True,
@@ -439,10 +440,8 @@ def series_input_form():
                 'total_volumes': total_volumes,
                 'start_time': time.time()
             }
-            
+
             # Start processing
-            total_volumes = sum(len(entry['volumes']) for entry in st.session_state.series_entries)
-            st.session_state.processing_state['total_volumes'] = total_volumes
             st.rerun()
 
 def confirm_single_series(series_name):
