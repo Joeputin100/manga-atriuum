@@ -201,47 +201,6 @@ def process_series():
             st.write(f"• {error}")
 
     st.rerun()  # Final rerun to show results
-    """Process a single volume and return book info"""
-    try:
-        deepseek_api = DeepSeekAPI()
-        google_books_api = GoogleBooksAPI()
-        book_data = deepseek_api.get_book_info(series_name, volume, project_state)
-        if book_data:
-            book = process_book_data(book_data, volume, google_books_api, project_state)
-            return book, None
-        else:
-            return None, f"Volume {volume} not found"
-    except Exception as e:
-        return None, f"Error processing volume {volume}: {str(e)}"
-    """Fetch cover image for a book using available cover fetchers"""
-    
-    # Try MAL first
-    mal_fetcher = MALCoverFetcher()
-    cover_url = mal_fetcher.fetch_cover_for_series(book.series_name)
-    if cover_url:
-        return cover_url
-    
-    # Try MangaDex as fallback
-    mangadex_fetcher = MangaDexCoverFetcher()
-    cover_url = mangadex_fetcher.fetch_cover_for_series(book.series_name)
-    if cover_url:
-        return cover_url
-    
-    # Try Google Books as last resort
-    google_client = GoogleBooksClient()
-    cover_url = google_client.get_cover_image(book.series_name, 1)
-    return cover_url
-    """Get ISBN for volume 1 of a series using DeepSeek API"""
-    try:
-        deepseek_api = DeepSeekAPI()
-        book_data = deepseek_api.get_book_info(series_name, 1, st.session_state.project_state)
-        if book_data and book_data.get('isbn_13'):
-            return book_data['isbn_13']
-        return None
-    except Exception:
-        return None
-
-
 def display_duck_animation():
     """Display animated duck with GIF"""
     """Display animated duck with GIF"""
@@ -290,8 +249,7 @@ def calculate_eta(start_time, progress, total):
 
 def display_progress_section():
     """Display progress tracking with duck animation"""
-    return
-
+    state = st.session_state.processing_state
     progress = state['progress']
     total = state['total_volumes']
 
