@@ -429,6 +429,119 @@ def series_input_form():
             st.session_state.processing_state['total_volumes'] = total_volumes
             st.rerun()
 
+def confirm_single_series(series_name):
+    """Confirm a single series name with series information in separate cards"""
+    st.header(f"🔍 Confirm: {series_name}")
+
+    # Initialize DeepSeek API
+    try:
+        deepseek_api = DeepSeekAPI()
+    except ValueError as e:
+        st.error(f"API configuration error: {e}")
+        return
+
+    # Get suggestions
+    suggestions = deepseek_api.correct_series_name(series_name)
+
+    # Debug logging
+    print(f"DEBUG: confirm_single_series called for '{series_name}'")
+    print(f"DEBUG: suggestions returned: {suggestions}")
+    print(f"DEBUG: Number of suggestions: {len(suggestions)}")
+
+    if len(suggestions) > 1:
+        # Multiple suggestions - display in separate cards
+        st.write("Select the correct series name:")
+
+        # Create columns for the cards
+        cols = st.columns(min(3, len(suggestions)))
+
+        for i, suggestion in enumerate(suggestions):
+            with cols[i % len(cols)]:
+                # Create a card container with distinct styling
+                card_colors = [
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                    "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+                    "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+                    "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+                    "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)"
+                ]
+                card_color = card_colors[i % len(card_colors)]
+
+                st.markdown(f"""
+                <div style="
+                    background: {card_color};
+                    border-radius: 12px;
+                    padding: 20px;
+                    margin: 10px 0;
+                    color: white;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                    border: 2px solid rgba(255, 255, 255, 0.3);
+                ">
+                """, unsafe_allow_html=True)
+
+                # Show title immediately
+                st.subheader(suggestion)
+
+                # Try to get cover image
+                try:
+                    # Create a dummy book object to get series cover
+                    dummy_book = BookInfo(
+                        series_name=suggestion,
+                        volume_number=1,
+                        book_title="",
+                        authors=[],
+                        msrp_cost=None,
+                        isbn_13=None,
+                        publisher_name="",
+                        copyright_year=None,
+                        description="",
+                        physical_description="",
+                        genres=[],
+                        warnings=[]
+                    )
+                    cover_url = fetch_cover_for_book(dummy_book)
+                except Exception:
+                        pass
+
+                if cover_url:
+                    try:
+                        st.image(cover_url, width=100)
+                    except Exception:
+                        pass
+
+                # Selection button
+                if st.button(f"Select {suggestion}", key=f"select_{i}"):
+                    st.session_state.pending_series_name = None
+                    # Add to confirmed series
+                    st.session_state.confirmed_series.append({
+                        "original_name": series_name,
+                        "confirmed_name": suggestion,
+                        "volumes": []  # Will be populated later
+                    })
+                    st.success(f"Selected: {suggestion}")
+                    st.rerun()
+
+    elif len(suggestions) == 1:
+        # Single suggestion - auto-confirm
+        confirmed_name = suggestions[0]
+        st.success(f"Found: {confirmed_name}")
+        
+        # Add to confirmed series
+        st.session_state.confirmed_series.append({
+            "original_name": series_name,
+            "confirmed_name": confirmed_name,
+            "volumes": []  # Will be populated later
+        })
+        
+        # Clear pending
+        st.session_state.pending_series_name = None
+        st.rerun()
+        
+    else:
+        st.error("No suggestions found. Please try a different series name.")
+
+
 def main():
     """Main application logic"""
     st.title("📚 Manga Lookup Tool")
