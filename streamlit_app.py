@@ -181,11 +181,12 @@ def series_input_form():
     
         # Series input section
         st.subheader("Add Series")
-    
-        with st.form("series_form", clear_on_submit=True):
-            # Make series name entry ordinal
-            series_count = len(st.session_state.series_entries) + 1
-            ordinal_text = "1st" if series_count == 1 else "2nd" if series_count == 2 else "3rd" if series_count == 3 else f"{series_count}th"
+
+        # Make series name entry ordinal
+        series_count = len(st.session_state.series_entries) + 1
+        ordinal_text = "1st" if series_count == 1 else "2nd" if series_count == 2 else "3rd" if series_count == 3 else f"{series_count}th"
+
+        with st.form(f"series_form_{series_count}", clear_on_submit=True):
 
             series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
     
@@ -451,7 +452,7 @@ def get_volume_input(original_name, confirmed_name):
     """Get volume input for a confirmed series"""
     st.subheader(f"📚 Add Volumes for {confirmed_name}")
 
-    with st.form("volume_form"):
+    with st.form(f"volume_form_{confirmed_name}"):
         volume_input = st.text_input(
             "Volume Numbers/Ranges",
             placeholder="e.g., 1-5,7,10 or 17-18-19 (for omnibus)",
