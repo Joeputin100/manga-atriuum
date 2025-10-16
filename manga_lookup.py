@@ -241,6 +241,8 @@ class DeepSeekAPI:
             "temperature": 0.3
         }
 
+        content = None  # Initialize content variable
+
         try:
             response = requests.post(self.base_url, headers=headers, json=payload, timeout=60)
             response.raise_for_status()
@@ -259,9 +261,8 @@ class DeepSeekAPI:
             if series_name not in suggestions:
                 # Check if any suggestion contains the original name (case-insensitive)
                 original_in_suggestions = any(
-                    series_name.lower() in suggestion.lower()
+                    suggestion and series_name.lower() in suggestion.lower()
                     for suggestion in suggestions
-                    if suggestion is not None
                 )
                 if not original_in_suggestions:
                     # Add original name as first suggestion
@@ -269,6 +270,10 @@ class DeepSeekAPI:
 
             return suggestions
 
+        except json.JSONDecodeError as e:
+            rprint(f"[red]JSON decode error in DeepSeek API response: {e}[/red]")
+            rprint(f"[yellow]Response content: {content if content else 'Not available'}[/yellow]")
+            return [series_name]  # Fallback to original name
         except Exception as e:
             rprint(f"[red]Error using DeepSeek API: {e}[/red]")
             return [series_name]  # Fallback to original name
@@ -413,13 +418,18 @@ class DeepSeekAPI:
             result = response.json()
             content = result["choices"][0]["message"]["content"].strip()
 
+            # Ensure content is not None before processing
+            if content is None:
+                return None
+
             # Limit to 60 characters for display
             if len(content) > 60:
                 content = content[:57] + "..."
 
             return content
 
-        except Exception:
+        except Exception as e:
+            rprint(f"[yellow]Error getting series info for '{series_name}': {e}[/yellow]")
             # If we can't get info, just return None
             return None
 

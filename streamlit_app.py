@@ -356,13 +356,16 @@ def confirm_single_series(series_name):
                     st.caption(f"⚠️ Cover error: {str(e)[:50]}...")
 
                 # Get series information
-                series_info = deepseek_api._get_series_info(suggestion)
-
-                # Display series information
-                if series_info:
-                    st.write(f"**Info:** {series_info}")
-                else:
-                    st.write("*No additional information available*")
+                try:
+                    series_info = deepseek_api._get_series_info(suggestion)
+                    # Display series information
+                    if series_info:
+                        st.write(f"**Info:** {series_info}")
+                    else:
+                        st.write("*No additional information available*")
+                except Exception as e:
+                    st.write("*Series information unavailable*")
+                    print(f"Error getting series info for '{suggestion}': {e}")
 
                 # Make the entire card clickable
                 if st.button(f"✓ Select {suggestion}", key=f"select_{series_name}_{i}"):
@@ -387,6 +390,7 @@ def confirm_single_series(series_name):
                 st.warning(f"Skipped {series_name}")
                 st.session_state.pending_series_name = None
                 st.rerun()
+    else:
         # Single suggestion
         selected_series = suggestions[0]
         st.success(f"✓ Using: {selected_series}")
@@ -438,9 +442,13 @@ def confirm_single_series(series_name):
                 st.subheader(selected_series)
 
                 # Get and display series information
-                series_info = deepseek_api._get_series_info(selected_series)
-                if series_info:
-                    st.write(f"**Series Info:** {series_info}")
+                try:
+                    series_info = deepseek_api._get_series_info(selected_series)
+                    if series_info:
+                        st.write(f"**Series Info:** {series_info}")
+                except Exception as e:
+                    st.write("*Series information unavailable*")
+                    print(f"Error getting series info for '{selected_series}': {e}")
 
                 if st.button("✓ Confirm and Add Volumes", type="primary"):
                     # Store selected series for volume input
@@ -537,8 +545,10 @@ def confirm_series_names():
             elif selected_option == "Skip":
                 st.warning(f"Skipped {series_name}")
                 continue
+            else:
                 selected_series = selected_option
                 st.success(f"Using: {selected_series}")
+        else:
             # Single suggestion
             selected_series = suggestions[0]
             st.success(f"Using: {selected_series}")
@@ -572,6 +582,7 @@ def process_single_volume(series_name, volume, project_state):
         if book_data:
             book = process_book_data(book_data, volume, google_books_api, project_state)
             return book, None
+        else:
             return None, f"Volume {volume} not found"
     except Exception as e:
         return None, f"Error processing volume {volume}: {str(e)}"
@@ -1066,19 +1077,6 @@ def main():
             display_results()
         else:
             st.info("No results yet. Complete the workflow in other tabs.")
-        # Processing in progress
-        st.header("🔄 Processing...")
-        display_progress_section()
-        process_series()
-        # Results available
-        display_results()
-        # Ready to process
-        confirm_series_names()
-        # Volume input phase
-        get_volume_input(st.session_state.original_series_name, st.session_state.selected_series)
-        # Series confirmation phase
-        confirm_single_series(st.session_state.pending_series_name)
-        # Input phase
 
 
 if __name__ == "__main__":
