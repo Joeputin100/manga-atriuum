@@ -285,46 +285,20 @@ def confirm_single_series(series_name):
     """Confirm a single series name with series information in separate cards"""
     st.header(f"🔍 Confirm: {series_name}")
 
-    # Debug information visible in UI
-    with st.expander("🔧 Debug Info", expanded=False):
-        st.write("**Function called with:**", series_name)
-        st.write("**Session state pending_series_name:**", st.session_state.get('pending_series_name'))
-
     # Initialize DeepSeek API
     try:
         deepseek_api = DeepSeekAPI()
-        with st.expander("🔧 Debug Info", expanded=False):
-            st.success("✅ DeepSeek API initialized successfully")
     except ValueError as e:
         st.error(f"API configuration error: {e}")
-        with st.expander("🔧 Debug Info", expanded=False):
-            st.error(f"❌ API init failed: {e}")
         return
 
     # Get suggestions
-    try:
-        suggestions = deepseek_api.correct_series_name(series_name)
-    except Exception as e:
-        st.error(f"Error getting suggestions: {e}")
-        suggestions = [series_name]  # Fallback
+    suggestions = deepseek_api.correct_series_name(series_name)
 
-    # Debug logging and UI display
+    # Debug logging
     print(f"DEBUG: confirm_single_series called for '{series_name}'")
     print(f"DEBUG: suggestions returned: {suggestions}")
     print(f"DEBUG: Number of suggestions: {len(suggestions)}")
-
-    with st.expander("🔧 Debug Info", expanded=False):
-        st.write("**Suggestions returned:**", suggestions)
-        st.write("**Number of suggestions:**", len(suggestions))
-        if not suggestions:
-            st.error("❌ No suggestions returned!")
-        elif len(suggestions) == 1:
-            st.info("ℹ️ Single suggestion (will show single card)")
-        else:
-            st.info(f"ℹ️ Multiple suggestions ({len(suggestions)} - will show multiple cards)")
-
-    # Simple debug display
-    st.write("Suggestions found:", suggestions)
 
     if len(suggestions) > 1:
         # Multiple suggestions - display in separate cards
@@ -1080,16 +1054,6 @@ def main():
     tab1, tab2, tab3 = st.tabs(["📚 Add Series", "🔍 Confirm", "📊 Results"])
     
     with tab1:
-        # Debug: Show current state
-        with st.expander("🔧 Workflow Debug", expanded=False):
-            st.write("**Processing:**", st.session_state.processing_state["is_processing"])
-            st.write("**All books:**", bool(st.session_state.all_books))
-            st.write("**Confirmed series:**", bool(st.session_state.confirmed_series))
-            st.write("**Selected series:**", bool(st.session_state.selected_series))
-            st.write("**Pending series:**", bool(st.session_state.pending_series_name))
-            if st.session_state.pending_series_name:
-                st.write("**Pending series name:**", st.session_state.pending_series_name)
-
         if st.session_state.processing_state["is_processing"]:
             st.info("Processing in progress... Check the Confirm tab for details.")
         elif st.session_state.all_books:
