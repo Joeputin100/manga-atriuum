@@ -404,6 +404,19 @@ def series_input_form():
                         pass
 
                 st.write(f"**Volumes:** {", ".join(map(str, entry["volumes"]))}")
+                # Volume input
+                col1, col2 = st.columns(2)
+                with col1:
+                    volume_input = st.text_input(f"Volumes for {entry["confirmed_name"]}", placeholder="1-5, 10", key=f"volumes_{i}")
+                with col2:
+                    if st.button("Add Volumes", key=f"add_vol_{i}") and volume_input:
+                        try:
+                            volumes = parse_volume_range(volume_input)
+                            entry["volumes"] = volumes
+                            st.success(f"Added {len(volumes)} volumes")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Invalid volume range: {e}")
 
                 # Remove button
                 if st.button("🗑️ Remove", key=f"remove_{i}"):
@@ -514,7 +527,7 @@ def confirm_single_series(series_name):
                 if st.button(f"Select {suggestion}", key=f"select_{i}"):
                     st.session_state.pending_series_name = None
                     # Add to confirmed series
-                    st.session_state.confirmed_series.append({
+                    st.session_state.series_entries.append({
                         "original_name": series_name,
                         "confirmed_name": suggestion,
                         "volumes": []  # Will be populated later
@@ -528,7 +541,7 @@ def confirm_single_series(series_name):
         st.success(f"Found: {confirmed_name}")
         
         # Add to confirmed series
-        st.session_state.confirmed_series.append({
+        st.session_state.series_entries.append({
             "original_name": series_name,
             "confirmed_name": confirmed_name,
             "volumes": []  # Will be populated later
