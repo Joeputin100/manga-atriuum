@@ -541,23 +541,29 @@ def main():
         # Display results
         st.header("📚 Lookup Results")
 
-        # Create a dataframe for display
-        import pandas as pd
-        books_data = []
-        for book in st.session_state.all_books:
-            books_data.append({
-                'Barcode': book.barcode,
-                'Series': book.series_name,
-                'Volume': book.volume_number,
-                'Title': book.book_title or 'N/A',
-                'ISBN': book.isbn_13 or 'N/A',
-                'Authors': ', '.join(book.authors) if book.authors else 'N/A',
-                'Publisher': book.publisher_name or 'N/A',
-                'MSRP': f"${book.msrp_cost:.2f}" if book.msrp_cost else 'N/A'
-            })
+        # Sort books by volume number
+        sorted_books = sorted(st.session_state.all_books, key=lambda x: x.volume_number)
 
-        df = pd.DataFrame(books_data)
-        st.dataframe(df, use_container_width=True)
+        # Display each book in a row with columns
+        for book in sorted_books:
+            col1, col2, col3, col4, col5, col6, col7, col8 = st.columns([1, 2, 1, 2, 1, 1, 1, 2])
+
+            # Cover image
+            cover_url = fetch_cover_for_book(book)
+            if cover_url:
+                col1.image(cover_url, width=80)
+            else:
+                col1.write("No cover")
+
+            col2.write(f"**{book.series_name}**")
+            col3.write(f"Vol {book.volume_number}")
+            col4.write(book.book_title or 'N/A')
+            col5.write(book.isbn_13 or 'N/A')
+            col6.write(', '.join(book.authors) if book.authors else 'N/A')
+            col7.write(book.publisher_name or 'N/A')
+            col8.write(book.description or 'N/A')
+
+            st.divider()
 
         # Export options
         st.subheader("Export Options")
