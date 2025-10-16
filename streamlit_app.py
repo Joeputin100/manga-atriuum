@@ -569,7 +569,14 @@ def main():
         st.subheader("Export Options")
         if st.button("Export to MARC", type="primary"):
             try:
-                marc_data = export_books_to_marc(st.session_state.all_books)
+                import tempfile
+                import os
+                with tempfile.NamedTemporaryFile(mode="w+b", suffix=".mrc", delete=False) as temp_file:
+                    temp_path = temp_file.name
+                    export_books_to_marc(st.session_state.all_books, temp_path)
+                    with open(temp_path, "rb") as f:
+                        marc_data = f.read()
+                    os.unlink(temp_path)
                 st.download_button(
                     label="Download MARC file",
                     data=marc_data,
