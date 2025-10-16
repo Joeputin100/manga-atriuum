@@ -206,15 +206,17 @@ def series_input_form():
             st.info(f"DEBUG: Setting pending_series_name to {series_name}")
             # Store the series name for confirmation
             st.session_state.pending_series_name = series_name
-            st.success(f"✓ Submitted '{series_name}' for confirmation")
             
 
             
             st.rerun()
+    
+    
             
 
 
     
+
 
     # Display current series with cyan background
     if st.session_state.series_entries:
@@ -288,6 +290,8 @@ def series_input_form():
                 if st.button("🗑️ Remove", key=f"remove_{i}"):
                     st.session_state.series_entries.pop(i)
                     st.rerun()
+    
+    
 
     
 
@@ -303,6 +307,8 @@ def series_input_form():
                 len(entry['volumes']) for entry in st.session_state.series_entries
             )
         st.rerun()
+    
+    
 
 
 
@@ -429,6 +435,8 @@ def confirm_single_series(series_name):
                     st.session_state.selected_series = suggestion
                     st.session_state.original_series_name = series_name
                     st.rerun()
+    
+    
 
     
 
@@ -442,6 +450,8 @@ def confirm_single_series(series_name):
                 # Clear pending series to restart
                 st.session_state.pending_series_name = None
                 st.rerun()
+    
+    
 
     
 
@@ -450,6 +460,8 @@ def confirm_single_series(series_name):
                 st.warning(f"Skipped {series_name}")
                 st.session_state.pending_series_name = None
                 st.rerun()
+    
+    
 
     
     else:
@@ -517,6 +529,8 @@ def confirm_single_series(series_name):
                     st.session_state.selected_series = selected_series
                     st.session_state.original_series_name = series_name
                     st.rerun()
+    
+    
 
     
 
@@ -557,6 +571,8 @@ def get_volume_input(original_name, confirmed_name):
                 st.session_state.original_series_name = None
                 st.session_state.pending_series_name = None
                 st.rerun()
+    
+    
 
     
             except ValueError as e:
@@ -568,6 +584,8 @@ def get_volume_input(original_name, confirmed_name):
             st.session_state.original_series_name = None
             st.session_state.pending_series_name = None
             st.rerun()
+    
+    
 
     
 
@@ -639,6 +657,8 @@ def confirm_series_names():
                 len(entry['volumes']) for entry in confirmed_series
             )
             st.rerun()
+    
+    
 
     
 
@@ -719,6 +739,8 @@ def process_series():
 
     st.session_state.all_books = all_books
     st.rerun()  # Update UI after processing
+    
+    
 
     st.session_state.processing_state['is_processing'] = False
 
@@ -740,6 +762,8 @@ def process_series():
             st.write(f"• {error}")
 
     st.rerun()  # Final rerun to show results
+    
+    
 
 
 
@@ -952,6 +976,8 @@ def display_results():
             if selected_index != st.session_state.selected_book_index:
                 st.session_state.selected_book_index = selected_index
                 st.rerun()
+    
+    
 
     
 
