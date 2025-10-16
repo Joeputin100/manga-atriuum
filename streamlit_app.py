@@ -90,7 +90,7 @@ def get_volume_1_isbn(series_name: str) -> Optional[str]:
 
 def display_duck_animation():
     """Display animated duck with GIF"""
-    st.image('https://media.giphy.com/media/WzA4Vj6V8UOEX10jMj/giphy.gif', use_container_width=True)
+    st.image('https://media.giphy.com/media/WzA4Vj6V8UOEX10jMj/giphy.gif')
 
 
 def calculate_elapsed_time(start_time):
@@ -175,7 +175,6 @@ def series_input_form():
             value=st.session_state.start_barcode,
             placeholder="Enter starting barcode",
             help="Enter starting barcode (e.g., T000001 or MANGA001)",
-            use_container_width=True
         )
         if start_barcode and start_barcode != st.session_state.start_barcode:
             st.session_state.start_barcode = start_barcode
@@ -187,7 +186,7 @@ def series_input_form():
             # Make series name entry ordinal
             series_count = len(st.session_state.series_entries) + 1
 
-            series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)", use_container_width=True)
+            series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
     
             submitted = st.form_submit_button("Confirm Series Name")
     
@@ -264,7 +263,7 @@ def series_input_form():
                     st.markdown(card_html, unsafe_allow_html=True)
                     
                     # Remove button outside the HTML
-                    if st.button("🗑️ Remove", key=f"remove_{i}", use_container_width=True):
+                    if st.button("🗑️ Remove", key=f"remove_{i}"):
                         st.session_state.series_entries.pop(i)
                         st.rerun()
                     
@@ -273,7 +272,7 @@ def series_input_form():
     
         # Start processing button
         if st.session_state.series_entries:
-            if st.button("🚀 Start Lookup", type="primary", use_container_width=True):
+            if st.button("🚀 Start Lookup", type="primary"):
                 st.session_state.processing_state['is_processing'] = True
                 st.session_state.processing_state['start_time'] = time.time()
                 st.session_state.processing_state['total_volumes'] = sum(
@@ -319,7 +318,7 @@ def confirm_single_series(series_name):
                         st.write("*No additional information available*")
 
                     # Make the entire card clickable
-                    if st.button(f"✓ Select {suggestion}", key=f"select_{i}", use_container_width=True):
+                    if st.button(f"✓ Select {suggestion}", key=f"select_{i}"):
                         # Store selected series for volume input
                         st.session_state.selected_series = suggestion
                         st.session_state.original_series_name = series_name
@@ -330,14 +329,14 @@ def confirm_single_series(series_name):
         # Look Again and Skip options
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🔄 Look Again", use_container_width=True):
+            if st.button("🔄 Look Again"):
                 st.info("Searching for more options...")
                 # Clear pending series to restart
                 st.session_state.pending_series_name = None
                 st.rerun()
 
         with col2:
-            if st.button("⏭️ Skip", use_container_width=True):
+            if st.button("⏭️ Skip"):
                 st.warning(f"Skipped {series_name}")
                 st.session_state.pending_series_name = None
                 st.rerun()
@@ -361,7 +360,7 @@ def confirm_single_series(series_name):
                 if series_info:
                     st.write(f"**Series Info:** {series_info}")
 
-                if st.button("✓ Confirm and Add Volumes", type="primary", use_container_width=True):
+                if st.button("✓ Confirm and Add Volumes", type="primary"):
                     # Store selected series for volume input
                     st.session_state.selected_series = selected_series
                     st.session_state.original_series_name = series_name
@@ -636,7 +635,7 @@ def show_book_details_modal(book: BookInfo):
                 st.success("Cover image fetched!")
         if book.cover_image_url:
             try:
-                st.image(book.cover_image_url, use_container_width=True, caption="Cover Image")
+                st.image(book.cover_image_url, caption="Cover Image")
             except Exception as e:
                 st.error(f"Could not load cover image: {e}")
                 st.write("**Cover:** Image unavailable")
@@ -712,7 +711,7 @@ def display_results():
 
     with col2:
         # JSON export
-        if st.button("💾 Export JSON", use_container_width=True):
+        if st.button("💾 Export JSON"):
             results_data = [
                 {
                     "series_name": book.series_name,
@@ -774,7 +773,7 @@ def display_results():
         # Create DataFrame and display as table
         if table_data:
             df = pd.DataFrame(table_data)
-            st.dataframe(df, use_container_width=True, hide_index=True)
+            st.dataframe(df, hide_index=True)
             st.info("No books found to display")
 
     # Book details modal
