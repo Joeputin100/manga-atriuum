@@ -204,6 +204,7 @@ def series_input_form():
         if submitted and series_name:
             # Store the series name for confirmation
             st.session_state.pending_series_name = series_name
+            st.success(f"✓ Submitted '{series_name}' for confirmation")
             st.rerun()
 
     # Display current series with cyan background
