@@ -184,8 +184,6 @@ def series_input_form():
     # Use a unique key for the series form with timestamp
     series_form_key = f"series_form_{series_count}_{len(st.session_state.series_entries)}_{int(time.time())}"
     # Track form submission
-    if 'form_just_submitted' not in st.session_state:
-        st.session_state.form_just_submitted = None
     with st.form(series_form_key, clear_on_submit=True):
 
         series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
@@ -200,7 +198,6 @@ def series_input_form():
 
         # Debug submission
         if submitted:
-            st.session_state.form_just_submitted = series_name
             st.write(f"🔄 Form submitted with: '{series_name}'")
         else:
             st.write("⏳ Waiting for form submission...")
@@ -210,12 +207,14 @@ def series_input_form():
             # Store the series name for confirmation
             st.session_state.pending_series_name = series_name
             st.success(f"✓ Submitted '{series_name}' for confirmation")
+            
+
+            
             st.rerun()
+            
+
+
     
-    # Debug outside form
-    if st.session_state.form_just_submitted:
-        st.success(f"✅ Form submitted successfully with: {st.session_state.form_just_submitted}")
-        st.session_state.form_just_submitted = None
 
     # Display current series with cyan background
     if st.session_state.series_entries:
@@ -289,11 +288,8 @@ def series_input_form():
                 if st.button("🗑️ Remove", key=f"remove_{i}"):
                     st.session_state.series_entries.pop(i)
                     st.rerun()
+
     
-    # Debug outside form
-    if st.session_state.form_just_submitted:
-        st.success(f"✅ Form submitted successfully with: {st.session_state.form_just_submitted}")
-        st.session_state.form_just_submitted = None
 
                 st.markdown("</div>", unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
@@ -307,6 +303,7 @@ def series_input_form():
                 len(entry['volumes']) for entry in st.session_state.series_entries
             )
         st.rerun()
+
 
 
 def confirm_single_series(series_name):
@@ -432,11 +429,8 @@ def confirm_single_series(series_name):
                     st.session_state.selected_series = suggestion
                     st.session_state.original_series_name = series_name
                     st.rerun()
+
     
-    # Debug outside form
-    if st.session_state.form_just_submitted:
-        st.success(f"✅ Form submitted successfully with: {st.session_state.form_just_submitted}")
-        st.session_state.form_just_submitted = None
 
                 st.markdown("</div>", unsafe_allow_html=True)
 
@@ -448,22 +442,16 @@ def confirm_single_series(series_name):
                 # Clear pending series to restart
                 st.session_state.pending_series_name = None
                 st.rerun()
+
     
-    # Debug outside form
-    if st.session_state.form_just_submitted:
-        st.success(f"✅ Form submitted successfully with: {st.session_state.form_just_submitted}")
-        st.session_state.form_just_submitted = None
 
         with col2:
             if st.button("⏭️ Skip"):
                 st.warning(f"Skipped {series_name}")
                 st.session_state.pending_series_name = None
                 st.rerun()
+
     
-    # Debug outside form
-    if st.session_state.form_just_submitted:
-        st.success(f"✅ Form submitted successfully with: {st.session_state.form_just_submitted}")
-        st.session_state.form_just_submitted = None
     else:
         # Single suggestion
         selected_series = suggestions[0]
@@ -529,11 +517,8 @@ def confirm_single_series(series_name):
                     st.session_state.selected_series = selected_series
                     st.session_state.original_series_name = series_name
                     st.rerun()
+
     
-    # Debug outside form
-    if st.session_state.form_just_submitted:
-        st.success(f"✅ Form submitted successfully with: {st.session_state.form_just_submitted}")
-        st.session_state.form_just_submitted = None
 
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -572,11 +557,8 @@ def get_volume_input(original_name, confirmed_name):
                 st.session_state.original_series_name = None
                 st.session_state.pending_series_name = None
                 st.rerun()
+
     
-    # Debug outside form
-    if st.session_state.form_just_submitted:
-        st.success(f"✅ Form submitted successfully with: {st.session_state.form_just_submitted}")
-        st.session_state.form_just_submitted = None
             except ValueError as e:
                 st.error(f"Error parsing volume range: {e}")
 
@@ -586,11 +568,8 @@ def get_volume_input(original_name, confirmed_name):
             st.session_state.original_series_name = None
             st.session_state.pending_series_name = None
             st.rerun()
+
     
-    # Debug outside form
-    if st.session_state.form_just_submitted:
-        st.success(f"✅ Form submitted successfully with: {st.session_state.form_just_submitted}")
-        st.session_state.form_just_submitted = None
 
 
 def confirm_series_names():
@@ -660,11 +639,8 @@ def confirm_series_names():
                 len(entry['volumes']) for entry in confirmed_series
             )
             st.rerun()
+
     
-    # Debug outside form
-    if st.session_state.form_just_submitted:
-        st.success(f"✅ Form submitted successfully with: {st.session_state.form_just_submitted}")
-        st.session_state.form_just_submitted = None
 
 
 def process_single_volume(series_name, volume, project_state):
@@ -743,6 +719,7 @@ def process_series():
 
     st.session_state.all_books = all_books
     st.rerun()  # Update UI after processing
+
     st.session_state.processing_state['is_processing'] = False
 
     # Record interaction
@@ -763,6 +740,7 @@ def process_series():
             st.write(f"• {error}")
 
     st.rerun()  # Final rerun to show results
+
 
 
 def fetch_cover_for_book(book: BookInfo) -> Optional[str]:
@@ -974,11 +952,8 @@ def display_results():
             if selected_index != st.session_state.selected_book_index:
                 st.session_state.selected_book_index = selected_index
                 st.rerun()
+
     
-    # Debug outside form
-    if st.session_state.form_just_submitted:
-        st.success(f"✅ Form submitted successfully with: {st.session_state.form_just_submitted}")
-        st.session_state.form_just_submitted = None
 
             selected_book_obj = st.session_state.all_books[selected_index]
 
