@@ -187,7 +187,19 @@ def series_input_form():
 
         series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
 
+        # Debug info inside form
+        if series_name:
+            st.write(f"📝 Current input: '{series_name}'")
+        else:
+            st.write("📝 No series name entered yet")
+
         submitted = st.form_submit_button("Confirm Series Name")
+
+        # Debug submission
+        if submitted:
+            st.write(f"🔄 Form submitted with: '{series_name}'")
+        else:
+            st.write("⏳ Waiting for form submission...")
 
         if submitted and series_name:
             # Store the series name for confirmation
