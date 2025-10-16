@@ -66,33 +66,18 @@ class MALCoverFetcher:
             return None
     
     def download_and_cache_image(self, image_url: str, series_name: str) -> Optional[str]:
-        """Download image and cache locally"""
+        """Download image and cache locally - return direct URL for Streamlit Cloud"""
         if not image_url:
             return None
-        
+
         try:
-            # Create cache directory
-            os.makedirs('cache/images', exist_ok=True)
-            
-            # Generate filename from series name
-            safe_name = "".join(c for c in series_name if c.isalnum() or c in (' ', '-', '_')).rstrip()
-            safe_name = safe_name.replace(' ', '_')
-            filename = f"{safe_name}.jpg"
-            filepath = f"cache/images/{filename}"
-            
-            # Download image
-            img_response = requests.get(image_url, timeout=15)
-            img_response.raise_for_status()
-            
-            # Save to cache
-            with open(filepath, 'wb') as f:
-                f.write(img_response.content)
-            
-            print(f"✓ Downloaded cover for '{series_name}'")
-            return f"/images/{filename}"
-            
+            # For Streamlit Cloud, return the direct URL instead of downloading
+            # This avoids file system issues and works better with cloud deployment
+            print(f"✓ Using direct image URL for '{series_name}'")
+            return image_url
+
         except Exception as e:
-            print(f"✗ Error downloading image for '{series_name}': {e}")
+            print(f"✗ Error processing image URL for '{series_name}': {e}")
             return None
     
     def fetch_cover_for_series(self, series_name: str) -> Optional[str]:

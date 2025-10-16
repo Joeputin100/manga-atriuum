@@ -360,6 +360,7 @@ def confirm_single_series(series_name):
                 # Display series information
                 if series_info:
                     st.write(f"**Info:** {series_info}")
+                else:
                     st.write("*No additional information available*")
 
                 # Make the entire card clickable
