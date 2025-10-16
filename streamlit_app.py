@@ -218,6 +218,28 @@ def series_input_form():
                 st.markdown(f"### 📚 {entry["confirmed_name"]}")
                 st.caption(f"Vol: {len(entry["volumes"])}")
 
+                # Try to get cover image
+                cover_url = None
+                try:
+                    # Create a dummy book object to get series cover
+                    dummy_book = BookInfo(
+                        series_name=entry["confirmed_name"],
+                        volume_number=1,
+                        book_title="",
+                        authors=[],
+                        msrp_cost=None,
+                        isbn_13=None,
+                        publisher_name="",
+                        copyright_year=None,
+                        description="",
+                        physical_description="",
+                        genres=[],
+                        warnings=[]
+                    )
+                    cover_url = fetch_cover_for_book(dummy_book)
+                except Exception:
+                    pass
+
                 if cover_url:
                     try:
                         st.image(cover_url, width=100)
