@@ -214,61 +214,22 @@ def series_input_form():
         for i, entry in enumerate(st.session_state.series_entries):
             col_idx = i % 2
             with cols[col_idx]:
-                # Alternate card styles
-                card_class = "manga-card" if i % 2 == 0 else "manga-card-alt"
-
-                # Try to get cover image
-                cover_url = None
-                try:
-                    # Create a dummy book object to get series cover
-                    dummy_book = BookInfo(
-                        series_name=entry["confirmed_name"],
-                        volume_number=1,
-                        book_title="",
-                        authors=[],
-                        msrp_cost=None,
-                        isbn_13=None,
-                        publisher_name="",
-                        copyright_year=None,
-                        description="",
-                        physical_description="",
-                        genres=[],
-                        warnings=[]
-                    )
-                    cover_url = fetch_cover_for_book(dummy_book)
-                except Exception:
-                    pass
-
-                # Card HTML
-                card_html = f"""
-                <div class="{card_class}">
-                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                        <h4 style="margin: 0; flex-grow: 1;">📚 {entry["confirmed_name"]}</h4>
-                        <span style="font-size: 0.8em;">Vol: {len(entry["volumes"])}</span>
-                    </div>
-                """
+                # Use Streamlit components instead of HTML for better compatibility
+                st.markdown(f"### 📚 {entry["confirmed_name"]}")
+                st.caption(f"Vol: {len(entry["volumes"])}")
 
                 if cover_url:
-                    card_html += f"""
-                    <div style="text-align: center; margin: 10px 0;">
-                        <img src="{cover_url}" style="max-width: 100px; max-height: 150px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" alt="Cover">
-                    </div>
-                    """
+                    try:
+                        st.image(cover_url, width=100)
+                    except Exception:
+                        st.write("📚 Cover unavailable")
 
-                card_html += f"""
-                    <p style="margin: 5px 0; font-size: 0.9em;">Volumes: {", ".join(map(str, entry["volumes"]))}</p>
-                    <div style="text-align: center; margin-top: 10px;">
-                """
+                st.write(f"**Volumes:** {", ".join(map(str, entry["volumes"]))}")
 
-                st.markdown(card_html, unsafe_allow_html=True)
-
-                # Remove button outside the HTML
+                # Remove button
                 if st.button("🗑️ Remove", key=f"remove_{i}"):
                     st.session_state.series_entries.pop(i)
                     st.rerun()
-
-                st.markdown("</div>", unsafe_allow_html=True)
-                st.markdown('</div>', unsafe_allow_html=True)
 
     # Start processing button
     if st.session_state.series_entries:
