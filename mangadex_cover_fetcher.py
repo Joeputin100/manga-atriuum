@@ -97,7 +97,7 @@ class MangaDexCoverFetcher:
             with open(filepath, 'wb') as f:
                 f.write(img_response.content)
 
-            print(f"✓ Downloaded cover for '{series_name}' from MangaDex")
+            print(f"✓ Using direct image URL for '{series_name}'")
             return f"/images/{filename}"
 
         except Exception as e:
@@ -120,7 +120,8 @@ class MangaDexCoverFetcher:
 
         print(f"Found cover: {cover_url}")
 
-        return self.download_and_cache_image(cover_url, series_name)
+        print(f"✓ Using direct image URL for '{series_name}'")
+        return cover_url
 
 def get_all_series_from_db() -> list:
 
