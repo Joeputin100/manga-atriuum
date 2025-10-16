@@ -274,20 +274,15 @@ def series_input_form():
         series_count = len(st.session_state.series_entries) + 1
         ordinal_text = "1st" if series_count == 1 else "2nd" if series_count == 2 else "3rd" if series_count == 3 else f"{series_count}th"
 
-        # Use a unique key for the series form with timestamp
-        series_form_key = f"series_form_{series_count}_{len(st.session_state.series_entries)}"
-        with st.form(series_form_key, clear_on_submit=True):
+        series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
 
-            series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
-
-            submitted = st.form_submit_button("Confirm Series Name")
-            if submitted and not series_name:
+        if st.button("Confirm Series Name", key=f"confirm_{series_count}"):
+            if not series_name:
                 st.error("Please enter a series name")
-                submitted = False
-
-            if submitted and series_name:
+            else:
                 # Store the series name for confirmation
                 st.session_state.pending_series_name = series_name
+                st.rerun()
 
     # Display current series with cyan background
     if st.session_state.series_entries:
