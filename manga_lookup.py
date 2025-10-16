@@ -251,6 +251,9 @@ class DeepSeekAPI:
             # Parse JSON response
             suggestions = json.loads(content)
 
+            # Filter out any None values from suggestions
+            suggestions = [s for s in suggestions if s is not None]
+
             # Ensure the original series name is included if it's valid
             # Check if the original name is in the suggestions, if not add it
             if series_name not in suggestions:
@@ -258,6 +261,7 @@ class DeepSeekAPI:
                 original_in_suggestions = any(
                     series_name.lower() in suggestion.lower()
                     for suggestion in suggestions
+                    if suggestion is not None
                 )
                 if not original_in_suggestions:
                     # Add original name as first suggestion
