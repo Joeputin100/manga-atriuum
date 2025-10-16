@@ -204,8 +204,8 @@ def process_series():
 
 
 def display_duck_animation():
-    """Display animated duck with GIF"""
-    """Display animated duck with GIF"""
+    
+    
     st.image('https://media.giphy.com/media/WzA4Vj6V8UOEX10jMj/giphy.gif')
 
 
@@ -254,39 +254,40 @@ def display_progress_section():
 def series_input_form():
     """Multi-series input form"""
     st.header("📚 Manga Series Input")
+    if not any(not entry['volumes'] for entry in st.session_state.series_entries):
 
-    # Starting barcode - always show with current value
-    st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
-    start_barcode = st.text_input(
-        "Starting Barcode",
-        value=st.session_state.start_barcode,
-        placeholder="Enter starting barcode",
-        help="Enter starting barcode (e.g., T000001 or MANGA001)",
-    )
-    if start_barcode and start_barcode != st.session_state.start_barcode:
-        st.session_state.start_barcode = start_barcode
+        # Starting barcode - always show with current value
+        st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
+        start_barcode = st.text_input(
+            "Starting Barcode",
+            value=st.session_state.start_barcode,
+            placeholder="Enter starting barcode",
+            help="Enter starting barcode (e.g., T000001 or MANGA001)",
+        )
+        if start_barcode and start_barcode != st.session_state.start_barcode:
+            st.session_state.start_barcode = start_barcode
 
-    # Series input section
-    st.subheader("Add Series")
+        # Series input section
+        st.subheader("Add Series")
 
-    # Make series name entry ordinal
-    series_count = len(st.session_state.series_entries) + 1
-    ordinal_text = "1st" if series_count == 1 else "2nd" if series_count == 2 else "3rd" if series_count == 3 else f"{series_count}th"
+        # Make series name entry ordinal
+        series_count = len(st.session_state.series_entries) + 1
+        ordinal_text = "1st" if series_count == 1 else "2nd" if series_count == 2 else "3rd" if series_count == 3 else f"{series_count}th"
 
-    # Use a unique key for the series form with timestamp
-    series_form_key = f"series_form_{series_count}_{len(st.session_state.series_entries)}"
-    with st.form(series_form_key, clear_on_submit=True):
+        # Use a unique key for the series form with timestamp
+        series_form_key = f"series_form_{series_count}_{len(st.session_state.series_entries)}"
+        with st.form(series_form_key, clear_on_submit=True):
 
-        series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
+            series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
 
-        submitted = st.form_submit_button("Confirm Series Name")
-        if submitted and not series_name:
-            st.error("Please enter a series name")
-            submitted = False
+            submitted = st.form_submit_button("Confirm Series Name")
+            if submitted and not series_name:
+                st.error("Please enter a series name")
+                submitted = False
 
-        if submitted and series_name:
-            # Store the series name for confirmation
-            st.session_state.pending_series_name = series_name
+            if submitted and series_name:
+                # Store the series name for confirmation
+                st.session_state.pending_series_name = series_name
 
     # Display current series with cyan background
     if st.session_state.series_entries:
@@ -350,7 +351,8 @@ def series_input_form():
                         try:
                             volumes = parse_volume_range(volume_input)
                             entry["volumes"] = volumes
-                            st.success(f"Added {len(volumes)} volumes")
+                            st.success(f"You have successfully added volumes {', '.join(map(str, volumes))} to {entry["confirmed_name"]}!")
+                            st.balloons()
                             st.rerun()
                         except Exception as e:
                             st.error(f"Invalid volume range: {e}")
