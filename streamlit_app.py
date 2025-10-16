@@ -182,41 +182,17 @@ def series_input_form():
     ordinal_text = "1st" if series_count == 1 else "2nd" if series_count == 2 else "3rd" if series_count == 3 else f"{series_count}th"
 
     # Use a unique key for the series form with timestamp
-    series_form_key = f"series_form_{series_count}_{len(st.session_state.series_entries)}_{int(time.time())}"
-    # Track form submission
+    series_form_key = f"series_form_{series_count}_{len(st.session_state.series_entries)}"
     with st.form(series_form_key, clear_on_submit=True):
 
         series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
 
-        # Debug info inside form
-        if series_name:
-            st.write(f"📝 Current input: '{series_name}'")
-        else:
-            st.write("📝 No series name entered yet")
-
         submitted = st.form_submit_button("Confirm Series Name")
 
-        # Debug submission
-        if submitted:
-            st.write(f"🔄 Form submitted with: '{series_name}'")
-        else:
-            st.write("⏳ Waiting for form submission...")
-
         if submitted and series_name:
-            st.info(f"DEBUG: Setting pending_series_name to {series_name}")
             # Store the series name for confirmation
             st.session_state.pending_series_name = series_name
-            
-
-            
             st.rerun()
-    
-    
-            
-
-
-    
-
 
     # Display current series with cyan background
     if st.session_state.series_entries:
@@ -290,10 +266,6 @@ def series_input_form():
                 if st.button("🗑️ Remove", key=f"remove_{i}"):
                     st.session_state.series_entries.pop(i)
                     st.rerun()
-    
-    
-
-    
 
                 st.markdown("</div>", unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
@@ -307,55 +279,26 @@ def series_input_form():
                 len(entry['volumes']) for entry in st.session_state.series_entries
             )
         st.rerun()
-    
-    
-
 
 
 def confirm_single_series(series_name):
     """Confirm a single series name with series information in separate cards"""
     st.header(f"🔍 Confirm: {series_name}")
 
-    # Debug information visible in UI
-    with st.expander("🔧 Debug Info", expanded=False):
-        st.write("**Function called with:**", series_name)
-        st.write("**Session state pending_series_name:**", st.session_state.get('pending_series_name'))
-
     # Initialize DeepSeek API
     try:
         deepseek_api = DeepSeekAPI()
-        with st.expander("🔧 Debug Info", expanded=False):
-            st.success("✅ DeepSeek API initialized successfully")
     except ValueError as e:
         st.error(f"API configuration error: {e}")
-        with st.expander("🔧 Debug Info", expanded=False):
-            st.error(f"❌ API init failed: {e}")
         return
 
     # Get suggestions
-    try:
-        suggestions = deepseek_api.correct_series_name(series_name)
-    except Exception as e:
-        st.error(f"Error getting suggestions: {e}")
-        suggestions = [series_name]  # Fallback
+    suggestions = deepseek_api.correct_series_name(series_name)
 
-    # Debug logging and UI display
+    # Debug logging
     print(f"DEBUG: confirm_single_series called for '{series_name}'")
     print(f"DEBUG: suggestions returned: {suggestions}")
     print(f"DEBUG: Number of suggestions: {len(suggestions)}")
-
-    with st.expander("🔧 Debug Info", expanded=False):
-        st.write("**Suggestions returned:**", suggestions)
-        st.write("**Number of suggestions:**", len(suggestions))
-        if not suggestions:
-            st.error("❌ No suggestions returned!")
-        elif len(suggestions) == 1:
-            st.info("ℹ️ Single suggestion (will show single card)")
-        else:
-            st.info(f"ℹ️ Multiple suggestions ({len(suggestions)} - will show multiple cards)")
-
-    # Simple debug display
-    st.write("Suggestions found:", suggestions)
 
     if len(suggestions) > 1:
         # Multiple suggestions - display in separate cards
@@ -435,10 +378,6 @@ def confirm_single_series(series_name):
                     st.session_state.selected_series = suggestion
                     st.session_state.original_series_name = series_name
                     st.rerun()
-    
-    
-
-    
 
                 st.markdown("</div>", unsafe_allow_html=True)
 
@@ -450,20 +389,12 @@ def confirm_single_series(series_name):
                 # Clear pending series to restart
                 st.session_state.pending_series_name = None
                 st.rerun()
-    
-    
-
-    
 
         with col2:
             if st.button("⏭️ Skip"):
                 st.warning(f"Skipped {series_name}")
                 st.session_state.pending_series_name = None
                 st.rerun()
-    
-    
-
-    
     else:
         # Single suggestion
         selected_series = suggestions[0]
@@ -529,10 +460,6 @@ def confirm_single_series(series_name):
                     st.session_state.selected_series = selected_series
                     st.session_state.original_series_name = series_name
                     st.rerun()
-    
-    
-
-    
 
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -571,10 +498,6 @@ def get_volume_input(original_name, confirmed_name):
                 st.session_state.original_series_name = None
                 st.session_state.pending_series_name = None
                 st.rerun()
-    
-    
-
-    
             except ValueError as e:
                 st.error(f"Error parsing volume range: {e}")
 
@@ -584,10 +507,6 @@ def get_volume_input(original_name, confirmed_name):
             st.session_state.original_series_name = None
             st.session_state.pending_series_name = None
             st.rerun()
-    
-    
-
-    
 
 
 def confirm_series_names():
@@ -657,10 +576,6 @@ def confirm_series_names():
                 len(entry['volumes']) for entry in confirmed_series
             )
             st.rerun()
-    
-    
-
-    
 
 
 def process_single_volume(series_name, volume, project_state):
@@ -739,9 +654,6 @@ def process_series():
 
     st.session_state.all_books = all_books
     st.rerun()  # Update UI after processing
-    
-    
-
     st.session_state.processing_state['is_processing'] = False
 
     # Record interaction
@@ -762,9 +674,6 @@ def process_series():
             st.write(f"• {error}")
 
     st.rerun()  # Final rerun to show results
-    
-    
-
 
 
 def fetch_cover_for_book(book: BookInfo) -> Optional[str]:
@@ -976,10 +885,6 @@ def display_results():
             if selected_index != st.session_state.selected_book_index:
                 st.session_state.selected_book_index = selected_index
                 st.rerun()
-    
-    
-
-    
 
             selected_book_obj = st.session_state.all_books[selected_index]
 
@@ -1149,16 +1054,6 @@ def main():
     tab1, tab2, tab3 = st.tabs(["📚 Add Series", "🔍 Confirm", "📊 Results"])
     
     with tab1:
-        # Debug: Show current state
-        with st.expander("🔧 Workflow Debug", expanded=False):
-            st.write("**Processing:**", st.session_state.processing_state["is_processing"])
-            st.write("**All books:**", bool(st.session_state.all_books))
-            st.write("**Confirmed series:**", bool(st.session_state.confirmed_series))
-            st.write("**Selected series:**", bool(st.session_state.selected_series))
-            st.write("**Pending series:**", bool(st.session_state.pending_series_name))
-            if st.session_state.pending_series_name:
-                st.write("**Pending series name:**", st.session_state.pending_series_name)
-
         if st.session_state.processing_state["is_processing"]:
             st.info("Processing in progress... Check the Confirm tab for details.")
         elif st.session_state.all_books:
