@@ -456,6 +456,8 @@ def get_volume_input(original_name, confirmed_name):
     st.subheader(f"📚 Add Volumes for {confirmed_name}")
 
     # Sanitize form key by removing special characters
+    if confirmed_name is None:
+        confirmed_name = "unknown_series"
     sanitized_name = "".join(c for c in confirmed_name if c.isalnum() or c in (' ', '-', '_')).replace(' ', '_')
     with st.form(f"volume_form_{sanitized_name}"):
         volume_input = st.text_input(
