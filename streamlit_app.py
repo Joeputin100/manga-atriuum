@@ -221,17 +221,18 @@ def series_input_form():
                 try:
                     # Create a dummy book object to get series cover
                     dummy_book = BookInfo(
-                        title="",
-                        authors=[],
-                        isbn_13=None,
                         series_name=entry["confirmed_name"],
                         volume_number=1,
+                        book_title="",
+                        authors=[],
+                        msrp_cost=None,
+                        isbn_13=None,
+                        publisher_name="",
+                        copyright_year=None,
                         description="",
-                        page_count=0,
-                        published_date="",
-                        categories=[],
-                        language="",
-                        publisher=""
+                        physical_description="",
+                        genres=[],
+                        warnings=[]
                     )
                     cover_url = fetch_cover_for_book(dummy_book)
                 except Exception:
@@ -332,17 +333,18 @@ def confirm_single_series(series_name):
                 try:
                     # Create a dummy book object to get series cover
                     dummy_book = BookInfo(
-                        title="",
-                        authors=[],
-                        isbn_13=None,
                         series_name=suggestion,
                         volume_number=1,
+                        book_title="",
+                        authors=[],
+                        msrp_cost=None,
+                        isbn_13=None,
+                        publisher_name="",
+                        copyright_year=None,
                         description="",
-                        page_count=0,
-                        published_date="",
-                        categories=[],
-                        language="",
-                        publisher=""
+                        physical_description="",
+                        genres=[],
+                        warnings=[]
                     )
                     cover_url = fetch_cover_for_book(dummy_book)
                     if cover_url:
@@ -407,17 +409,18 @@ def confirm_single_series(series_name):
                 try:
                     # Create a dummy book object to get series cover
                     dummy_book = BookInfo(
-                        title="",
-                        authors=[],
-                        isbn_13=None,
                         series_name=selected_series,
                         volume_number=1,
+                        book_title="",
+                        authors=[],
+                        msrp_cost=None,
+                        isbn_13=None,
+                        publisher_name="",
+                        copyright_year=None,
                         description="",
-                        page_count=0,
-                        published_date="",
-                        categories=[],
-                        language="",
-                        publisher=""
+                        physical_description="",
+                        genres=[],
+                        warnings=[]
                     )
                     cover_url = fetch_cover_for_book(dummy_book)
                     if cover_url:
