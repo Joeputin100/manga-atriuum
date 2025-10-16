@@ -356,7 +356,7 @@ def series_input_form():
             st.session_state.pending_series_name = series_name
 
     # Display current series with cyan background
-    if st.session_state.series_entries and all(len(entry["volumes"]) > 0 for entry in st.session_state.series_entries):
+    if st.session_state.series_entries:
         st.markdown("""
         <style>
         .cyan-background {
@@ -426,7 +426,7 @@ def series_input_form():
                     st.session_state.series_entries.pop(i)
 
 #    # Start processing button
-    if st.session_state.series_entries and all(len(entry["volumes"]) > 0 for entry in st.session_state.series_entries):
+    if st.session_state.series_entries:
         if st.button("🚀 Start Lookup", type="primary"):
             # Calculate total volumes
             
