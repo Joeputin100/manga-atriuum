@@ -302,9 +302,13 @@ def series_input_form():
 
         # Make series name entry ordinal
         series_count = len(st.session_state.series_entries) + 1
+        ordinal_text = "1st" if series_count == 1 else "2nd" if series_count == 2 else "3rd" if series_count == 3 else f"{series_count}th"
+        series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
+        if st.button("Confirm Series Name", key="confirm_series"):
+            if series_name:
+                st.session_state.pending_series_name = series_name
+                st.info("Confirming series name, searching for matches...")
                 st.rerun()
-            else:
-                st.error("Please enter a series name")
             else:
                 st.error("Please enter a series name")
 
@@ -360,7 +364,7 @@ def series_input_form():
                     except Exception:
                         pass
 
-                st.write(f"**Volumes:** {", ".join(map(str, entry["volumes"]))}")
+                    st.write(f"**Volumes:** {", ".join(map(str, entry["volumes"]))}")
                 # Volume input
                 col1, col2 = st.columns(2)
                 with col1:
@@ -435,11 +439,11 @@ def confirm_single_series(series_name):
     st.header(f"🔍 Confirm: {series_name}")
 
     # Initialize DeepSeek API
+    st.info("Searching for series matches...")
     try:
         deepseek_api = DeepSeekAPI()
     except ValueError as e:
         st.error(f"API configuration error: {e}")
-    st.info("Searching for series matches...")
         return
 
     # Get suggestions
@@ -457,7 +461,7 @@ def confirm_single_series(series_name):
                 # Fetch series details
                 try:
                     book_data = deepseek_api.get_book_info(suggestion, 1, st.session_state.project_state)
-                st.write(f"Book data keys: {list(book_data.keys()) if book_data else None}")
+                    st.write(f"Book data keys: {list(book_data.keys()) if book_data else None}")
                     authors = book_data.get("authors", []) if book_data else []
                     description = book_data.get("description", "") if book_data else ""
                     total_volumes = book_data.get("number_of_extant_volumes", "Unknown") if book_data else "Unknown"
@@ -503,10 +507,10 @@ def confirm_single_series(series_name):
                         copyright_year=None,
                         description="",
                         physical_description="",
-                st.markdown('<p style="font-size: 10px; color: gray;">Note: Covers may vary for different languages, editions, and reprintings.</p>', unsafe_allow_html=True)
                         genres=[],
                         warnings=[]
                     )
+                    st.markdown('<p style="font-size: 10px; color: gray;">Note: Covers may vary for different languages, editions, and reprintings.</p>', unsafe_allow_html=True)
                     cover_url = fetch_cover_for_book(dummy_book)
                 except Exception:
                     pass
