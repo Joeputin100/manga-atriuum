@@ -523,6 +523,7 @@ def confirm_single_series(series_name):
                     st.session_state.pending_series_name = None
                     # Add to confirmed series
                     st.session_state.series_entries.append({
+    st.rerun()
                         "original_name": series_name,
                         "confirmed_name": suggestion,
                         "volumes": []
@@ -537,6 +538,7 @@ def confirm_single_series(series_name):
         
         # Add to confirmed series
         st.session_state.series_entries.append({
+    st.rerun()
             "original_name": series_name,
             "confirmed_name": confirmed_name,
             "volumes": []
