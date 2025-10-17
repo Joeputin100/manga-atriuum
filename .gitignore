@@ -54,6 +54,7 @@ Thumbs.db
 
 # Project state (can be regenerated)
 project_state.json
+google_books.toml
 
 # Test files
 *.mrc

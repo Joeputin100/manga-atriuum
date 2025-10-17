@@ -28,6 +28,7 @@ import pandas as pd
 from datetime import datetime
 from typing import Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import html
 
 # Import existing core logic
 from manga_lookup import (
@@ -155,7 +156,7 @@ def process_series():
     try:
         _ = DeepSeekAPI()  # Create instance to verify API is available
     except ValueError as e:
-        st.error(f"API configuration error: {e}")
+        st.error("API configuration error. Please check your environment variables.")
         st.session_state.processing_state['is_processing'] = False
         return
 
@@ -443,7 +444,7 @@ def confirm_single_series(series_name):
     try:
         deepseek_api = DeepSeekAPI()
     except ValueError as e:
-        st.error(f"API configuration error: {e}")
+        st.error("API configuration error. Please check your environment variables.")
         return
 
     # Get suggestions
@@ -600,7 +601,7 @@ def main():
             books = sorted(series_groups[series_name], key=lambda x: x.volume_number)
 
             # Series header with background
-            st.markdown(f'<div style="background-color:{series_colors[color_index % len(series_colors)]}; padding:10px; border-radius:5px;"><h3>📚 {series_name}</h3></div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="background-color:{series_colors[color_index % len(series_colors)]}; padding:10px; border-radius:5px;"><h3>📚 {html.escape(series_name)}</h3></div>', unsafe_allow_html=True)
             color_index += 1
 
             # Table header
@@ -663,7 +664,7 @@ def main():
                         mime="application/octet-stream"
                     )
                 except Exception as e:
-                    st.error(f"Export failed: {e}")
+                    st.error("An error occurred during the export process.")
         with col2:
             if st.button("Download Project State JSON"):
                 try:
@@ -677,7 +678,7 @@ def main():
                         mime="application/json"
                     )
                 except Exception as e:
-                    st.error(f"Export failed: {e}")
+                    st.error("An error occurred during the export process.")
         with col3:
             if st.button("Print Labels"):
                 st.session_state.show_label_form = True

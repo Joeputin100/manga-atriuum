@@ -210,10 +210,16 @@ class DeepSeekAPI:
         """Use DeepSeek API to correct and suggest manga series names"""
         prompt = f"""
         Given the manga series name "{series_name}", provide 3-5 corrected or alternative names
+        that are actual manga series or editions.
         that are actual manga series.
 
         IMPORTANT: If "{series_name}" is already a correct manga series name, include it as the first suggestion.
         If "{series_name}" is a valid manga series, prioritize it over other suggestions.
+        For popular series with multiple editions, include different formats:
+        - Regular edition (individual volumes)
+        - Omnibus edition (3 volumes per book)
+        - Colossal edition (5 volumes per book)
+        Format edition names as "Series Name (Edition Type)"
 
         Only include actual manga series names, not unrelated popular series.
         If "{series_name}" is misspelled or incomplete, provide the correct full name first.
@@ -224,7 +230,7 @@ class DeepSeekAPI:
 
         Return only the names as a JSON list, no additional text.
 
-        Example format: ["One Piece", "Naruto", "Bleach", "Boruto: Naruto Next Generations", "Boruto: Two Blue Vortex"]
+        Example format: ["Attack on Titan (Regular Edition)", "Attack on Titan (Omnibus Edition)", "Attack on Titan (Colossal Edition)", "One Piece", "Naruto"]
         """
 
         headers = {
@@ -355,16 +361,23 @@ class DeepSeekAPI:
         Required fields:
         - series_name: The official series name
         - volume_number: {volume_number}
-        - book_title: The specific title for this volume (append "(Volume {volume_number})")
+        - book_title: The specific title for this volume (append "(Volume {volume_text})")
+        - volume_text: The volume number or range for this book (e.g., "1" for regular, "1-3" for omnibus, "1-5" for colossal)
         - authors: List of authors/artists in "Last, First M." format, comma-separated for multiple
         - msrp_cost: Manufacturer's Suggested Retail Price in USD
         - isbn_13: ISBN-13 for paperback English edition (preferred) or other available edition
         - publisher_name: Publisher of the English edition
         - copyright_year: 4-digit copyright year
+        Determine edition from series_name:
+        - If series_name contains "Omnibus", edition_type = "omnibus", volumes_per_book = 3, volume_text = f"{volume_number * 3 - 2}-{volume_number * 3}"
+        - If contains "Colossal", edition_type = "colossal", volumes_per_book = 5, volume_text = f"{volume_number * 5 - 4}-{volume_number * 5}"
+        - Else, edition_type = "regular", volumes_per_book = 1, volume_text = str(volume_number)
         - description: Summary of the book's content and notable reviews
         - physical_description: Physical characteristics (pages, dimensions, etc.)
         - genres: List of genres/subjects
         - number_of_extant_volumes: Total number of volumes published for this series
+        - edition_type: Type of edition (regular, omnibus, colossal)
+        - volumes_per_book: Number of volumes per book for this edition
         - cover_image_url: Direct URL to the book's cover image from an authoritative source (publisher website, Amazon, etc.) if available
 
         Format requirements:
@@ -446,6 +459,8 @@ class GoogleBooksAPI:
 
     def __init__(self):
         self.base_url = "https://www.googleapis.com/books/v1/volumes"
+        self.api_key = os.getenv("GEMINI_API_KEY")
+        self.api_key = os.getenv("GEMINI_API_KEY")
 
     def get_cover_image_url(self, isbn: str, project_state: Optional[ProjectState] = None) -> Optional[str]:
         """Get cover image URL for a book by ISBN using keyless Google Books API"""
@@ -460,8 +475,9 @@ class GoogleBooksAPI:
                 return cached_url
 
         # Construct the keyless API URL
-        url = f"{self.base_url}?q=isbn:{isbn}&maxResults=1"
-        print(f"🔍 Searching Google Books API for ISBN {isbn}")
+        url = f"{self.base_url}?q=isbn:{isbn}&maxResults=1&langRestrict=en"
+        if self.api_key:
+            url += f"&key={self.api_key}"
 
         try:
             # Make the keyless HTTP request
@@ -495,6 +511,30 @@ class GoogleBooksAPI:
                 print(f"✗ No cover image found in Google Books for ISBN {isbn}")
 
             return cover_url
+    def search_books(self, query: str, max_results: int = 5) -> List[Dict]:
+        """Search Google Books API for books matching the query"""
+        url = f"{self.base_url}?q={query}&maxResults={max_results}&langRestrict=en"
+        if self.api_key:
+            url += f"&key={self.api_key}"
+        
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            
+            results = []
+            for item in data.get('items', []):
+                volume_info = item.get('volumeInfo', {})
+                result = {
+                    'title': volume_info.get('title', ''),
+                    'authors': volume_info.get('authors', []),
+                    image_links: volume_info.get(imageLinks, {}),
+                    language: volume_info.get(language, ),
+                }
+                results.append(result)
+            return results
+        except Exception:
+            return []
 
         except requests.exceptions.RequestException as e:
             print(f"⚠️ Request error for ISBN {isbn}: {e}")
@@ -540,6 +580,30 @@ class GoogleBooksAPI:
                         break
 
             return cover_url
+    def search_books(self, query: str, max_results: int = 5) -> List[Dict]:
+        """Search Google Books API for books matching the query"""
+        url = f"{self.base_url}?q={query}&maxResults={max_results}&langRestrict=en"
+        if self.api_key:
+            url += f"&key={self.api_key}"
+        
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            
+            results = []
+            for item in data.get('items', []):
+                volume_info = item.get('volumeInfo', {})
+                result = {
+                    'title': volume_info.get('title', ''),
+                    'authors': volume_info.get('authors', []),
+                    image_links: volume_info.get(imageLinks, {}),
+                    language: volume_info.get(language, ),
+                }
+                results.append(result)
+            return results
+        except Exception:
+            return []
 
         except requests.exceptions.RequestException:
             # Silently fail - cover images are optional
