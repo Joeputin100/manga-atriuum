@@ -413,8 +413,8 @@ def series_input_form():
     
     with col2:
         if state['start_time']:
-        elapsed = calculate_elapsed_time(state['start_time'])
-        st.metric("Elapsed Time", elapsed)
+            elapsed = calculate_elapsed_time(state['start_time'])
+            st.metric("Elapsed Time", elapsed)
     
     with col3:
     # Animated duck
