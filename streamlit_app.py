@@ -395,7 +395,7 @@ def series_input_form():
 
 
     state = st.session_state.processing_state
-        if state['is_processing']:
+    if state['is_processing']:
         progress = state['progress']
         total = state['total_volumes']
     
@@ -416,7 +416,7 @@ def series_input_form():
     
         with col3:
         # Animated duck
-display_duck_animation()
+            display_duck_animation()
             st.caption("Processing...")
     
 # Current task info
