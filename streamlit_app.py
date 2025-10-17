@@ -250,7 +250,20 @@ def calculate_eta(start_time, progress, total):
 
 
 def display_progress_section():
-    """Display progress tracking with duck animation"""
+    """Display progress tracking"""
+    state = st.session_state.processing_state
+    progress = state['progress']
+    total = state['total_volumes']
+
+    if progress == 0:
+        st.write("Preparing to lookup manga volumes...")
+    else:
+        st.write(f"Processing {progress} of {total} volumes")
+        if state['current_series']:
+            st.info(f"Current: {state['current_series']} - Volume {state['current_volume']}")
+    
+    display_duck_animation()
+    st.caption("Please wait...")
 def series_input_form():
     """Multi-series input form"""
     st.header("📚 Manga Series Input")
