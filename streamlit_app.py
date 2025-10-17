@@ -298,12 +298,11 @@ def series_input_form():
         series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
 
         if st.button("Confirm Series Name", key=f"confirm_{series_count}"):
-            if not series_name:
-                st.error("Please enter a series name")
-                    else:
-        st.divider()
+            if series_name:
                 st.session_state.pending_series_name = series_name
                 st.rerun()
+            else:
+                st.error("Please enter a series name")
 
     # Display current series with cyan background
     if st.session_state.series_entries:
