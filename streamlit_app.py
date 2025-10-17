@@ -273,18 +273,20 @@ def series_input_form():
     """Multi-series input form"""
     st.header("📚 Manga Series Input")
     if not any(not entry['volumes'] for entry in st.session_state.series_entries):
-
+        # Starting barcode - show until used
+        if not st.session_state.get('start_barcode_used', False):
         # Starting barcode - always show with current value
-        st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
-        start_barcode = st.text_input(
-            "Starting Barcode",
-            value=st.session_state.start_barcode,
-            placeholder="Enter starting barcode",
-            help="Enter starting barcode (e.g., T000001 or MANGA001)",
-        )
-        if start_barcode and start_barcode != st.session_state.start_barcode:
-            st.session_state.start_barcode = start_barcode
-
+            st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
+            start_barcode = st.text_input(
+                "Starting Barcode",
+                value=st.session_state.start_barcode,
+                placeholder="Enter starting barcode",
+                help="Enter starting barcode (e.g., T000001 or MANGA001)",
+            )
+            if start_barcode and start_barcode != st.session_state.start_barcode:
+                st.session_state.start_barcode = start_barcode
+            st.session_state['start_barcode_used'] = True
+    
         # Series input section
         st.subheader("Add Series")
 
@@ -299,6 +301,7 @@ def series_input_form():
                 st.error("Please enter a series name")
             else:
                 # Store the series name for confirmation
+        st.divider()
                 st.session_state.pending_series_name = series_name
                 st.rerun()
 
@@ -373,6 +376,7 @@ def series_input_form():
                 # Remove button
                 if st.button("🗑️ Remove", key=f"remove_{i}"):
                     st.session_state.series_entries.pop(i)
+    st.divider()
 
 #    # Start processing button
     if st.session_state.series_entries:
@@ -395,27 +399,26 @@ def series_input_form():
 
 
     state = st.session_state.processing_state
-    if state['is_processing']:
-        progress = state['progress']
-        total = state['total_volumes']
+    progress = state['progress']
+    total = state['total_volumes']
     
-        # Progress bar
-        progress_percent = int((progress / total) * 100) if total > 0 else 0
-        st.progress(progress_percent / 100)
+    # Progress bar
+    progress_percent = int((progress / total) * 100) if total > 0 else 0
+    st.progress(progress_percent / 100)
     
-        # Progress info
-        col1, col2, col3 = st.columns(3)
+    # Progress info
+    col1, col2, col3 = st.columns(3)
     
-        with col1:
-            st.metric("Progress", f"{progress}/{total}")
+    with col1:
+        st.metric("Progress", f"{progress}/{total}")
     
-        with col2:
-            if state['start_time']:
-                elapsed = calculate_elapsed_time(state['start_time'])
-                st.metric("Elapsed Time", elapsed)
+    with col2:
+        if state['start_time']:
+        elapsed = calculate_elapsed_time(state['start_time'])
+        st.metric("Elapsed Time", elapsed)
     
-        with col3:
-        # Animated duck
+    with col3:
+    # Animated duck
             display_duck_animation()
             st.caption("Processing...")
     
@@ -448,6 +451,16 @@ def confirm_single_series(series_name):
 
         for i, suggestion in enumerate(suggestions):
             with cols[i % len(cols)]:
+                # Fetch series details
+                try:
+                    book_data = deepseek_api.get_book_info(suggestion, 1, st.session_state.project_state)
+                    authors = book_data.get("authors", []) if book_data else []
+                    description = book_data.get("description", "") if book_data else ""
+                    total_volumes = book_data.get("total_volumes", "Unknown") if book_data else "Unknown"
+                except Exception:
+                    authors = []
+                    description = "Unable to fetch details"
+                    total_volumes = "Unknown"
                 card_colors = [
                     "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                     "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
@@ -498,7 +511,13 @@ def confirm_single_series(series_name):
                         st.image(cover_url, width=100)
                     except Exception:
                         pass
-
+                if authors:
+                    st.write(f"**Authors:** {", ".join(authors)}")
+                if description:
+                    desc_text = description[:150] + "..." if len(description) > 150 else description
+                    st.write(f"**Description:** {desc_text}")
+                if total_volumes != "Unknown":
+                    st.write(f"**Total Volumes:** {total_volumes}")
                 # Selection button
                 if st.button(f"Select {suggestion}", key=f"select_{i}"):
                     st.session_state.pending_series_name = None
