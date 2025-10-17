@@ -46,9 +46,6 @@ from mangadex_cover_fetcher import MangaDexCoverFetcher
 
 
 def initialize_session_state():
-    # Reset processing state if stuck
-    if st.session_state.processing_state.get('is_processing', False) and not st.session_state.all_books:
-        st.session_state.processing_state['is_processing'] = False
     """Initialize session state variables"""
     if 'series_entries' not in st.session_state:
         st.session_state.series_entries = []
@@ -75,6 +72,9 @@ def initialize_session_state():
         st.session_state.original_series_name = None
     if 'start_barcode' not in st.session_state:
         st.session_state.start_barcode = "T000001"
+    # Reset processing state if stuck
+    if st.session_state.processing_state.get('is_processing', False) and not st.session_state.all_books:
+        st.session_state.processing_state['is_processing'] = False
 def get_volume_1_isbn(series_name: str) -> Optional[str]:
     """Get ISBN for volume 1 of a series using DeepSeek API"""
     try:
