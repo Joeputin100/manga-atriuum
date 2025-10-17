@@ -300,7 +300,6 @@ def series_input_form():
             if not series_name:
                 st.error("Please enter a series name")
             else:
-                # Store the series name for confirmation
         st.divider()
                 st.session_state.pending_series_name = series_name
                 st.rerun()
