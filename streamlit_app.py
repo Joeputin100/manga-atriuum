@@ -394,9 +394,9 @@ def series_input_form():
             }
 
             # Start processing
+            st.rerun()
+
     if state['is_processing']:
-                st.rerun()
-    
     
         state = st.session_state.processing_state
         progress = state['progress']
@@ -416,12 +416,12 @@ def series_input_form():
             if state['start_time']:
                 elapsed = calculate_elapsed_time(state['start_time'])
                 st.metric("Elapsed Time", elapsed)
-        
-        with col3:
-        # Animated duck
-                display_duck_animation()
-                st.caption("Processing...")
-        
+    
+    with col3:
+    # Animated duck
+            display_duck_animation()
+            st.caption("Processing...")
+    
 # Current task info
     if state['current_series']:
         st.info(f"Processing: **{state['current_series']}** - Volume **{state['current_volume']}**")
