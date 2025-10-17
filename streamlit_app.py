@@ -450,7 +450,7 @@ def confirm_single_series(series_name):
                     book_data = deepseek_api.get_book_info(suggestion, 1, st.session_state.project_state)
                     authors = book_data.get("authors", []) if book_data else []
                     description = book_data.get("description", "") if book_data else ""
-                    total_volumes = book_data.get("total_volumes", "Unknown") if book_data else "Unknown"
+                    total_volumes = book_data.get("number_of_extant_volumes", "Unknown") if book_data else "Unknown"
                 except Exception:
                     authors = []
                     description = "Unable to fetch details"
