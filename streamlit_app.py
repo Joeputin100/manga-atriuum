@@ -95,11 +95,11 @@ def fetch_cover_for_book(book: BookInfo) -> Optional[str]:
     # Try Google Books first for English covers
     try:
         google_api = GoogleBooksAPI()
-        search_term = f"{book.series_name} volume {book.volume_number}"
-        results = google_api.search_books(search_term, max_results=1)
-        if results and results[0].get('image_links', {}).get('thumbnail'):
-            return results[0]['image_links']['thumbnail']
+        cover_url = google_api.get_series_cover_image(book.series_name, book.volume_number, st.session_state.project_state if 'project_state' in st.session_state else None)
+        if cover_url:
+            return cover_url
     except Exception:
+        pass
         pass
     
     # Fallback to MAL
