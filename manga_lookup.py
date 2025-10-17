@@ -364,6 +364,7 @@ class DeepSeekAPI:
         - description: Summary of the book's content and notable reviews
         - physical_description: Physical characteristics (pages, dimensions, etc.)
         - genres: List of genres/subjects
+        - number_of_extant_volumes: Total number of volumes published for this series
         - cover_image_url: Direct URL to the book's cover image from an authoritative source (publisher website, Amazon, etc.) if available
 
         Format requirements:
