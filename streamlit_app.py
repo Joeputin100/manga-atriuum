@@ -395,30 +395,31 @@ def series_input_form():
 
 
     state = st.session_state.processing_state
-    progress = state['progress']
-    total = state['total_volumes']
-
-    # Progress bar
-    progress_percent = int((progress / total) * 100) if total > 0 else 0
-    st.progress(progress_percent / 100)
-
-    # Progress info
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric("Progress", f"{progress}/{total}")
-
-    with col2:
-        if state['start_time']:
-            elapsed = calculate_elapsed_time(state['start_time'])
-            st.metric("Elapsed Time", elapsed)
-
-    with col3:
+        if state['is_processing']:
+        progress = state['progress']
+        total = state['total_volumes']
+    
+        # Progress bar
+        progress_percent = int((progress / total) * 100) if total > 0 else 0
+        st.progress(progress_percent / 100)
+    
+        # Progress info
+        col1, col2, col3 = st.columns(3)
+    
+        with col1:
+            st.metric("Progress", f"{progress}/{total}")
+    
+        with col2:
+            if state['start_time']:
+                elapsed = calculate_elapsed_time(state['start_time'])
+                st.metric("Elapsed Time", elapsed)
+    
+        with col3:
         # Animated duck
-        display_duck_animation()
-        st.caption("Processing...")
-
-    # Current task info
+display_duck_animation()
+            st.caption("Processing...")
+    
+# Current task info
     if state['current_series']:
         st.info(f"Processing: **{state['current_series']}** - Volume **{state['current_volume']}**")
 
