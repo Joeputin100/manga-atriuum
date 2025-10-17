@@ -417,10 +417,10 @@ def series_input_form():
                     elapsed = calculate_elapsed_time(state['start_time'])
                     st.metric("Elapsed Time", elapsed)
         
-    with col3:
-    # Animated duck
-            display_duck_animation()
-            st.caption("Processing...")
+        with col3:
+        # Animated duck
+                display_duck_animation()
+                st.caption("Processing...")
     
 # Current task info
     if state['current_series']:
