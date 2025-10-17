@@ -46,6 +46,9 @@ from mangadex_cover_fetcher import MangaDexCoverFetcher
 
 
 def initialize_session_state():
+    # Reset processing state if stuck
+    if st.session_state.processing_state.get('is_processing', False) and not st.session_state.all_books:
+        st.session_state.processing_state['is_processing'] = False
     """Initialize session state variables"""
     if 'series_entries' not in st.session_state:
         st.session_state.series_entries = []
@@ -533,6 +536,9 @@ def main():
 
     # Initialize session state
     initialize_session_state()
+    # Reset processing state if stuck
+    if st.session_state.processing_state.get('is_processing', False) and not st.session_state.all_books:
+        st.session_state.processing_state['is_processing'] = False
 
     # Handle pending series confirmation
     if st.session_state.pending_series_name:
