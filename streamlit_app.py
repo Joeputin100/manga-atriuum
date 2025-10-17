@@ -531,6 +531,7 @@ def confirm_single_series(series_name):
 
 
 def main():
+    # Main application entry point
     """Main application logic"""
     st.title("📚 Manga Lookup Tool")
 
