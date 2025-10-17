@@ -122,7 +122,18 @@ def process_single_volume(series_name, volume, project_state):
 
 def process_series():
     """Process all confirmed series with threaded execution for better progress updates"""
-    if not st.session_state.series_entries:
+    # Create a list of all volumes to process
+    all_volumes = []
+    for series_entry in st.session_state.series_entries:
+        series_name = series_entry['confirmed_name']
+        volumes = series_entry['volumes']
+        for volume in volumes:
+            all_volumes.append((series_name, volume))
+
+    if not all_volumes:
+        st.session_state.processing_state['is_processing'] = False
+        st.warning("No volumes to process. Please add volumes to your series first.")
+        st.rerun()
         return
 
     # Initialize API (not used directly in this function but needed for imports)
@@ -139,14 +150,6 @@ def process_series():
 
     # Show initial processing message
     st.info("🔄 Please wait while we look up your manga volumes...")
-
-    # Create a list of all volumes to process
-    all_volumes = []
-    for series_entry in st.session_state.series_entries:
-        series_name = series_entry['confirmed_name']
-        volumes = series_entry['volumes']
-        for volume in volumes:
-            all_volumes.append((series_name, volume))
 
     # Process volumes with threading
     with ThreadPoolExecutor(max_workers=15) as executor:
@@ -201,7 +204,6 @@ def process_series():
             st.write(f"• {error}")
 
     st.rerun()  # Final rerun to show results
-
 
 def display_duck_animation():
     
