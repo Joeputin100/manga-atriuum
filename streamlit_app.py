@@ -89,25 +89,37 @@ def get_volume_1_isbn(series_name: str) -> Optional[str]:
 
 
 def fetch_cover_for_book(book: BookInfo) -> Optional[str]:
-    """Fetch cover image for a book using available cover fetchers"""
+    """Fetch cover image URL, prioritizing English editions"""
     
-    # Try MAL first
-    mal_fetcher = MALCoverFetcher()
-    cover_url = mal_fetcher.fetch_cover_for_series(book.series_name)
-    if cover_url:
-        return cover_url
+    # Try Google Books first for English covers
+    try:
+        google_api = GoogleBooksAPI()
+        search_term = f"{book.series_name} volume {book.volume_number}"
+        results = google_api.search_books(search_term, max_results=1)
+        if results and results[0].get('image_links', {}).get('thumbnail'):
+            return results[0]['image_links']['thumbnail']
+    except Exception:
+        pass
     
-    # Try MangaDex as fallback
-    mangadex_fetcher = MangaDexCoverFetcher()
-    cover_url = mangadex_fetcher.fetch_cover_for_series(book.series_name)
-    if cover_url:
-        return cover_url
+    # Fallback to MAL
+    try:
+        mal_fetcher = MALCoverFetcher()
+        cover_url = mal_fetcher.fetch_cover(book.series_name, book.volume_number)
+        if cover_url:
+            return cover_url
+    except Exception:
+        pass
     
-    # Try Google Books as last resort
-    google_client = GoogleBooksClient()
-    cover_url = google_client.get_cover_image(book.series_name, 1)
-    return cover_url
-
+    # Fallback to MangaDex
+    try:
+        mangadex_fetcher = MangaDexCoverFetcher()
+        cover_url = mangadex_fetcher.fetch_cover(book.series_name, book.volume_number)
+        if cover_url:
+            return cover_url
+    except Exception:
+        pass
+    
+    return None
 
 def process_single_volume(series_name, volume, project_state):
     """Process a single volume and return book info"""
@@ -294,9 +306,10 @@ def series_input_form():
 
         series_name = st.text_input(f"Enter {ordinal_text} Series Name", help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)")
 
-        if st.button("Confirm Series Name", key=f"confirm_{series_count}"):
+        if st.button("Confirm Series Name", key="confirm_series"):
             if series_name:
                 st.session_state.pending_series_name = series_name
+            st.info("Confirming series name, searching for matches...")
             else:
                 st.error("Please enter a series name")
 
@@ -431,6 +444,7 @@ def confirm_single_series(series_name):
         deepseek_api = DeepSeekAPI()
     except ValueError as e:
         st.error(f"API configuration error: {e}")
+    st.info("Searching for series matches...")
         return
 
     # Get suggestions
@@ -448,6 +462,7 @@ def confirm_single_series(series_name):
                 # Fetch series details
                 try:
                     book_data = deepseek_api.get_book_info(suggestion, 1, st.session_state.project_state)
+                st.write(f"Book data keys: {list(book_data.keys()) if book_data else None}")
                     authors = book_data.get("authors", []) if book_data else []
                     description = book_data.get("description", "") if book_data else ""
                     total_volumes = book_data.get("number_of_extant_volumes", "Unknown") if book_data else "Unknown"
@@ -493,6 +508,7 @@ def confirm_single_series(series_name):
                         copyright_year=None,
                         description="",
                         physical_description="",
+                st.markdown('<p style="font-size: 10px; color: gray;">Note: Covers may vary for different languages, editions, and reprintings.</p>', unsafe_allow_html=True)
                         genres=[],
                         warnings=[]
                     )
