@@ -137,7 +137,6 @@ def process_series():
     if not all_volumes:
         st.session_state.processing_state['is_processing'] = False
         st.warning("No volumes to process. Please add volumes to your series first.")
-        st.rerun()
         return
 
     # Initialize API (not used directly in this function but needed for imports)
@@ -146,7 +145,6 @@ def process_series():
     except ValueError as e:
         st.error(f"API configuration error: {e}")
         st.session_state.processing_state['is_processing'] = False
-        st.rerun()
         return
 
     all_books = []
@@ -207,7 +205,6 @@ def process_series():
         for error in errors:
             st.write(f"• {error}")
 
-    st.rerun()  # Final rerun to show results
 
 def display_duck_animation():
     
@@ -300,7 +297,6 @@ def series_input_form():
         if st.button("Confirm Series Name", key=f"confirm_{series_count}"):
             if series_name:
                 st.session_state.pending_series_name = series_name
-                st.rerun()
             else:
                 st.error("Please enter a series name")
 
@@ -368,7 +364,6 @@ def series_input_form():
                             entry["volumes"] = volumes
                             st.success(f"You have successfully added volumes {', '.join(map(str, volumes))} to {entry["confirmed_name"]}!")
                             st.balloons()
-                            st.rerun()
                         except Exception as e:
                             st.error(f"Invalid volume range: {e}")
 
@@ -394,7 +389,6 @@ def series_input_form():
             }
 
             # Start processing
-            st.rerun()
 
     state = st.session_state.processing_state
     if state['is_processing']:
@@ -523,13 +517,11 @@ def confirm_single_series(series_name):
                     st.session_state.pending_series_name = None
                     # Add to confirmed series
                     st.session_state.series_entries.append({
-    st.rerun()
                         "original_name": series_name,
                         "confirmed_name": suggestion,
                         "volumes": []
                     })
                     st.success(f"Selected: {suggestion}")
-                    st.rerun()
 
     elif len(suggestions) == 1:
         # Single suggestion - auto-confirm
@@ -538,7 +530,6 @@ def confirm_single_series(series_name):
         
         # Add to confirmed series
         st.session_state.series_entries.append({
-    st.rerun()
             "original_name": series_name,
             "confirmed_name": confirmed_name,
             "volumes": []
@@ -546,7 +537,6 @@ def confirm_single_series(series_name):
         
         # Clear pending
         st.session_state.pending_series_name = None
-        st.rerun()
         
     else:
         st.error("No suggestions found. Please try a different series name.")
@@ -676,14 +666,12 @@ def main():
         with col3:
             if st.button("Print Labels"):
                 st.session_state.show_label_form = True
-                st.rerun()
         with col4:
             # Clear results and start over
             if st.button("Start New Lookup"):
                 st.session_state.all_books = []
                 st.session_state.series_entries = []
                 st.session_state.confirmed_series = []
-                st.rerun()
 
         st.subheader("Print Labels")
         with st.form("label_form"):
@@ -714,10 +702,8 @@ def main():
                     mime="application/pdf"
                 )
                 st.session_state.show_label_form = False
-                st.rerun()
         if st.button("Cancel"):
             st.session_state.show_label_form = False
-            st.rerun()
 
     else:
         # Show series input form
