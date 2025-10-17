@@ -300,7 +300,7 @@ def series_input_form():
         if st.button("Confirm Series Name", key=f"confirm_{series_count}"):
             if not series_name:
                 st.error("Please enter a series name")
-            else:
+                    else:
         st.divider()
                 st.session_state.pending_series_name = series_name
                 st.rerun()
