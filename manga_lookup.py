@@ -326,6 +326,49 @@ class DeepSeekAPI:
         else:
             return suggestions
 
+    def _create_comprehensive_prompt(self, series_name: str, volume_number: int) -> str:
+        """Create a comprehensive prompt for DeepSeek API"""
+        return f"""
+        Perform grounded deep research for the manga series "{series_name}" volume {volume_number}.
+        Provide comprehensive information in JSON format with the following fields:
+
+        Required fields:
+        - series_name: The official series name
+        - volume_number: {volume_number}
+        - book_title: The specific title for this volume (append "(Volume {volume_number})")
+        - authors: List of authors/artists in "Last, First M." format, comma-separated for multiple
+        - msrp_cost: Manufacturer's Suggested Retail Price in USD
+        - isbn_13: ISBN-13 for paperback English edition (preferred) or other available edition
+        - publisher_name: Publisher of the English edition
+        - copyright_year: 4-digit copyright year
+        - description: Summary of the book's content and notable reviews
+        - physical_description: Physical characteristics (pages, dimensions, etc.)
+        - genres: List of genres/subjects
+        - cover_image_url: Direct URL to the book's cover image from an authoritative source (publisher website, Amazon, etc.) if available
+
+        Format requirements:
+        - Shift leading articles to end ("The Last of the Mohicans" → "Last of the Mohicans, The")
+        - Format author names as "Last, First M."
+        - Use authoritative sources where possible
+        - If information is unavailable, use best available data and note any gaps
+        - Return only valid JSON, no additional text
+
+        Example format:
+        {{
+          "series_name": "One Piece",
+          "volume_number": 1,
+          "book_title": "One Piece (Volume 1)",
+          "authors": ["Oda, Eiichiro"],
+          "msrp_cost": 9.99,
+          "isbn_13": "9781569319017",
+          "publisher_name": "VIZ Media LLC",
+          "copyright_year": 2003,
+          "description": "Monkey D. Luffy begins his journey...",
+          "physical_description": "208 pages, 5 x 7.5 inches",
+          "genres": ["Shonen", "Adventure", "Fantasy"]
+        }}
+        """.strip()
+
     def get_book_info(
         self,
         series_name: str,
