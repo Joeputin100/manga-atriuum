@@ -724,3 +724,25 @@ class GoogleBooksAPI:
         except Exception as e:
             print(f"Error fetching from Google Books: {e}")
             return None
+
+def generate_sequential_barcodes(start_barcode: str, count: int) -> List[str]:
+    """Generate sequential barcodes from a starting barcode"""
+    barcodes = []
+
+    # Extract prefix and numeric part
+    import re
+    match = re.match(r'([A-Za-z]*)(\d+)', start_barcode)
+
+    if not match:
+        raise ValueError(f"Invalid barcode format: {start_barcode}. Expected format like 'T000001'")
+
+    prefix = match.group(1) or ""
+    start_num = int(match.group(2))
+    num_digits = len(match.group(2))
+
+    for i in range(count):
+        current_num = start_num + i
+        barcode = f"{prefix}{current_num:0{num_digits}d}"
+        barcodes.append(barcode)
+
+    return barcodes
