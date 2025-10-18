@@ -29,7 +29,7 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from label_generator import generate_pdf_sheet
+# from label_generator import generate_pdf_sheet
 
 # Import cover fetchers
 from mal_cover_fetcher import MALCoverFetcher
