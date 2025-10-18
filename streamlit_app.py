@@ -465,6 +465,10 @@ def confirm_single_series(series_name):
                     st.write(f"Book data keys: {list(book_data.keys()) if book_data else None}")
                     authors = book_data.get("authors", []) if book_data else []
                     description = book_data.get("description", "") if book_data else ""
+                    if total_volumes != "Unknown":
+                        description += f"
+
+Total Volumes: {total_volumes}"
                     total_volumes = book_data.get("number_of_extant_volumes", "Unknown") if book_data else "Unknown"
                 except Exception:
                     authors = []
