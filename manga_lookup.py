@@ -399,5 +399,6 @@ class VertexAPI:
                             "text": prompt
                         }
                     ]
+                }
+            ]
         }
-        return "test"
