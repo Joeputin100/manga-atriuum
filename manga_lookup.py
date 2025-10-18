@@ -1,20 +1,11 @@
 #!/usr/bin/env python3
-import sqlite3
-
-"""
-Manga Lookup Tool
-
-A comprehensive Python script that uses DeepSeek API for manga series lookup,
-corrects series names, fetches detailed book information, and displays results
-in an interactive Rich TUI with clickable row interface.
-"""
-
 import json
 import os
 import re
+import sqlite3
 import time
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 
 import requests
 from dotenv import load_dotenv
@@ -22,6 +13,13 @@ from rich import print as rprint
 
 # Load environment variables
 load_dotenv()
+
+HTTP_STATUS_TOO_MANY_REQUESTS = 429
+EXPECTED_NAME_PARTS = 2
+MAX_NAME_PARTS = 2
+MIN_MSRP = 10
+MAX_MSRP = 30
+MIN_COPYRIGHT_YEAR = 1900
 
 
 @dataclass
@@ -58,15 +56,18 @@ class ProjectState:
         cursor = self.conn.cursor()
 
         # Metadata table for global stats
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS metadata (
                 key TEXT PRIMARY KEY,
                 value TEXT
             )
-        """)
+        """,
+        )
 
         # Cached responses table
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS cached_responses (
                 id INTEGER PRIMARY KEY,
                 prompt_hash TEXT,
@@ -75,10 +76,12 @@ class ProjectState:
                 timestamp TEXT,
                 UNIQUE(prompt_hash, volume)
             )
-        """)
+        """,
+        )
 
         # API calls table
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS api_calls (
                 id INTEGER PRIMARY KEY,
                 prompt TEXT,
@@ -87,27 +90,32 @@ class ProjectState:
                 success BOOLEAN,
                 timestamp TEXT
             )
-        """)
+        """,
+        )
 
         # Searches table
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS searches (
                 id INTEGER PRIMARY KEY,
                 query TEXT,
                 books_found INTEGER,
                 timestamp TEXT
             )
-        """)
+        """,
+        )
 
         # Cached cover images
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS cached_cover_images (
                 id INTEGER PRIMARY KEY,
                 isbn TEXT UNIQUE,
                 url TEXT,
                 timestamp TEXT
             )
-        """)
+        """,
+        )
 
         self.conn.commit()
 
@@ -117,7 +125,7 @@ class ProjectState:
         defaults = {
             "interaction_count": "0",
             "total_books_found": "0",
-            "start_time": datetime.now().isoformat(),
+            "start_time": datetime.now(UTC).isoformat(),
         }
         for key, value in defaults.items():
             cursor.execute(
@@ -135,16 +143,22 @@ class ProjectState:
     def _set_metadata(self, key: str, value: str):
         cursor = self.conn.cursor()
         cursor.execute(
-            "INSERT OR REPLACE INTO metadata (key, value) VALUES (?, ?)", (key, value),
+            "INSERT OR REPLACE INTO metadata (key, value) VALUES (?, ?)",
+            (key, value),
         )
         self.conn.commit()
 
     def record_api_call(
-        self, prompt: str, response: str, volume: int, success: bool = True,
+        self,
+        prompt: str,
+        response: str,
+        volume: int,
+        *,
+        success: bool = True,
     ):
         """Record API call with full details for caching"""
         cursor = self.conn.cursor()
-        timestamp = datetime.now().isoformat()
+        timestamp = datetime.now(UTC).isoformat()
 
         # Insert API call
         cursor.execute(
@@ -182,7 +196,7 @@ class ProjectState:
     def record_interaction(self, search_query: str, books_found: int):
         """Record a new user interaction"""
         cursor = self.conn.cursor()
-        timestamp = datetime.now().isoformat()
+        timestamp = datetime.now(UTC).isoformat()
 
         # Update metadata
         interaction_count = int(self._get_metadata("interaction_count")) + 1
@@ -201,7 +215,8 @@ class ProjectState:
         """Get cached cover image URL by ISBN key"""
         cursor = self.conn.cursor()
         cursor.execute(
-            "SELECT url FROM cached_cover_images WHERE isbn = ?", (isbn_key,),
+            "SELECT url FROM cached_cover_images WHERE isbn = ?",
+            (isbn_key,),
         )
         row = cursor.fetchone()
         return row[0] if row else None
@@ -209,7 +224,7 @@ class ProjectState:
     def cache_cover_image(self, isbn_key: str, url: str):
         """Cache a cover image URL"""
         cursor = self.conn.cursor()
-        timestamp = datetime.now().isoformat()
+        timestamp = datetime.now(UTC).isoformat()
         cursor.execute(
             "INSERT OR REPLACE INTO cached_cover_images (isbn, url, timestamp) VALUES (?, ?, ?)",
             (isbn_key, url, timestamp),
@@ -223,7 +238,8 @@ class DeepSeekAPI:
     def __init__(self):
         self.api_key = os.getenv("DEEPSEEK_API_KEY")
         if not self.api_key:
-            raise ValueError("DEEPSEEK_API_KEY not found in environment variables")
+            msg = "DEEPSEEK_API_KEY not found in environment variables"
+            raise ValueError(msg)
 
         self.base_url = "https://api.deepseek.com/v1/chat/completions"
         self.model = "deepseek-chat"  # Using DeepSeek-V3.2-Exp (non-thinking mode)
@@ -272,7 +288,10 @@ class DeepSeekAPI:
 
         try:
             response = requests.post(
-                self.base_url, headers=headers, json=payload, timeout=60,
+                self.base_url,
+                headers=headers,
+                json=payload,
+                timeout=60,
             )
             response.raise_for_status()
 
@@ -280,8 +299,6 @@ class DeepSeekAPI:
             content = result["choices"][0]["message"]["content"]
 
             # Debug logging
-            print(f"DEBUG: DeepSeek API response status: {response.status_code}")
-            print(f"DEBUG: DeepSeek API response content: {content}")
 
             # Parse JSON response
             suggestions = json.loads(content)
@@ -290,7 +307,6 @@ class DeepSeekAPI:
             suggestions = [s for s in suggestions if s is not None]
 
             # Debug logging
-            print(f"DEBUG: Filtered suggestions: {suggestions}")
 
             # Ensure the original series name is included if it's valid
             # Check if the original name is in the suggestions, if not add it
@@ -304,20 +320,17 @@ class DeepSeekAPI:
                     # Add original name as first suggestion
                     suggestions.insert(0, series_name)
 
-            return suggestions
-
-        except json.JSONDecodeError as e:
-            rprint(f"[red]JSON decode error in DeepSeek API response: {e}[/red]")
-            rprint(
-                f"[yellow]Response content: {content if content else 'Not available'}[/yellow]",
-            )
-            return [series_name]  # Fallback to original name
-        except Exception as e:
+        except OSError as e:
             rprint(f"[red]Error using DeepSeek API: {e}[/red]")
             return [series_name]  # Fallback to original name
+        else:
+            return suggestions
 
     def get_book_info(
-        self, series_name: str, volume_number: int, project_state: ProjectState,
+        self,
+        series_name: str,
+        volume_number: int,
+        project_state: ProjectState,
     ) -> dict | None:
         """Get comprehensive book information using DeepSeek API"""
 
@@ -350,7 +363,10 @@ class DeepSeekAPI:
 
         try:
             response = requests.post(
-                self.base_url, headers=headers, json=payload, timeout=120,
+                self.base_url,
+                headers=headers,
+                json=payload,
+                timeout=120,
             )
             response.raise_for_status()
 
@@ -369,7 +385,10 @@ class DeepSeekAPI:
                 )
                 rprint(f"[red]Content: {content[:500]}[/red]")
                 project_state.record_api_call(
-                    prompt, content, volume_number, success=False,
+                    prompt,
+                    content,
+                    volume_number,
+                    success=False,
                 )
             if not book_data.get("number_of_extant_volumes"):
                 google_api = GoogleBooksAPI()
@@ -381,19 +400,19 @@ class DeepSeekAPI:
             # Record successful API call
             project_state.record_api_call(prompt, content, volume_number, success=True)
 
-            return book_data
-
         except requests.exceptions.HTTPError as e:
-            if e.response and e.response.status_code == 429:
+            if e.response and e.response.status_code == HTTP_STATUS_TOO_MANY_REQUESTS:
                 rprint(
                     f"[yellow]Rate limit exceeded for volume {volume_number}, waiting 5 seconds...[/yellow]",
                 )
                 time.sleep(5)
                 return self.get_book_info(series_name, volume_number, project_state)
             rprint(f"[red]HTTP error for volume {volume_number}: {e}[/red]")
-        except Exception as e:
+        except OSError as e:
             rprint(f"[red]Error fetching data for volume {volume_number}: {e}[/red]")
             return None
+        else:
+            return book_data
 
 
 class DataValidator:
@@ -425,7 +444,7 @@ class DataValidator:
         # Handle common Japanese name formats
         name_parts = author_name.strip().split()
 
-        if len(name_parts) == 2:
+        if len(name_parts) == EXPECTED_NAME_PARTS:
             # Assume "First Last" format
             return f"{name_parts[1]}, {name_parts[0]}"
         if len(name_parts) == 1:
@@ -449,16 +468,23 @@ class DataValidator:
         return ", ".join(formatted_authors)
 
 
-
-
 class GoogleBooksAPI:
     """Handles Google Books API interactions for cover image retrieval using keyless queries"""
 
     def __init__(self):
         self.base_url = "https://www.googleapis.com/books/v1/volumes"
 
+    def _select_cover_image(self, image_links: dict) -> str | None:
+        """Select the best available cover image from Google Books image links."""
+        for size in ["smallThumbnail", "thumbnail", "small", "medium", "large", "extraLarge"]:
+            if size in image_links:
+                return image_links[size]
+        return None
+
     def get_cover_image_url(
-        self, isbn: str, project_state: ProjectState | None = None,
+        self,
+        isbn: str,
+        project_state: ProjectState | None = None,
     ) -> str | None:
         """Get cover image URL for a book by ISBN using keyless Google Books API"""
         if not isbn:
@@ -468,12 +494,10 @@ class GoogleBooksAPI:
         if project_state:
             cached_url = project_state.get_cached_cover_image(f"isbn:{isbn}")
             if cached_url:
-                print(f"✓ Using cached cover image for ISBN {isbn}")
                 return cached_url
 
         # Construct the keyless API URL
         url = f"{self.base_url}?q=isbn:{isbn}&maxResults=1"
-        print(f"🔍 Searching Google Books API for ISBN {isbn}")
 
         try:
             # Make the keyless HTTP request
@@ -482,7 +506,6 @@ class GoogleBooksAPI:
             data = response.json()
 
             if data.get("totalItems", 0) == 0:
-                print(f"✗ No results found for ISBN {isbn}")
                 return None
 
             volume_info = data["items"][0]["volumeInfo"]
@@ -499,23 +522,19 @@ class GoogleBooksAPI:
                         break
 
             if cover_url:
-                print(f"✓ Found cover image for ISBN {isbn}: {cover_url}")
                 # Cache the result
                 if project_state:
                     project_state.cache_cover_image(f"isbn:{isbn}", cover_url)
             else:
-                print(f"✗ No cover image found in Google Books for ISBN {isbn}")
+                pass
 
+        except requests.exceptions.RequestException:
+            # Silently fail - cover images are optional
+            return None
+        except OSError:
+            return None
+        else:
             return cover_url
-
-        except requests.exceptions.RequestException as e:
-            print(f"⚠️ Request error for ISBN {isbn}: {e}")
-            # Silently fail - cover images are optional
-            return None
-        except Exception as e:
-            print(f"⚠️ Unexpected error for ISBN {isbn}: {e}")
-            # Silently fail - cover images are optional
-            return None
 
     def get_total_volumes(self, series_name: str) -> int:
         """Get the total number of volumes in a manga series using Google Books API"""
@@ -535,7 +554,6 @@ class GoogleBooksAPI:
             for item in data.get("items", []):
                 title = item["volumeInfo"].get("title", "").lower()
                 # Look for volume patterns
-                import re
 
                 match = re.search(r"volume (\d+)", title)
                 if match:
@@ -543,10 +561,8 @@ class GoogleBooksAPI:
 
             return max(volume_numbers) if volume_numbers else 0
 
-        except Exception:
+        except OSError:
             return 0
-
-
 
 
 def parse_volume_range(volume_input: str) -> list[int]:
@@ -566,25 +582,28 @@ def parse_volume_range(volume_input: str) -> list[int]:
                 try:
                     start, end = map(int, part.split("-"))
                     volumes.extend(range(start, end + 1))
-                except ValueError:
-                    raise ValueError(f"Invalid volume range format: {part}")
+                except ValueError as e:
+                    msg = f"Invalid volume range format: {part}"
+                    raise ValueError(msg) from e
             else:
                 # Handle omnibus format like '17-18-19' (multiple volumes in one book)
                 try:
                     # Split by hyphens and convert all parts to integers
                     omnibus_volumes = list(map(int, part.split("-")))
                     volumes.extend(omnibus_volumes)
-                except ValueError:
-                    raise ValueError(f"Invalid omnibus format: {part}")
+                except ValueError as e:
+                    msg = f"Invalid omnibus format: {part}"
+                    raise ValueError(msg) from e
         else:
             # Handle single volume like '7'
             try:
                 volumes.append(int(part))
-            except ValueError:
-                raise ValueError(f"Invalid volume number: {part}")
+            except ValueError as e:
+                msg = f"Invalid volume number: {part}"
+                raise ValueError(msg) from e
 
     # Remove duplicates and sort
-    return sorted(list(set(volumes)))
+    return sorted(set(volumes))
 
 
 def generate_sequential_barcodes(start_barcode: str, count: int) -> list[str]:
@@ -596,8 +615,9 @@ def generate_sequential_barcodes(start_barcode: str, count: int) -> list[str]:
     match = re.match(r"([A-Za-z]*)(\d+)", start_barcode)
 
     if not match:
+        msg = f"Invalid barcode format: {start_barcode}. Expected format like 'T000001'"
         raise ValueError(
-            f"Invalid barcode format: {start_barcode}. Expected format like 'T000001'",
+            msg,
         )
 
     prefix = match.group(1) or ""
@@ -640,9 +660,9 @@ def process_book_data(
             # Check if it's likely a single author in "Last, First" format
             parts = authors_raw.split(", ")
             if (
-                len(parts) == 2
-                and len(parts[0].split()) <= 2
-                and len(parts[1].split()) <= 2
+                len(parts) == EXPECTED_NAME_PARTS
+                and len(parts[0].split()) <= MAX_NAME_PARTS
+                and len(parts[1].split()) <= MAX_NAME_PARTS
             ):
                 # Likely a single author in "Last, First" format
                 authors = [authors_raw.strip()]
@@ -662,12 +682,12 @@ def process_book_data(
     else:
         try:
             msrp_cost = float(msrp_cost)
-            if msrp_cost < 10:
+            if msrp_cost < MIN_MSRP:
                 rounded_msrp = 10.0
                 warnings.append(
                     f"MSRP ${msrp_cost:.2f} is below minimum $10 (rounded up to ${rounded_msrp:.2f})",
                 )
-            elif msrp_cost > 30:
+            elif msrp_cost > MAX_MSRP:
                 warnings.append(f"MSRP ${msrp_cost:.2f} exceeds typical maximum $30")
         except (ValueError, TypeError):
             warnings.append("Invalid MSRP format")
@@ -677,14 +697,13 @@ def process_book_data(
     copyright_year = None
     date_str = str(raw_data.get("copyright_year", ""))
     if date_str:
-        import re
 
-        year_patterns = [r"(19|20)\d{2}", r"\d{4}"]
+        year_patterns = [r"\b(19|20)\d{2}\b", r"\b\d{4}\b"]
         for pattern in year_patterns:
             matches = re.findall(pattern, date_str)
             if matches:
                 year = int(matches[0])
-                if 1900 <= year <= datetime.now().year + 1:
+                if MIN_COPYRIGHT_YEAR <= year <= datetime.now(UTC).year + 1:
                     copyright_year = year
                     break
     if not copyright_year:
@@ -692,10 +711,11 @@ def process_book_data(
 
     # Handle genres
     genres_raw = raw_data.get("genres", [])
-    if isinstance(genres_raw, str):
-        genres = [genre.strip() for genre in genres_raw.split(",")]
-    else:
-        genres = genres_raw
+    genres = (
+        [genre.strip() for genre in genres_raw.split(",")]
+        if isinstance(genres_raw, str)
+        else genres_raw
+    )
 
     # Extract cover image URL if available from DeepSeek data
     cover_image_url = raw_data.get("cover_image_url")
@@ -705,13 +725,14 @@ def process_book_data(
         isbn = raw_data.get("isbn_13")
         if isbn:
             cover_image_url = google_books_api.get_cover_image_url(
-                isbn, project_state=project_state,
+                isbn,
+                project_state=project_state,
             )
             # Debug: Print cover image status
             if cover_image_url:
-                print(f"✓ Found cover image for ISBN {isbn}: {cover_image_url}")
+                pass
             else:
-                print(f"✗ No cover image found for ISBN {isbn}")
+                pass
 
     return BookInfo(
         series_name=series_name,
