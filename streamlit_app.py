@@ -341,7 +341,7 @@ def series_input_form():
                 st.rerun()
         if st.session_state.get("barcode_confirmed", False):
             st.subheader("Add Series")
-            st.write(f"Barcode pattern: {st.session_state.get(barcode_pattern, )}")
+            st.write(f"Barcode pattern: {st.session_state.get('barcode_pattern', '')}")
 
         # Make series name entry ordinal
         series_count = len(st.session_state.series_entries) + 1
