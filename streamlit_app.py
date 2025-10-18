@@ -35,15 +35,15 @@ from pathlib import Path
 from mal_cover_fetcher import MALCoverFetcher
 
 # Import existing core logic
-# from manga_lookup import (
-    BookInfo,
-    DeepSeekAPI,
-    GoogleBooksAPI,
-    ProjectState,
-    generate_sequential_barcodes,
-    parse_volume_range,
-    process_book_data,
-)
+# # from manga_lookup import (
+#     BookInfo,
+#     DeepSeekAPI,
+#     GoogleBooksAPI,
+#     ProjectState,
+#     generate_sequential_barcodes,
+#     parse_volume_range,
+#     process_book_data,
+# )
 from mangadex_cover_fetcher import MangaDexCoverFetcher
 
 # Import MARC exporter
