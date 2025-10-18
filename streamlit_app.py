@@ -300,6 +300,8 @@ def display_progress_section():
 
 
 def series_input_form():
+    if "barcode_confirmed" not in st.session_state:
+        st.session_state.barcode_confirmed = False
     if st.button("Reset Barcode State"):
         if "barcode_confirmed" in st.session_state:
             del st.session_state.barcode_confirmed
