@@ -533,13 +533,10 @@ def confirm_single_series(series_name):
                     )
                     authors = book_data.get("authors", []) if book_data else []
                     description = book_data.get("description", "") if book_data else ""
-                        description += "\\n\\nTotal Volumes: " + str(total_volumes)
                     total_volumes = (
                         book_data.get("number_of_extant_volumes", "Unknown")
                         if book_data
                         else "Unknown"
-                    if total_volumes != "Unknown":
-                        description += f"\n\nTotal Volumes: {total_volumes}"
                     )
                 except Exception as e:
                     st.error(f"API Error: {e!s}")
@@ -609,7 +606,6 @@ def confirm_single_series(series_name):
                         else description
                     )
                     st.write(f"**Description:** {desc_text}")
-                if total_volumes != "Unknown":
                     st.write(f"**Total Volumes:** {total_volumes}")
                 # Selection button
                 if st.button(f"Select {suggestion}", key=f"select_{i}"):
