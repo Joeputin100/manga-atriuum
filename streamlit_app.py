@@ -178,16 +178,16 @@ def process_series():
             # Update progress
             st.session_state.processing_state["current_series"] = series_name
             st.session_state.processing_state["current_volume"] = volume
-            st.session_state.processing_state["progress"] = i + 1
+                    st.session_state.processing_state["progress"] = i + 1
 
             try:
                 book, error = future.result()
-                if book:
+                        if book:
                     all_books.append(book)
-                elif error:
-                    errors.append(error)
+                        elif error:
+                            errors.append(error)
             except Exception as e:
-                errors.append(f"Unexpected error processing {series_name} volume {volume}: {e!s}")
+                        errors.append(f"Unexpected error processing {series_name} volume {volume}: {e!s}")
 
     # Assign barcodes
     start_barcode = st.session_state.get("start_barcode", "T000001")
@@ -367,12 +367,12 @@ def series_input_form():
                         warnings=[],
                     )
                     cover_url = fetch_cover_for_book(dummy_book)
-                except Exception:
+                    except Exception:
                         pass
 
                 if cover_url:
                         st.image(cover_url, width=100)
-                    except Exception:
+                        except Exception:
                         pass
 
                     st.write(f"**Volumes:** {", ".join(map(str, entry["volumes"]))}")
@@ -524,12 +524,12 @@ def confirm_single_series(series_name):
                     )
                     st.markdown('<p style="font-size: 10px; color: gray;">Note: Covers may vary for different languages, editions, and reprintings.</p>', unsafe_allow_html=True)
                     cover_url = fetch_cover_for_book(dummy_book)
-                except Exception:
+                    except Exception:
                     pass
 
                 if cover_url:
                         st.image(cover_url, width=100)
-                    except Exception:
+                        except Exception:
                         pass
                 if authors:
                     st.write(f"**Authors:** {", ".join(authors)}")
@@ -673,7 +673,7 @@ def main():
                         file_name="manga_collection.mrc",
                         mime="application/octet-stream",
                     )
-                except Exception:
+                    except Exception:
                     st.error("An error occurred during the export process.")
         with col2:
             if st.button("Download Project State JSON"):
@@ -687,7 +687,7 @@ def main():
                         file_name="project_state.json",
                         mime="application/json",
                     )
-                except Exception:
+                    except Exception:
                     st.error("An error occurred during the export process.")
         with col3:
             if st.button("Print Labels"):
