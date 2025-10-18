@@ -290,17 +290,18 @@ def series_input_form():
                 help="Enter starting barcode (e.g., T000001 or MANGA001)",
                 key="start_barcode_input",
             )
+            # Show barcode increment pattern dynamically
+            if start_barcode_input:
+                sample_barcodes = generate_sequential_barcodes(start_barcode_input, 5)
+                st.write(f"Barcode pattern: {", ".join(sample_barcodes)}")
+            
             if st.button("Confirm Barcode"):
                 if start_barcode_input:
                     st.session_state.start_barcode = start_barcode_input
-                    # Show barcode increment pattern
-                    sample_barcodes = generate_sequential_barcodes(start_barcode_input, 5)
-                    st.success(f"Barcode pattern confirmed: {", ".join(sample_barcodes)}...")
                     st.session_state.barcode_confirmed = True
                     st.rerun()
                 if not start_barcode_input:
                     st.error("Please enter a starting barcode")
-        # Series input section
         if st.session_state.get("barcode_confirmed", False):
             st.subheader("Add Series")
 
