@@ -428,13 +428,15 @@ def series_input_form():
                     )
                 with col2:
                     if st.button("Add Volumes", key=f"add_vol_{i}") and volume_input:
-                        volumes = parse_volume_range(volume_input)
-                        entry["volumes"] = volumes
-                        st.success(
+                        try:
+                            volumes = parse_volume_range(volume_input)
+                            entry["volumes"] = volumes
+                            st.success(
                             f"You have successfully added volumes {', '.join(map(str, volumes))} to {entry['confirmed_name']}!",
                         )
-                        st.balloons()
-                        st.error(f"Invalid volume range: {e}")
+                            st.balloons()
+                        except ValueError as e:
+                            st.error(f"Invalid volume range: {e}")
 
                 # Remove button
                 if st.button("🗑️ Remove", key=f"remove_{i}"):
