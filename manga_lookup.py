@@ -569,3 +569,158 @@ def parse_volume_range(volume_input: str) -> List[int]:
 
     # Remove duplicates and sort
     return sorted(list(set(volumes)))
+
+class GoogleBooksAPI:
+    """Handles Google Books API interactions for cover image retrieval using keyless queries"""
+
+    def __init__(self):
+        self.base_url = "https://www.googleapis.com/books/v1/volumes"
+        self.api_key = os.getenv("GEMINI_API_KEY")
+
+    def get_cover_image_url(self, isbn: str, project_state: Optional[ProjectState] = None) -> Optional[str]:
+        if not isbn:
+            return None
+
+        # Check cache first if project_state is provided
+        if project_state:
+            cached_url = project_state.get_cached_cover_image(f"isbn:{isbn}")
+            if cached_url:
+                return cached_url
+
+        # Construct the keyless API URL
+        url = f"{self.base_url}?q=isbn:{isbn}&maxResults=1"
+        if self.api_key:
+            url += f"&key={self.api_key}"
+
+        try:
+            # Make the keyless HTTP request
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+
+            if data.get('totalItems', 0) == 0:
+                return None
+
+            volume_info = data['items'][0]['volumeInfo']
+            image_links = volume_info.get('imageLinks', {})
+
+            # Get the small thumbnail cover image URL
+            cover_url = image_links.get('smallThumbnail')
+
+            # If small thumbnail not available, try other sizes
+            if not cover_url:
+                for size in ['thumbnail', 'small', 'medium', 'large', 'extraLarge']:
+                    if size in image_links:
+                        cover_url = image_links[size]
+                        break
+
+            if cover_url:
+                if project_state:
+                    project_state.cache_cover_image(f"isbn:{isbn}", cover_url)
+            else:
+                print(f"✗ No cover image found in Google Books for ISBN {isbn}")
+
+            return cover_url
+
+        except Exception as e:
+            print(f"Error fetching cover image: {e}")
+            return None
+
+    def get_series_cover_image(self, series_name: str, volume_number: int = 1, project_state: Optional[ProjectState] = None) -> Optional[str]:
+        # Check cache first if project_state is provided
+        if project_state:
+            cached_url = project_state.get_cached_cover_image(f"series:{series_name}")
+            if cached_url:
+                return cached_url
+        
+        # Search for the series with volume 1
+        query = f'intitle:"{series_name}" "volume {volume_number}" manga'
+        url = f"{self.base_url}?q={query}&maxResults=1"
+        if self.api_key:
+            url += f"&key={self.api_key}"
+        
+        try:
+            # Make the keyless HTTP request
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            
+            if data.get('totalItems', 0) == 0:
+                return None
+            
+            volume_info = data['items'][0]['volumeInfo']
+            image_links = volume_info.get('imageLinks', {})
+            
+            # Get the small thumbnail cover image URL
+            cover_url = image_links.get('smallThumbnail')
+            
+            # If small thumbnail not available, try other sizes
+            if not cover_url:
+                for size in ['thumbnail', 'small', 'medium', 'large', 'extraLarge']:
+                    if size in image_links:
+                        cover_url = image_links[size]
+                        break
+            
+            return cover_url
+        
+        except Exception as e:
+            print(f"Error fetching series cover image: {e}")
+            return None
+
+    def get_total_volumes(self, series_name: str) -> int:
+        """Get approximate total number of volumes for a series from Google Books API"""
+        query = f'intitle:"{series_name}" manga'
+        url = f"{self.base_url}?q={query}&maxResults=1"
+        if self.api_key:
+            url += f"&key={self.api_key}"
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            return data.get('totalItems', 0)
+        except Exception as e:
+            print(f"Error fetching total volumes from Google Books: {e}")
+            return 0
+
+    def get_book_info_from_google(self, series_name: str, volume_number: int) -> Optional[Dict]:
+        """Fallback: Get basic book info from Google Books API"""
+        query = f'intitle:"{series_name}" "volume {volume_number}" manga'
+        url = f"{self.base_url}?q={query}&maxResults=1"
+        if self.api_key:
+            url += f"&key={self.api_key}"
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            if data.get('totalItems', 0) == 0:
+                return None
+            volume_info = data['items'][0]['volumeInfo']
+            # Map to our format
+            book_data = {
+                'series_name': series_name,
+                'volume_number': volume_number,
+                'book_title': volume_info.get('title', f"{series_name} (Volume {volume_number})"),
+                'authors': volume_info.get('authors', []),
+                'description': volume_info.get('description', ''),
+                'publisher_name': volume_info.get('publisher', ''),
+                'copyright_year': volume_info.get('publishedDate', '').split('-')[0] if volume_info.get('publishedDate') else None,
+                'physical_description': '',
+                'genres': volume_info.get('categories', []),
+                'isbn_13': None,
+                'msrp_cost': None,
+                'cover_image_url': None,
+            }
+            # Try to get ISBN
+            identifiers = volume_info.get('industryIdentifiers', [])
+            for ident in identifiers:
+                if ident.get('type') == 'ISBN_13':
+                    book_data['isbn_13'] = ident.get('identifier')
+                    break
+            # Try to get cover
+            image_links = volume_info.get('imageLinks', {})
+            cover_url = image_links.get('smallThumbnail') or image_links.get('thumbnail')
+            book_data['cover_image_url'] = cover_url
+            return book_data
+        except Exception as e:
+            print(f"Error fetching from Google Books: {e}")
+            return None
