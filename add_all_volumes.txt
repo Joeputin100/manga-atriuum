@@ -1,4 +1,0 @@
-  File "/data/data/com.termux/files/home/projects/manga_lookup_tool/add_missing_volumes.py", line 36
-    else:
-         ^
-IndentationError: unindent does not match any outer indentation level
