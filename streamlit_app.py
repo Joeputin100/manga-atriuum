@@ -276,9 +276,17 @@ def display_progress_section():
     display_duck_animation()
     st.caption("Please wait...")
 def series_input_form():
+    if st.button("Reset Barcode State"):
+        if "barcode_confirmed" in st.session_state:
+            del st.session_state.barcode_confirmed
+        if "start_barcode" in st.session_state:
+            del st.session_state.start_barcode
+        if "start_barcode_input" in st.session_state:
+            del st.session_state.start_barcode_input
+        st.rerun()
     """Multi-series input form"""
     st.header("📚 Manga Series Input")
-    if not st.session_state.series_entries or any(not entry["volumes"] for entry in st.session_state.series_entries):
+    if True:
         # Starting barcode - show until used
         # Starting barcode - always show with current value
         if not st.session_state.get("barcode_confirmed", False):
