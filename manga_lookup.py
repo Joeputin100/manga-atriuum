@@ -401,5 +401,3 @@ class VertexAPI:
                     ]
         }
         return "test"
-        """    def _create_comprehensive_prompt(self, series_name: str, volume_number: int) -> str:
-        return """"
