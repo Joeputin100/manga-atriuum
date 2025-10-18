@@ -399,88 +399,9 @@ class VertexAPI:
                             "text": prompt
                         }
                     ]
-                }
-    def _create_comprehensive_prompt(self, series_name: str, volume_number: int) -> str:
-        """Create a comprehensive prompt for DeepSeek API"""
-        # Determine edition and volume_text
-        if "omnibus" in series_name.lower():
-            edition_type = "omnibus"
-            volumes_per_book = 3
-            volume_text = f"{volume_number * 3 - 2}-{volume_number * 3}"
-        elif "colossal" in series_name.lower():
-            edition_type = "colossal"
-            volumes_per_book = 5
-            volume_text = f"{volume_number * 5 - 4}-{volume_number * 5}"
-        else:
-            edition_type = "regular"
-            volumes_per_book = 1
-            volume_text = str(volume_number)
-
-        return f"""
-        Perform grounded deep research for the manga series "{series_name}" volume {volume_number}.
-        Provide comprehensive information in JSON format with the following fields:
-
-        Required fields:
-        - series_name: The official series name
-        - volume_number: {volume_number}
-        - book_title: The specific title for this volume (append "(Volume {volume_text})")
-        - volume_text: The volume number or range for this book (e.g., "1" for regular, "1-3" for omnibus, "1-5" for colossal)
-        - authors: List of authors/artists in "Last, First M." format, comma-separated for multiple
-        - msrp_cost: Manufacturer's Suggested Retail Price in USD
-        - isbn_13: ISBN-13 for paperback English edition (preferred) or other available edition
-        - publisher_name: Publisher of the English edition
-        - copyright_year: 4-digit copyright year
-        - description: Summary of the book's content and notable reviews
-        - physical_description: Physical characteristics (pages, dimensions, etc.)
-        - genres: List of genres/subjects
-        - number_of_extant_volumes: Total number of volumes published for this series
-        - edition_type: Type of edition (regular, omnibus, colossal)
-        - volumes_per_book: Number of volumes per book for this edition
-
-        Provide the information as valid JSON that can be parsed.
-        """
-            ]
         }
-
-        try:
-            response = requests.post(url, json=payload, timeout=120)
-            response.raise_for_status()
-
-            result = response.json()
-            content = result["candidates"][0]["content"]["parts"][0]["text"]
-
-            # Strip markdown if present
-            content = content.strip()
-            if content.startswith('```json'):
-                content = content[7:]
-            if content.endswith('```'):
-                content = content[:-3]
-            content = content.strip()
-
-            # Parse JSON response
-            try:
-                book_data = json.loads(content)
-            except json.JSONDecodeError as e:
-                rprint(f"[red]Invalid JSON response from Vertex for volume {volume_number}: {e}[/red]")
-                rprint(f"[red]Content: {content[:500]}[/red]")
-                project_state.record_api_call(prompt, content, volume_number, success=False)
-                return None
-
-            # Record successful API call
-            project_state.record_api_call(prompt, content, volume_number, success=True)
-
-            return book_data
-
-        except requests.exceptions.HTTPError as e:
-            rprint(f"[red]HTTP error from Vertex for volume {volume_number}: {e}[/red]")
-            project_state.record_api_call(prompt, str(e), volume_number, success=False)
-            return None
-        except Exception as e:
-            rprint(f"[red]Error fetching data from Vertex for volume {volume_number}: {e}[/red]")
-            project_state.record_api_call(prompt, str(e), volume_number, success=False)
-            return None
-
-    def _create_comprehensive_prompt(self, series_name: str, volume_number: int) -> str:
+        return "test"
+        """    def _create_comprehensive_prompt(self, series_name: str, volume_number: int) -> str:
         """Create a comprehensive prompt for Vertex AI"""
         # Determine edition and volume_text
         if "omnibus" in series_name.lower():
@@ -496,7 +417,7 @@ class VertexAPI:
             volumes_per_book = 1
             volume_text = str(volume_number)
 
-        return f"""
+        return """"
         Perform grounded deep research for the manga series "{series_name}" volume {volume_number}.
         Provide comprehensive information in JSON format with the following fields:
 
@@ -886,3 +807,99 @@ def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Opti
         warnings=warnings,
         cover_image_url=cover_image_url
     )
+
+class VertexAPI:
+    """Handles Vertex AI interactions using Gemini model"""
+
+    def __init__(self):
+        self.api_key = os.getenv("GEMINI_API_KEY")
+        self.base_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+        self.model = "gemini-1.5-flash"
+
+    def get_book_info(self, series_name: str, volume_number: int, project_state: ProjectState) -> Optional[Dict]:
+        """Get comprehensive book information using Vertex AI"""
+
+        # Create comprehensive prompt
+        prompt = self._create_comprehensive_prompt(series_name, volume_number)
+
+        # Check cache first
+        cached_response = project_state.get_cached_response(prompt, volume_number)
+        if cached_response:
+            rprint(f"[cyan]📚 Using cached data from Vertex for volume {volume_number}[/cyan]")
+            try:
+                return json.loads(cached_response)
+            except json.JSONDecodeError:
+                rprint(f"[yellow]⚠️ Cached data corrupted, fetching fresh data[/yellow]")
+
+        # If we get here, we need to make a new API call
+        rprint(f"[blue]🔍 Making Vertex API call for volume {volume_number}[/blue]")
+
+        url = f"{self.base_url}?key={self.api_key}" if self.api_key else self.base_url
+
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": prompt
+                        }
+                    ]
+                }
+            ]
+        }
+
+        try:
+            response = requests.post(url, json=payload, timeout=120)
+            response.raise_for_status()
+
+            result = response.json()
+            content = result["candidates"][0]["content"]["parts"][0]["text"]
+
+            # Strip markdown if present
+            content = content.strip()
+            if content.startswith('```json'):
+                content = content[7:]
+            if content.endswith('```'):
+                content = content[:-3]
+            content = content.strip()
+
+            # Parse JSON response
+            try:
+                book_data = json.loads(content)
+            except json.JSONDecodeError as e:
+                rprint(f"[red]Invalid JSON response from Vertex for volume {volume_number}: {e}[/red]")
+                rprint(f"[red]Content: {content[:500]}[/red]")
+                project_state.record_api_call(prompt, content, volume_number, success=False)
+                return None
+
+            # Record successful API call
+            project_state.record_api_call(prompt, content, volume_number, success=True)
+
+            return book_data
+
+        except requests.exceptions.HTTPError as e:
+            rprint(f"[red]HTTP error from Vertex for volume {volume_number}: {e}[/red]")
+            project_state.record_api_call(prompt, str(e), volume_number, success=False)
+            return None
+        except Exception as e:
+            rprint(f"[red]Error fetching data from Vertex for volume {volume_number}: {e}[/red]")
+            project_state.record_api_call(prompt, str(e), volume_number, success=False)
+            return None
+
+    def _create_comprehensive_prompt(self, series_name: str, volume_number: int) -> str:
+        """Create a comprehensive prompt for Vertex AI"""
+        # Determine edition and volume_text
+        if "omnibus" in series_name.lower():
+            edition_type = "omnibus"
+            volumes_per_book = 3
+            volume_text = f"{volume_number * 3 - 2}-{volume_number * 3}"
+        elif "colossal" in series_name.lower():
+            edition_type = "colossal"
+            volumes_per_book = 5
+            volume_text = f"{volume_number * 5 - 4}-{volume_number * 5}"
+        else:
+            edition_type = "regular"
+            volumes_per_book = 1
+            volume_text = str(volume_number)
+
+        return """"
