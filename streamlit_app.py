@@ -1,7 +1,6 @@
 # Manga Lookup Tool - Dev Version
 # Trivial change to trigger redeploy
 # Trivial change to trigger redeploy
-#!/usr/bin/env python3
 # Updated for deployment
 """
 Manga Lookup Tool - Streamlit Web App
@@ -21,9 +20,16 @@ try:
 except ImportError:
     sys.exit(1)
 
+import contextlib
 import html
+import json
+import tempfile
 import time
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+
+from label_generator import generate_pdf_sheet
 
 # Import cover fetchers
 from mal_cover_fetcher import MALCoverFetcher
@@ -42,6 +48,13 @@ from mangadex_cover_fetcher import MangaDexCoverFetcher
 
 # Import MARC exporter
 from marc_exporter import export_books_to_marc
+
+SECONDS_IN_MINUTE = 60
+SECONDS_IN_HOUR = 3600
+EXPECTED_SERIES_COUNT = 2
+EXPECTED_SERIES_COUNT_2 = 3
+MAX_DESCRIPTION_LENGTH = 150
+MAX_SHORT_DESCRIPTION_LENGTH = 100
 
 
 def initialize_session_state():
@@ -90,8 +103,9 @@ def get_volume_1_isbn(series_name: str) -> str | None:
         )
         if book_data and book_data.get("isbn_13"):
             return book_data["isbn_13"]
-        return None
-    except Exception:
+        else:
+            return None
+    except OSError:
         return None
 
 
@@ -112,17 +126,12 @@ def fetch_cover_for_book(book: BookInfo) -> str | None:
         )
         if cover_url:
             return cover_url
-    except Exception:
+    except OSError:
         pass
 
     # Fallback to MAL
-    try:
-        mal_fetcher = MALCoverFetcher()
-        cover_url = mal_fetcher.fetch_cover(book.series_name, book.volume_number)
-        if cover_url:
-            return cover_url
-    except Exception:
-        pass
+    with contextlib.suppress(OSError):
+        MALCoverFetcher()
 
     # Fallback to MangaDex
     try:
@@ -130,7 +139,7 @@ def fetch_cover_for_book(book: BookInfo) -> str | None:
         cover_url = mangadex_fetcher.fetch_cover(book.series_name, book.volume_number)
         if cover_url:
             return cover_url
-    except Exception:
+    except OSError:
         pass
 
     return None
@@ -145,20 +154,20 @@ def process_single_volume(series_name, volume, project_state):
         if book_data:
             book = process_book_data(book_data, volume, google_books_api, project_state)
             return book, None
-        return None, f"Volume {volume} not found"
-    except Exception as e:
+        else:
+            return None, f"Volume {volume} not found"
+    except OSError as e:
         return None, f"Error processing volume {volume}: {e!s}"
 
 
 def process_series():
     """Process all confirmed series with threaded execution for better progress updates"""
     # Create a list of all volumes to process
-    all_volumes = []
-    for series_entry in st.session_state.series_entries:
-        series_name = series_entry["confirmed_name"]
-        volumes = series_entry["volumes"]
-        for volume in volumes:
-            all_volumes.append((series_name, volume))
+    all_volumes = [
+        (series_entry["confirmed_name"], volume)
+        for series_entry in st.session_state.series_entries
+        for volume in series_entry["volumes"]
+    ]
 
     if not all_volumes:
         st.session_state.processing_state["is_processing"] = False
@@ -248,14 +257,14 @@ def calculate_elapsed_time(start_time):
         return "0 seconds"
 
     elapsed = time.time() - start_time
-    if elapsed < 60:
+    if elapsed < SECONDS_IN_MINUTE:
         return f"{int(elapsed)} seconds"
-    if elapsed < 3600:
-        minutes = int(elapsed / 60)
-        seconds = int(elapsed % 60)
+    if elapsed < SECONDS_IN_HOUR:
+        minutes = int(elapsed / SECONDS_IN_MINUTE)
+        seconds = int(elapsed % SECONDS_IN_MINUTE)
         return f"{minutes}m {seconds}s"
-    hours = int(elapsed / 3600)
-    minutes = int((elapsed % 3600) / 60)
+    hours = int(elapsed / SECONDS_IN_HOUR)
+    minutes = int((elapsed % SECONDS_IN_HOUR) / SECONDS_IN_MINUTE)
     return f"{hours}h {minutes}m"
 
 
@@ -272,11 +281,11 @@ def calculate_eta(start_time, progress, total):
     remaining = total - progress
     if rate > 0:
         eta_seconds = remaining / rate
-        if eta_seconds < 60:
+        if eta_seconds < SECONDS_IN_MINUTE:
             return f"{int(eta_seconds)} seconds"
-        if eta_seconds < 3600:
-            return f"{int(eta_seconds/60)} minutes"
-        return f"{int(eta_seconds/3600)} hours"
+        if eta_seconds < SECONDS_IN_HOUR:
+            return f"{int(eta_seconds/SECONDS_IN_MINUTE)} minutes"
+        return f"{int(eta_seconds/SECONDS_IN_HOUR)} hours"
     return "Calculating..."
 
 
@@ -329,42 +338,43 @@ def series_input_form():
             # Show barcode increment pattern dynamically
             if start_barcode_input:
                 sample_barcodes = generate_sequential_barcodes(start_barcode_input, 5)
-                st.write(f"Barcode pattern: {', '.join(sample_barcodes)}")
+                st.session_state.barcode_pattern = ", ".join(sample_barcodes)
+                st.write(f"Barcode pattern: {st.session_state.barcode_pattern}")
             if start_barcode_input:
                 st.session_state.start_barcode = start_barcode_input
                 # Show barcode increment pattern
                 sample_barcodes = generate_sequential_barcodes(start_barcode_input, 5)
+                st.session_state.barcode_pattern = ", ".join(sample_barcodes)
                 st.success(
-                    f"Barcode pattern confirmed: {', '.join(sample_barcodes)}...",
+                    f"Barcode pattern confirmed: {st.session_state.barcode_pattern}...",
                 )
                 st.session_state.barcode_confirmed = True
                 st.rerun()
         if st.session_state.get("barcode_confirmed", False):
             st.subheader("Add Series")
-            st.write(f"Barcode pattern: {st.session_state.get('barcode_pattern', '')}")
 
-        # Make series name entry ordinal
-        series_count = len(st.session_state.series_entries) + 1
-        ordinal_text = (
-            "1st"
-            if series_count == 1
-            else (
-                "2nd"
-                if series_count == 2
-                else "3rd" if series_count == 3 else f"{series_count}th"
+            # Make series name entry ordinal
+            series_count = len(st.session_state.series_entries) + 1
+            ordinal_text = (
+                "1st"
+                if series_count == 1
+                else (
+                    "2nd"
+                    if series_count == EXPECTED_SERIES_COUNT
+                    else "3rd" if series_count == EXPECTED_SERIES_COUNT_2 else f"{series_count}th"
+                )
             )
-        )
-        series_name = st.text_input(
-            f"Enter {ordinal_text} Series Name",
-            help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)",
-        )
-        if st.button("Confirm Series Name", key="confirm_series"):
-            if series_name:
-                st.session_state.pending_series_name = series_name
-                st.info("Confirming series name, searching for matches...")
-                st.rerun()
-            else:
-                st.error("Please enter a series name")
+            series_name = st.text_input(
+                f"Enter {ordinal_text} Series Name",
+                help="Enter the manga series name (e.g., Naruto, One Piece, Death Note)",
+            )
+            if st.button("Confirm Series Name", key="confirm_series"):
+                if series_name:
+                    st.session_state.pending_series_name = series_name
+                    st.info("Confirming series name, searching for matches...")
+                    st.rerun()
+                else:
+                    st.error("Please enter a series name")
 
     # Display current series with cyan background
     if st.session_state.series_entries and any(
@@ -414,7 +424,7 @@ def series_input_form():
                         warnings=[],
                     )
                     cover_url = fetch_cover_for_book(dummy_book)
-                except Exception:
+                except OSError:
                     pass
 
                 if cover_url:
@@ -435,8 +445,8 @@ def series_input_form():
                             volumes = parse_volume_range(volume_input)
                             entry["volumes"] = volumes
                             st.success(
-                            f"You have successfully added volumes {', '.join(map(str, volumes))} to {entry['confirmed_name']}!",
-                        )
+                                f"You have successfully added volumes {', '.join(map(str, volumes))} to {entry['confirmed_name']}!",
+                            )
                             st.balloons()
                         except ValueError as e:
                             st.error(f"Invalid volume range: {e}")
@@ -543,7 +553,7 @@ def confirm_single_series(series_name):
                         if book_data
                         else "Unknown"
                     )
-                except Exception as e:
+                except OSError as e:
                     st.error(f"API Error: {e!s}")
                     authors = []
                     description = "Unable to fetch details"
@@ -597,7 +607,7 @@ def confirm_single_series(series_name):
                         unsafe_allow_html=True,
                     )
                     cover_url = fetch_cover_for_book(dummy_book)
-                except Exception:
+                except OSError:
                     pass
 
                 if cover_url:
@@ -606,8 +616,8 @@ def confirm_single_series(series_name):
                     st.write(f"**Authors:** {', '.join(authors)}")
                 if description:
                     desc_text = (
-                        description[:150] + "..."
-                        if len(description) > 150
+                        description[:MAX_DESCRIPTION_LENGTH] + "..."
+                        if len(description) > MAX_DESCRIPTION_LENGTH
                         else description
                     )
                     st.write(f"**Description:** {desc_text}")
@@ -679,25 +689,20 @@ def main():
         # Display results
         st.header("📚 Lookup Results")
 
-        # Group books by series
-        from collections import defaultdict
-
         series_groups = defaultdict(list)
         for book in st.session_state.all_books:
             series_groups[book.series_name].append(book)
 
         # Sort series and volumes
         series_colors = ["#f0f8ff", "#fff8dc", "#f5f5f5", "#e6e6fa"]
-        color_index = 0
-        for series_name in sorted(series_groups.keys()):
+        for i, series_name in enumerate(sorted(series_groups.keys())):
             books = sorted(series_groups[series_name], key=lambda x: x.volume_number)
 
             # Series header with background
             st.markdown(
-                f'<div style="background-color:{series_colors[color_index % len(series_colors)]}; padding:10px; border-radius:5px;"><h3>📚 {html.escape(series_name)}</h3></div>',
+                f'<div style="background-color:{series_colors[i % len(series_colors)]}; padding:10px; border-radius:5px;"><h3>📚 {html.escape(series_name)}</h3></div>',
                 unsafe_allow_html=True,
             )
-            color_index += 1
 
             # Table header
             col1, col2, col3, col4, col5, col6 = st.columns([1, 3, 2, 2, 2, 2])
@@ -728,7 +733,7 @@ def main():
 
                 col3.write(", ".join(book.genres) if book.genres else "N/A")
                 desc = book.description or "N/A"
-                col4.write(desc[:100] + "..." if len(desc) > 100 else desc)
+                col4.write(desc[:MAX_SHORT_DESCRIPTION_LENGTH] + "..." if len(desc) > MAX_SHORT_DESCRIPTION_LENGTH else desc)
                 col5.write(book.physical_description or "N/A")
                 col6.write(f"${book.msrp_cost:.2f}" if book.msrp_cost else "N/A")
                 st.markdown("</div>", unsafe_allow_html=True)
@@ -747,9 +752,6 @@ def main():
         with col1:
             if st.button("Export to MARC", type="primary"):
                 try:
-                    import os
-                    import tempfile
-
                     with tempfile.NamedTemporaryFile(
                         mode="w+b",
                         suffix=".mrc",
@@ -757,24 +759,20 @@ def main():
                     ) as temp_file:
                         temp_path = temp_file.name
                         export_books_to_marc(st.session_state.all_books, temp_path)
-                        with open(temp_path, "rb") as f:
+                        with Path(temp_path).open("rb") as f:
                             marc_data = f.read()
-                        os.unlink(temp_path)
+                        Path(temp_path).unlink()
                     st.download_button(
                         label="Download MARC file",
                         data=marc_data,
                         file_name="manga_collection.mrc",
                         mime="application/octet-stream",
                     )
-                except Exception:
-                    st.error("An error occurred during the export process.")
-                except Exception:
+                except OSError:
                     st.error("An error occurred during the export process.")
         with col2:
             if st.button("Download Project State JSON"):
                 try:
-                    import json
-
                     state_data = (
                         st.session_state.project_state.__dict__
                     )  # Get the dict of ProjectState
@@ -785,7 +783,7 @@ def main():
                         file_name="project_state.json",
                         mime="application/json",
                     )
-                except Exception:
+                except OSError:
                     st.error("An error occurred during the export process.")
         with col3:
             if st.button("Print Labels"):
@@ -816,28 +814,24 @@ def main():
             )
             submitted = st.form_submit_button("Generate Labels")
             if submitted:
-                # Generate label data
-                from label_generator import generate_pdf_sheet
-
-                label_data = []
-                for book in st.session_state.all_books:
-                    label_data.append(
-                        {
-                            "Title": book.book_title or book.series_name,
-                            "Author's Name": (
-                                ", ".join(book.authors) if book.authors else "Unknown"
-                            ),
-                            "Publication Year": (
-                                str(book.copyright_year) if book.copyright_year else ""
-                            ),
-                            "Series Title": book.series_name,
-                            "Series Volume": str(book.volume_number),
-                            "Call Number": f"Manga {book.barcode}",
-                            "Holdings Barcode": book.barcode,
-                            "spine_label_id": label_id,
-                            "clipart": clipart,
-                        },
-                    )
+                label_data = [
+                    {
+                        "Title": book.book_title or book.series_name,
+                        "Author's Name": (
+                            ", ".join(book.authors) if book.authors else "Unknown"
+                        ),
+                        "Publication Year": (
+                            str(book.copyright_year) if book.copyright_year else ""
+                        ),
+                        "Series Title": book.series_name,
+                        "Series Volume": str(book.volume_number),
+                        "Call Number": f"Manga {book.barcode}",
+                        "Holdings Barcode": book.barcode,
+                        "spine_label_id": label_id,
+                        "clipart": clipart,
+                    }
+                    for book in st.session_state.all_books
+                ]
                 pdf_data = generate_pdf_sheet(label_data)
                 st.download_button(
                     label="Download Labels PDF",
