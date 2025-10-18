@@ -293,9 +293,12 @@ def series_input_form():
             # Show barcode increment pattern dynamically
             if start_barcode_input:
                 sample_barcodes = generate_sequential_barcodes(start_barcode_input, 5)
-                st.write(f"Barcode pattern: {", ".join(sample_barcodes)}")
-            
-            if st.button("Confirm Barcode"):
+            if start_barcode_input:
+                try:
+                    sample_barcodes = generate_sequential_barcodes(start_barcode_input, 5)
+                    st.write(f"Barcode pattern: {", ".join(sample_barcodes)}")
+                except ValueError as e:
+                    st.write(f"Invalid barcode format: {e}")
                 if start_barcode_input:
                     st.session_state.start_barcode = start_barcode_input
                     st.session_state.barcode_confirmed = True
