@@ -329,8 +329,20 @@ class DeepSeekAPI:
 
             result = response.json()
             content = result["choices"][0]["message"]["content"]
-
             # Parse JSON response
+            content = content.strip()
+            if content.startswith('```json'):
+                content = content[7:]
+            if content.endswith('```'):
+                content = content[:-3]
+            content = content.strip()
+            try:
+                book_data = json.loads(content)
+            except json.JSONDecodeError as e:
+                rprint(f"[red]Invalid JSON response for volume {volume_number}: {e}[/red]")
+                rprint(f"[red]Content: {content[:500]}[/red]")
+                project_state.record_api_call(prompt, content, volume_number, success=False)
+                return None
             book_data = json.loads(content)
 
             # Record successful API call
@@ -345,15 +357,39 @@ class DeepSeekAPI:
                 return self.get_book_info(series_name, volume_number, project_state)
             else:
                 rprint(f"[red]HTTP error for volume {volume_number}: {e}[/red]")
-                project_state.record_api_call(prompt, str(e), volume_number, success=False)
-                return None
         except Exception as e:
+            rprint(f"[red]Error fetching data for volume {volume_number}: {e}[/red]")
+            project_state.record_api_call(prompt, str(e), volume_number, success=False)
+            # Try fallback to Google Books
+            try:
+                google_api = GoogleBooksAPI()
+                fallback_data = google_api.get_book_info_from_google(series_name, volume_number)
+                if fallback_data:
+                    rprint(f"[yellow]Using Google Books fallback for volume {volume_number}[/yellow]")
+                    return fallback_data
+            except Exception as fb_e:
+                rprint(f"[red]Fallback also failed: {fb_e}[/red]")
+            return None
             rprint(f"[red]Error fetching data for volume {volume_number}: {e}[/red]")
             project_state.record_api_call(prompt, str(e), volume_number, success=False)
             return None
 
     def _create_comprehensive_prompt(self, series_name: str, volume_number: int) -> str:
         """Create a comprehensive prompt for DeepSeek API"""
+        # Determine edition and volume_text
+        if "omnibus" in series_name.lower():
+            edition_type = "omnibus"
+            volumes_per_book = 3
+            volume_text = f"{volume_number * 3 - 2}-{volume_number * 3}"
+        elif "colossal" in series_name.lower():
+            edition_type = "colossal"
+            volumes_per_book = 5
+            volume_text = f"{volume_number * 5 - 4}-{volume_number * 5}"
+        else:
+            edition_type = "regular"
+            volumes_per_book = 1
+            volume_text = str(volume_number)
+
         return f"""
         Perform grounded deep research for the manga series "{series_name}" volume {volume_number}.
         Provide comprehensive information in JSON format with the following fields:
@@ -530,115 +566,22 @@ class GoogleBooksAPI:
             response = requests.get(url, timeout=10)
             response.raise_for_status()
             data = response.json()
-
             if data.get('totalItems', 0) == 0:
                 return None
-
             volume_info = data['items'][0]['volumeInfo']
             image_links = volume_info.get('imageLinks', {})
-
             # Get the small thumbnail cover image URL
             cover_url = image_links.get('smallThumbnail')
-
             # If small thumbnail not available, try other sizes
             if not cover_url:
                 for size in ['thumbnail', 'small', 'medium', 'large', 'extraLarge']:
                     if size in image_links:
                         cover_url = image_links[size]
+                        break
             return cover_url
         except Exception as e:
             print(f"Error fetching series cover image: {e}")
             return None
-
-class DataValidator:
-    """Handles data validation and formatting"""
-
-    @staticmethod
-    def format_title(title: str) -> str:
-        """Format title with leading articles shifted to the end"""
-        articles = ["the", "a", "an"]
-        words = title.split()
-
-        if words and words[0].lower() in articles:
-            article = words[0]
-            rest = " ".join(words[1:])
-            return f"{rest}, {article.capitalize()}"
-
-        return title
-
-    @staticmethod
-    def format_author_name(author_name: str) -> str:
-        """Format author name as 'Last, First M.'"""
-        if not author_name:
-            return ""
-
-        # Check if already in "Last, First" format
-        if ", " in author_name:
-            return author_name
-
-        # Handle common Japanese name formats
-        name_parts = author_name.strip().split()
-
-        if len(name_parts) == 2:
-            # Assume "First Last" format
-            return f"{name_parts[1]}, {name_parts[0]}"
-        elif len(name_parts) == 1:
-            # Single name (like "Oda")
-            return name_parts[0]
-        else:
-            # Complex name, try to handle
-            if any(part.endswith('-') for part in name_parts):
-                # Handle hyphenated names
-                return author_name
-            else:
-                # Default: assume first part is first name, last part is last name
-                return f"{name_parts[-1]}, {' '.join(name_parts[:-1])}"
-
-    @staticmethod
-    def format_authors_list(authors: List[str]) -> str:
-        """Format list of authors as comma-separated 'Last, First M.'"""
-        if not authors:
-            return ""
-        formatted_authors = [DataValidator.format_author_name(author) for author in authors]
-        return ", ".join(formatted_authors)
-def parse_volume_range(volume_input: str) -> List[int]:
-    """Parse volume range input like '1-5,7,10' and omnibus formats like '17-18-19' into list of volume numbers"""
-    volumes = []
-
-    # Split by commas
-    parts = [part.strip() for part in volume_input.split(",")]
-
-    for part in parts:
-        if '-' in part:
-            # Count the number of hyphens to determine format
-            hyphens_count = part.count('-')
-
-            if hyphens_count == 1:
-                # Handle range like '1-5' (single range)
-                try:
-                    start, end = map(int, part.split('-'))
-                    volumes.extend(range(start, end + 1))
-                except ValueError:
-                    raise ValueError(f"Invalid volume range format: {part}")
-            else:
-                # Handle omnibus format like '17-18-19' (multiple volumes in one book)
-                try:
-                    # Split by hyphens and convert all parts to integers
-                    omnibus_volumes = list(map(int, part.split('-')))
-                    volumes.extend(omnibus_volumes)
-                except ValueError:
-                    raise ValueError(f"Invalid omnibus format: {part}")
-        else:
-            # Handle single volume like '7'
-            try:
-                volumes.append(int(part))
-            except ValueError:
-                raise ValueError(f"Invalid volume number: {part}")
-
-    # Remove duplicates and sort
-    return sorted(list(set(volumes)))
-
-
 def generate_sequential_barcodes(start_barcode: str, count: int) -> List[str]:
     """Generate sequential barcodes from a starting barcode"""
     barcodes = []
@@ -660,6 +603,48 @@ def generate_sequential_barcodes(start_barcode: str, count: int) -> List[str]:
         barcodes.append(barcode)
 
     return barcodes
+    def get_book_info_from_google(self, series_name: str, volume_number: int) -> Optional[Dict]:
+        """Fallback: Get basic book info from Google Books API"""
+        query = f'intitle:"{series_name}" "volume {volume_number}" manga'
+        url = f"{self.base_url}?q={query}&maxResults=1"
+        if self.api_key:
+            url += f"&key={self.api_key}"
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            if data.get('totalItems', 0) == 0:
+                return None
+            volume_info = data['items'][0]['volumeInfo']
+            # Map to our format
+            book_data = {
+                'series_name': series_name,
+                'volume_number': volume_number,
+                'book_title': volume_info.get('title', f"{series_name} (Volume {volume_number})"),
+                'authors': volume_info.get('authors', []),
+                'description': volume_info.get('description', ''),
+                'publisher_name': volume_info.get('publisher', ''),
+                'copyright_year': volume_info.get('publishedDate', '').split('-')[0] if volume_info.get('publishedDate') else None,
+                'physical_description': '',
+                'genres': volume_info.get('categories', []),
+                'isbn_13': None,
+                'msrp_cost': None,
+                'cover_image_url': None,
+            }
+            # Try to get ISBN
+            identifiers = volume_info.get('industryIdentifiers', [])
+            for ident in identifiers:
+                if ident.get('type') == 'ISBN_13':
+                    book_data['isbn_13'] = ident.get('identifier')
+                    break
+            # Try to get cover
+            image_links = volume_info.get('imageLinks', {})
+            cover_url = image_links.get('smallThumbnail') or image_links.get('thumbnail')
+            book_data['cover_image_url'] = cover_url
+            return book_data
+        except Exception as e:
+            print(f"Error fetching from Google Books: {e}")
+            return None
 def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Optional[GoogleBooksAPI] = None, project_state: Optional[ProjectState] = None) -> BookInfo:
     """Process raw API data into structured BookInfo"""
     warnings = []
