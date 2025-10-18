@@ -400,6 +400,45 @@ class VertexAPI:
                         }
                     ]
                 }
+    def _create_comprehensive_prompt(self, series_name: str, volume_number: int) -> str:
+        """Create a comprehensive prompt for DeepSeek API"""
+        # Determine edition and volume_text
+        if "omnibus" in series_name.lower():
+            edition_type = "omnibus"
+            volumes_per_book = 3
+            volume_text = f"{volume_number * 3 - 2}-{volume_number * 3}"
+        elif "colossal" in series_name.lower():
+            edition_type = "colossal"
+            volumes_per_book = 5
+            volume_text = f"{volume_number * 5 - 4}-{volume_number * 5}"
+        else:
+            edition_type = "regular"
+            volumes_per_book = 1
+            volume_text = str(volume_number)
+
+        return f"""
+        Perform grounded deep research for the manga series "{series_name}" volume {volume_number}.
+        Provide comprehensive information in JSON format with the following fields:
+
+        Required fields:
+        - series_name: The official series name
+        - volume_number: {volume_number}
+        - book_title: The specific title for this volume (append "(Volume {volume_text})")
+        - volume_text: The volume number or range for this book (e.g., "1" for regular, "1-3" for omnibus, "1-5" for colossal)
+        - authors: List of authors/artists in "Last, First M." format, comma-separated for multiple
+        - msrp_cost: Manufacturer's Suggested Retail Price in USD
+        - isbn_13: ISBN-13 for paperback English edition (preferred) or other available edition
+        - publisher_name: Publisher of the English edition
+        - copyright_year: 4-digit copyright year
+        - description: Summary of the book's content and notable reviews
+        - physical_description: Physical characteristics (pages, dimensions, etc.)
+        - genres: List of genres/subjects
+        - number_of_extant_volumes: Total number of volumes published for this series
+        - edition_type: Type of edition (regular, omnibus, colossal)
+        - volumes_per_book: Number of volumes per book for this edition
+
+        Provide the information as valid JSON that can be parsed.
+        """
             ]
         }
 
