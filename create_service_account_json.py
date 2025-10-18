@@ -6,8 +6,9 @@ This converts the TOML format service account credentials to JSON format
 that can be used with Google authentication libraries.
 """
 
-import os
 import json
+import os
+
 
 def create_service_account_json():
     """Convert vertex.toml to service-account.json"""
@@ -22,7 +23,7 @@ def create_service_account_json():
         # Parse the TOML file
         import toml
         vertex_config = toml.load(vertex_path)
-        vertex_ai = vertex_config.get('vertex_ai', {})
+        vertex_ai = vertex_config.get("vertex_ai", {})
 
         # Create JSON structure
         service_account_info = {
@@ -35,11 +36,11 @@ def create_service_account_json():
             "auth_uri": vertex_ai.get("auth_uri"),
             "token_uri": vertex_ai.get("token_uri"),
             "auth_provider_x509_cert_url": vertex_ai.get("auth_provider_x509_cert_url"),
-            "client_x509_cert_url": vertex_ai.get("client_x509_cert_url")
+            "client_x509_cert_url": vertex_ai.get("client_x509_cert_url"),
         }
 
         # Save as JSON
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(service_account_info, f, indent=2)
 
         print(f"✅ Created {output_path}")
@@ -47,7 +48,7 @@ def create_service_account_json():
         print(f"   Service Account: {service_account_info['client_email']}")
 
         # Set environment variable for Google authentication
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = output_path
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = output_path
         print(f"✅ Set GOOGLE_APPLICATION_CREDENTIALS={output_path}")
 
         return True
@@ -70,7 +71,7 @@ def test_service_account_auth():
         # Refresh token
         credentials.refresh(Request())
 
-        print(f"✅ Service account authentication successful!")
+        print("✅ Service account authentication successful!")
         print(f"   Project: {project}")
         print(f"   Email: {credentials.service_account_email}")
         print(f"   Token: {credentials.token[:50]}...")

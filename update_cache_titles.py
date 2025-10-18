@@ -6,11 +6,10 @@ Update all cached entries to ensure book titles include the series name as a sub
 If the book title doesn't include the series title, add it to the beginning with a colon.
 """
 
-import sys
-import os
 import json
+import os
 import re
-from typing import Dict, List
+import sys
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
@@ -33,15 +32,15 @@ def extract_series_name_from_prompt(prompt: str) -> str:
     return ""
 
 
-def update_book_title_with_series(book_data: Dict, series_name: str) -> Dict:
+def update_book_title_with_series(book_data: dict, series_name: str) -> dict:
     """Update book title to include series name if not present"""
     if not book_data or not isinstance(book_data, dict):
         return book_data
 
-    if 'book_title' not in book_data:
+    if "book_title" not in book_data:
         return book_data
 
-    current_title = book_data['book_title']
+    current_title = book_data["book_title"]
 
     # Check if series name is already in the title (case-insensitive)
     if series_name.lower() in current_title.lower():
@@ -49,7 +48,7 @@ def update_book_title_with_series(book_data: Dict, series_name: str) -> Dict:
 
     # Add series name to the beginning with a colon
     new_title = f"{series_name}: {current_title}"
-    book_data['book_title'] = new_title
+    book_data["book_title"] = new_title
 
     return book_data
 
@@ -64,11 +63,11 @@ def main():
     project_state = ProjectState()
 
     updated_count = 0
-    total_cached = len(project_state.state['cached_responses'])
+    total_cached = len(project_state.state["cached_responses"])
 
     print(f"\nProcessing {total_cached} cached responses...")
 
-    for cache_key, cached_response in list(project_state.state['cached_responses'].items()):
+    for cache_key, cached_response in list(project_state.state["cached_responses"].items()):
         try:
             # Parse the JSON response
             book_data = json.loads(cached_response)
@@ -77,11 +76,11 @@ def main():
             series_name = ""
 
             # Try to find the series name in the cache key
-            if '_' in cache_key:
+            if "_" in cache_key:
                 # Look for series name in cache key
-                parts = cache_key.split('_')
+                parts = cache_key.split("_")
                 # The prompt part contains the series name
-                prompt_part = ' '.join(parts[:-1])
+                prompt_part = " ".join(parts[:-1])
                 series_name = extract_series_name_from_prompt(prompt_part)
 
             # If we couldn't extract series name, skip this entry
@@ -89,13 +88,13 @@ def main():
                 continue
 
             # Update the book title if needed
-            original_title = book_data.get('book_title', '')
+            original_title = book_data.get("book_title", "")
             updated_book_data = update_book_title_with_series(book_data, series_name)
 
             # If title was updated, save the changes
-            if updated_book_data.get('book_title') != original_title:
+            if updated_book_data.get("book_title") != original_title:
                 updated_response = json.dumps(updated_book_data)
-                project_state.state['cached_responses'][cache_key] = updated_response
+                project_state.state["cached_responses"][cache_key] = updated_response
                 updated_count += 1
                 print(f"  ✓ Updated: {original_title} → {updated_book_data['book_title']}")
 

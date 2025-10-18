@@ -7,31 +7,30 @@ and fetches their data using the DeepSeek API with retry logic.
 Saves to database after each successful addition to prevent data loss.
 """
 
-import os
 import json
 import time
 from collections import defaultdict
-from typing import List, Dict, Set
 
 # Import existing modules
-from manga_lookup import DeepSeekAPI, DataValidator, GoogleBooksAPI, process_book_data, ProjectState
+from manga_lookup import DeepSeekAPI, GoogleBooksAPI, ProjectState, process_book_data
 
-def get_current_volumes() -> Dict[str, Set[int]]:
+
+def get_current_volumes() -> dict[str, set[int]]:
     """Get current volumes per series from project_state.json"""
     try:
-        with open('project_state.json', 'r') as f:
+        with open("project_state.json") as f:
             state = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
     series_volumes = defaultdict(set)
 
-    for api_call in state.get('api_calls', []):
-        if api_call.get('success', False):
+    for api_call in state.get("api_calls", []):
+        if api_call.get("success", False):
             try:
-                response = json.loads(api_call['response'])
-                series = response.get('series_name')
-                volume = api_call.get('volume')
+                response = json.loads(api_call["response"])
+                series = response.get("series_name")
+                volume = api_call.get("volume")
                 if series and volume:
                     series_volumes[series].add(volume)
             except json.JSONDecodeError:
@@ -39,7 +38,7 @@ def get_current_volumes() -> Dict[str, Set[int]]:
 
     return dict(series_volumes)
 
-def find_missing_volumes(series_volumes: Dict[str, Set[int]], max_volumes: Dict[str, int]) -> Dict[str, List[int]]:
+def find_missing_volumes(series_volumes: dict[str, set[int]], max_volumes: dict[str, int]) -> dict[str, list[int]]:
     """Find missing volumes for each series"""
     missing = {}
 
@@ -85,34 +84,34 @@ def main():
 
     # Known maximum volumes for popular series
     max_volumes = {
-        'One Piece': 110,
-        'Naruto': 72,
-        'Bleach': 74,
-        'Death Note': 13,
-        'Attack on Titan': 34,
-        'Attack on Titan: Before the Fall': 17,
-        'Black Butler': 32,
-        'Black Clover': 33,
-        'Blue Exorcist': 27,
-        'Boruto: Naruto Next Generations': 18,
-        'Boruto: Naruto The Next Generation': 18,
-        'Boruto: Two Blue Vortex': 5,
-        'Cells At Work': 8,
-        'Deadman Wonderland': 13,
-        'Golden Kamuy': 31,
-        'Haikyuu!!': 45,
-        'Mob Psycho 100': 16,
-        'Noragami: Stray God': 27,
-        'One Punch Man': 26,
-        'Silent Voice, A': 7,
-        'To Your Eternity': 18,
-        'Tokyo Ghoul': 14,
-        'Tokyo Ghoul:re': 16,
-        'Akira': 6,
-        'Assassination Classroom': 21,
-        'Barefoot Gen: A Cartoon Story of Hiroshima': 10,
-        'Show-ha Shoten': 6,
-        'Show-ha Shoten!': 6,
+        "One Piece": 110,
+        "Naruto": 72,
+        "Bleach": 74,
+        "Death Note": 13,
+        "Attack on Titan": 34,
+        "Attack on Titan: Before the Fall": 17,
+        "Black Butler": 32,
+        "Black Clover": 33,
+        "Blue Exorcist": 27,
+        "Boruto: Naruto Next Generations": 18,
+        "Boruto: Naruto The Next Generation": 18,
+        "Boruto: Two Blue Vortex": 5,
+        "Cells At Work": 8,
+        "Deadman Wonderland": 13,
+        "Golden Kamuy": 31,
+        "Haikyuu!!": 45,
+        "Mob Psycho 100": 16,
+        "Noragami: Stray God": 27,
+        "One Punch Man": 26,
+        "Silent Voice, A": 7,
+        "To Your Eternity": 18,
+        "Tokyo Ghoul": 14,
+        "Tokyo Ghoul:re": 16,
+        "Akira": 6,
+        "Assassination Classroom": 21,
+        "Barefoot Gen: A Cartoon Story of Hiroshima": 10,
+        "Show-ha Shoten": 6,
+        "Show-ha Shoten!": 6,
     }
 
     current_volumes = get_current_volumes()
@@ -152,7 +151,7 @@ def main():
                     print(f"    ✓ Added {series} Vol. {volume}")
                     added_count += 1
                     # Save incrementally to prevent data loss
-                    with open('project_state.json', 'w') as f:
+                    with open("project_state.json", "w") as f:
                         json.dump(project_state.state, f, indent=2)
                 else:
                     print(f"    ✗ Failed to process {series} Vol. {volume}")

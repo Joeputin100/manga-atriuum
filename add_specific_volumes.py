@@ -5,7 +5,8 @@ Add Specific Missing Volumes
 Manually add a few missing volumes for testing.
 """
 
-from manga_lookup import DeepSeekAPI, GoogleBooksAPI, process_book_data, ProjectState
+from manga_lookup import DeepSeekAPI, GoogleBooksAPI, ProjectState, process_book_data
+
 
 def main():
     # Initialize

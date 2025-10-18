@@ -4,9 +4,11 @@ Test if service account can access Google Books API
 """
 
 import os
+
 import requests
 from google.auth import default
 from google.auth.transport.requests import Request
+
 
 def test_service_account_books_api():
     """Test if service account can access Google Books API"""
@@ -19,21 +21,21 @@ def test_service_account_books_api():
         # Refresh token
         credentials.refresh(Request())
 
-        print(f"✅ Service account authenticated")
+        print("✅ Service account authenticated")
         print(f"   Project: {project}")
         print(f"   Email: {credentials.service_account_email}")
 
         # Try to use the token for Google Books API
         headers = {
-            'Authorization': f'Bearer {credentials.token}',
-            'Content-Type': 'application/json'
+            "Authorization": f"Bearer {credentials.token}",
+            "Content-Type": "application/json",
         }
 
         # Test with Google Books API
         test_isbn = "9781421580366"  # Tokyo Ghoul Vol 1
         url = "https://www.googleapis.com/books/v1/volumes"
         params = {
-            'q': f'isbn:{test_isbn}'
+            "q": f"isbn:{test_isbn}",
         }
 
         print(f"📚 Making request for ISBN: {test_isbn}")
@@ -43,16 +45,16 @@ def test_service_account_books_api():
 
         if response.status_code == 200:
             data = response.json()
-            total_items = data.get('totalItems', 0)
+            total_items = data.get("totalItems", 0)
             print(f"✅ Success! Found {total_items} items")
 
             if total_items > 0:
-                item = data['items'][0]
-                volume_info = item.get('volumeInfo', {})
+                item = data["items"][0]
+                volume_info = item.get("volumeInfo", {})
                 print(f"   Title: {volume_info.get('title', 'N/A')}")
 
                 # Check for cover images
-                image_links = volume_info.get('imageLinks', {})
+                image_links = volume_info.get("imageLinks", {})
                 if image_links:
                     print(f"   Cover images: {list(image_links.keys())}")
                     for size, url in image_links.items():
@@ -61,10 +63,9 @@ def test_service_account_books_api():
                     print("   No cover images found")
 
             return True
-        else:
-            print(f"❌ API request failed")
-            print(f"   Response: {response.text}")
-            return False
+        print("❌ API request failed")
+        print(f"   Response: {response.text}")
+        return False
 
     except Exception as e:
         print(f"❌ Error: {e}")

@@ -23,87 +23,83 @@ except ImportError:
     print("Or deploy directly to Streamlit Cloud.")
     exit(1)
 
-import os
-import json
-import time
-import pandas as pd
-from datetime import datetime
-from typing import Optional
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import html
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# Import cover fetchers
+from mal_cover_fetcher import MALCoverFetcher
 
 # Import existing core logic
 from manga_lookup import (
-    BookInfo, DeepSeekAPI, DataValidator, ProjectState, GoogleBooksAPI,
-    parse_volume_range, generate_sequential_barcodes, process_book_data
+    BookInfo,
+    DeepSeekAPI,
+    GoogleBooksAPI,
+    ProjectState,
+    generate_sequential_barcodes,
+    parse_volume_range,
+    process_book_data,
 )
+from mangadex_cover_fetcher import MangaDexCoverFetcher
 
 # Import MARC exporter
 from marc_exporter import export_books_to_marc
-# Import cover fetchers
-
-from google_books_client import GoogleBooksClient
-
-from mal_cover_fetcher import MALCoverFetcher
-
-from mangadex_cover_fetcher import MangaDexCoverFetcher
 
 
 def initialize_session_state():
     """Initialize session state variables"""
-    if 'series_entries' not in st.session_state:
+    if "series_entries" not in st.session_state:
         st.session_state.series_entries = []
-    if 'confirmed_series' not in st.session_state:
+    if "confirmed_series" not in st.session_state:
         st.session_state.confirmed_series = []
-    if 'all_books' not in st.session_state:
+    if "all_books" not in st.session_state:
         st.session_state.all_books = []
-    if 'processing_state' not in st.session_state:
+    if "processing_state" not in st.session_state:
         st.session_state.processing_state = {
-            'is_processing': False,
-            'current_series': None,
-            'current_volume': None,
-            'progress': 0,
-            'total_volumes': 0,
-            'start_time': None
+            "is_processing": False,
+            "current_series": None,
+            "current_volume": None,
+            "progress": 0,
+            "total_volumes": 0,
+            "start_time": None,
     }
-    if 'project_state' not in st.session_state:
+    if "project_state" not in st.session_state:
         st.session_state.project_state = ProjectState()
-    if 'pending_series_name' not in st.session_state:
+    if "pending_series_name" not in st.session_state:
         st.session_state.pending_series_name = None
-    if 'selected_series' not in st.session_state:
+    if "selected_series" not in st.session_state:
         st.session_state.selected_series = None
-    if 'original_series_name' not in st.session_state:
+    if "original_series_name" not in st.session_state:
         st.session_state.original_series_name = None
-    if 'start_barcode' not in st.session_state:
+    if "start_barcode" not in st.session_state:
         st.session_state.start_barcode = "T000001"
     # Reset processing state if stuck
-    if st.session_state.processing_state.get('is_processing', False) and not st.session_state.all_books:
-        st.session_state.processing_state['is_processing'] = False
-def get_volume_1_isbn(series_name: str) -> Optional[str]:
+    if st.session_state.processing_state.get("is_processing", False) and not st.session_state.all_books:
+        st.session_state.processing_state["is_processing"] = False
+def get_volume_1_isbn(series_name: str) -> str | None:
     """Get ISBN for volume 1 of a series using DeepSeek API"""
     try:
         deepseek_api = DeepSeekAPI()
         book_data = deepseek_api.get_book_info(series_name, 1, st.session_state.project_state)
-        if book_data and book_data.get('isbn_13'):
-            return book_data['isbn_13']
+        if book_data and book_data.get("isbn_13"):
+            return book_data["isbn_13"]
         return None
     except Exception:
         return None
 
 
-def fetch_cover_for_book(book: BookInfo) -> Optional[str]:
+def fetch_cover_for_book(book: BookInfo) -> str | None:
     """Fetch cover image URL, prioritizing English editions"""
-    
+
     # Try Google Books first for English covers
     try:
         google_api = GoogleBooksAPI()
-        cover_url = google_api.get_series_cover_image(book.series_name, book.volume_number, st.session_state.project_state if 'project_state' in st.session_state else None)
+        cover_url = google_api.get_series_cover_image(book.series_name, book.volume_number, st.session_state.project_state if "project_state" in st.session_state else None)
         if cover_url:
             return cover_url
     except Exception:
         pass
-        pass
-    
+
     # Fallback to MAL
     try:
         mal_fetcher = MALCoverFetcher()
@@ -112,7 +108,7 @@ def fetch_cover_for_book(book: BookInfo) -> Optional[str]:
             return cover_url
     except Exception:
         pass
-    
+
     # Fallback to MangaDex
     try:
         mangadex_fetcher = MangaDexCoverFetcher()
@@ -121,7 +117,7 @@ def fetch_cover_for_book(book: BookInfo) -> Optional[str]:
             return cover_url
     except Exception:
         pass
-    
+
     return None
 
 def process_single_volume(series_name, volume, project_state):
@@ -133,10 +129,9 @@ def process_single_volume(series_name, volume, project_state):
         if book_data:
             book = process_book_data(book_data, volume, google_books_api, project_state)
             return book, None
-        else:
-            return None, f"Volume {volume} not found"
+        return None, f"Volume {volume} not found"
     except Exception as e:
-        return None, f"Error processing volume {volume}: {str(e)}"
+        return None, f"Error processing volume {volume}: {e!s}"
 
 
 def process_series():
@@ -144,22 +139,22 @@ def process_series():
     # Create a list of all volumes to process
     all_volumes = []
     for series_entry in st.session_state.series_entries:
-        series_name = series_entry['confirmed_name']
-        volumes = series_entry['volumes']
+        series_name = series_entry["confirmed_name"]
+        volumes = series_entry["volumes"]
         for volume in volumes:
             all_volumes.append((series_name, volume))
 
     if not all_volumes:
-        st.session_state.processing_state['is_processing'] = False
+        st.session_state.processing_state["is_processing"] = False
         st.warning("No volumes to process. Please add volumes to your series first.")
         return
 
     # Initialize API (not used directly in this function but needed for imports)
     try:
         _ = DeepSeekAPI()  # Create instance to verify API is available
-    except ValueError as e:
+    except ValueError:
         st.error("API configuration error. Please check your environment variables.")
-        st.session_state.processing_state['is_processing'] = False
+        st.session_state.processing_state["is_processing"] = False
         return
 
     all_books = []
@@ -181,9 +176,9 @@ def process_series():
             series_name, volume = future_to_volume[future]
 
             # Update progress
-            st.session_state.processing_state['current_series'] = series_name
-            st.session_state.processing_state['current_volume'] = volume
-            st.session_state.processing_state['progress'] = i + 1
+            st.session_state.processing_state["current_series"] = series_name
+            st.session_state.processing_state["current_volume"] = volume
+            st.session_state.processing_state["progress"] = i + 1
 
             try:
                 book, error = future.result()
@@ -192,16 +187,16 @@ def process_series():
                 elif error:
                     errors.append(error)
             except Exception as e:
-                errors.append(f"Unexpected error processing {series_name} volume {volume}: {str(e)}")
+                errors.append(f"Unexpected error processing {series_name} volume {volume}: {e!s}")
 
     # Assign barcodes
-    start_barcode = st.session_state.get('start_barcode', "T000001")
+    start_barcode = st.session_state.get("start_barcode", "T000001")
     barcodes = generate_sequential_barcodes(start_barcode, len(all_books))
     for book, barcode in zip(all_books, barcodes):
         book.barcode = barcode
 
     st.session_state.all_books = all_books
-    st.session_state.processing_state['is_processing'] = False
+    st.session_state.processing_state["is_processing"] = False
 
     # Record interaction
     series_info = ", ".join([
@@ -209,7 +204,7 @@ def process_series():
         for entry in st.session_state.series_entries
     ])
     st.session_state.project_state.record_interaction(
-        f"Multiple series: {series_info}", len(all_books)
+        f"Multiple series: {series_info}", len(all_books),
     )
 
     # Show results
@@ -222,9 +217,9 @@ def process_series():
 
 
 def display_duck_animation():
-    
-    
-    st.image('https://media.giphy.com/media/WzA4Vj6V8UOEX10jMj/giphy.gif')
+
+
+    st.image("https://media.giphy.com/media/WzA4Vj6V8UOEX10jMj/giphy.gif")
 
 
 def calculate_elapsed_time(start_time):
@@ -235,14 +230,13 @@ def calculate_elapsed_time(start_time):
     elapsed = time.time() - start_time
     if elapsed < 60:
         return f"{int(elapsed)} seconds"
-    elif elapsed < 3600:
+    if elapsed < 3600:
         minutes = int(elapsed / 60)
         seconds = int(elapsed % 60)
         return f"{minutes}m {seconds}s"
-    else:
-        hours = int(elapsed / 3600)
-        minutes = int((elapsed % 3600) / 60)
-        return f"{hours}h {minutes}m"
+    hours = int(elapsed / 3600)
+    minutes = int((elapsed % 3600) / 60)
+    return f"{hours}h {minutes}m"
 
 
 def calculate_eta(start_time, progress, total):
@@ -260,34 +254,33 @@ def calculate_eta(start_time, progress, total):
         eta_seconds = remaining / rate
         if eta_seconds < 60:
             return f"{int(eta_seconds)} seconds"
-        elif eta_seconds < 3600:
+        if eta_seconds < 3600:
             return f"{int(eta_seconds/60)} minutes"
-        else:
-            return f"{int(eta_seconds/3600)} hours"
+        return f"{int(eta_seconds/3600)} hours"
     return "Calculating..."
 
 
 def display_progress_section():
     """Display progress tracking"""
     state = st.session_state.processing_state
-    progress = state['progress']
-    total = state['total_volumes']
+    progress = state["progress"]
+    total = state["total_volumes"]
 
     if progress == 0:
         st.write("Preparing to lookup manga volumes...")
     else:
         st.write(f"Processing {progress} of {total} volumes")
-        if state['current_series']:
+        if state["current_series"]:
             st.info(f"Current: {state['current_series']} - Volume {state['current_volume']}")
-    
+
     display_duck_animation()
     st.caption("Please wait...")
 def series_input_form():
     """Multi-series input form"""
     st.header("📚 Manga Series Input")
-    if not any(not entry['volumes'] for entry in st.session_state.series_entries):
+    if not any(not entry["volumes"] for entry in st.session_state.series_entries):
         # Starting barcode - show until used
-        if not st.session_state.get('start_barcode_used', False):
+        if not st.session_state.get("start_barcode_used", False):
         # Starting barcode - always show with current value
             st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
             start_barcode = st.text_input(
@@ -298,8 +291,8 @@ def series_input_form():
             )
             if start_barcode and start_barcode != st.session_state.start_barcode:
                 st.session_state.start_barcode = start_barcode
-            st.session_state['start_barcode_used'] = True
-    
+            st.session_state["start_barcode_used"] = True
+
         # Series input section
         st.subheader("Add Series")
 
@@ -316,7 +309,7 @@ def series_input_form():
                 st.error("Please enter a series name")
 
     # Display current series with cyan background
-    if st.session_state.series_entries and any(entry.get('volumes', []) for entry in st.session_state.series_entries):
+    if st.session_state.series_entries and any(entry.get("volumes", []) for entry in st.session_state.series_entries):
         st.markdown("""
         <style>
         .cyan-background {
@@ -355,7 +348,7 @@ def series_input_form():
                         description="",
                         physical_description="",
                         genres=[],
-                        warnings=[]
+                        warnings=[],
                     )
                     cover_url = fetch_cover_for_book(dummy_book)
                 except Exception:
@@ -388,51 +381,51 @@ def series_input_form():
     st.divider()
 
 #    # Start processing button
-    if st.session_state.series_entries and any(entry.get('volumes', []) for entry in st.session_state.series_entries):
+    if st.session_state.series_entries and any(entry.get("volumes", []) for entry in st.session_state.series_entries):
         if st.button("🚀 Start Lookup", type="primary"):
             # Calculate total volumes
-            total_volumes = sum(len(entry['volumes']) for entry in st.session_state.series_entries)
+            total_volumes = sum(len(entry["volumes"]) for entry in st.session_state.series_entries)
 
             # Initialize processing state
             st.session_state.processing_state = {
-                'is_processing': True,
-                'current_series': None,
-                'current_volume': None,
-                'progress': 0,
-                'total_volumes': total_volumes,
-                'start_time': time.time()
+                "is_processing": True,
+                "current_series": None,
+                "current_volume": None,
+                "progress": 0,
+                "total_volumes": total_volumes,
+                "start_time": time.time(),
             }
 
             # Start processing
 
     state = st.session_state.processing_state
-    if state['is_processing']:
-    
-        progress = state['progress']
-        total = state['total_volumes']
-        
+    if state["is_processing"]:
+
+        progress = state["progress"]
+        total = state["total_volumes"]
+
         # Progress bar
         progress_percent = int((progress / total) * 100) if total > 0 else 0
         st.progress(progress_percent / 100)
-        
+
         # Progress info
         col1, col2, col3 = st.columns(3)
-        
+
         with col1:
             st.metric("Progress", f"{progress}/{total}")
-        
+
         with col2:
-                if state['start_time']:
-                    elapsed = calculate_elapsed_time(state['start_time'])
+                if state["start_time"]:
+                    elapsed = calculate_elapsed_time(state["start_time"])
                     st.metric("Elapsed Time", elapsed)
-        
+
         with col3:
         # Animated duck
                 display_duck_animation()
                 st.caption("Processing...")
-    
+
 # Current task info
-    if state['current_series']:
+    if state["current_series"]:
         st.info(f"Processing: **{state['current_series']}** - Volume **{state['current_volume']}**")
 
 
@@ -445,7 +438,7 @@ def confirm_single_series(series_name):
     st.info("Searching for series matches...")
     try:
         deepseek_api = DeepSeekAPI()
-    except ValueError as e:
+    except ValueError:
         st.error("API configuration error. Please check your environment variables.")
         return
 
@@ -470,7 +463,7 @@ def confirm_single_series(series_name):
                                 description += "\\n\\nTotal Volumes: " + str(total_volumes)
                     total_volumes = book_data.get("number_of_extant_volumes", "Unknown") if book_data else "Unknown"
                 except Exception as e:
-                    st.error(f"API Error: {str(e)}")
+                    st.error(f"API Error: {e!s}")
                     authors = []
                     description = "Unable to fetch details"
                     total_volumes = "Unknown"
@@ -480,7 +473,7 @@ def confirm_single_series(series_name):
                     "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
                     "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
                     "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-                    "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)"
+                    "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
                 ]
                 card_color = card_colors[i % len(card_colors)]
 
@@ -513,7 +506,7 @@ def confirm_single_series(series_name):
                         description="",
                         physical_description="",
                         genres=[],
-                        warnings=[]
+                        warnings=[],
                     )
                     st.markdown('<p style="font-size: 10px; color: gray;">Note: Covers may vary for different languages, editions, and reprintings.</p>', unsafe_allow_html=True)
                     cover_url = fetch_cover_for_book(dummy_book)
@@ -539,7 +532,7 @@ def confirm_single_series(series_name):
                     st.session_state.series_entries.append({
                         "original_name": series_name,
                         "confirmed_name": suggestion,
-                        "volumes": []
+                        "volumes": [],
                     })
                     st.success(f"Selected: {suggestion}")
 
@@ -547,17 +540,17 @@ def confirm_single_series(series_name):
         # Single suggestion - auto-confirm
         confirmed_name = suggestions[0]
         st.success(f"Found: {confirmed_name}")
-        
+
         # Add to confirmed series
         st.session_state.series_entries.append({
             "original_name": series_name,
             "confirmed_name": confirmed_name,
-            "volumes": []
+            "volumes": [],
         })
-        
+
         # Clear pending
         st.session_state.pending_series_name = None
-        
+
     else:
         st.error("No suggestions found. Please try a different series name.")
 
@@ -570,8 +563,8 @@ def main():
     # Initialize session state
     initialize_session_state()
     # Reset processing state if stuck
-    if st.session_state.processing_state.get('is_processing', False) and not st.session_state.all_books:
-        st.session_state.processing_state['is_processing'] = False
+    if st.session_state.processing_state.get("is_processing", False) and not st.session_state.all_books:
+        st.session_state.processing_state["is_processing"] = False
 
     # Handle pending series confirmation
     if st.session_state.pending_series_name:
@@ -599,7 +592,7 @@ def main():
             series_groups[book.series_name].append(book)
 
         # Sort series and volumes
-        series_colors = ['#f0f8ff', '#fff8dc', '#f5f5f5', '#e6e6fa']
+        series_colors = ["#f0f8ff", "#fff8dc", "#f5f5f5", "#e6e6fa"]
         color_index = 0
         for series_name in sorted(series_groups.keys()):
             books = sorted(series_groups[series_name], key=lambda x: x.volume_number)
@@ -620,7 +613,7 @@ def main():
             # Rows
             row_color = False
             for book in books:
-                row_bg = '#f9f9f9' if row_color else 'white'
+                row_bg = "#f9f9f9" if row_color else "white"
                 st.markdown(f'<div style="background-color:{row_bg}; padding:5px; margin:2px 0; border-radius:3px;">', unsafe_allow_html=True)
                 col1, col2, col3, col4, col5, col6 = st.columns([1, 3, 2, 2, 2, 2])
                 col1.write(str(book.volume_number))
@@ -630,14 +623,14 @@ def main():
                 with col2:
                     if cover_url:
                         st.image(cover_url, width=60)
-                    st.write(book.book_title or 'N/A')
+                    st.write(book.book_title or "N/A")
 
                 col3.write(", ".join(book.genres) if book.genres else "N/A")
                 desc = book.description or "N/A"
                 col4.write(desc[:100] + "..." if len(desc) > 100 else desc)
                 col5.write(book.physical_description or "N/A")
                 col6.write(f"${book.msrp_cost:.2f}" if book.msrp_cost else "N/A")
-                st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
                 row_color = not row_color
 
             # Warnings
@@ -653,8 +646,8 @@ def main():
         with col1:
             if st.button("Export to MARC", type="primary"):
                 try:
-                    import tempfile
                     import os
+                    import tempfile
                     with tempfile.NamedTemporaryFile(mode="w+b", suffix=".mrc", delete=False) as temp_file:
                         temp_path = temp_file.name
                         export_books_to_marc(st.session_state.all_books, temp_path)
@@ -665,9 +658,9 @@ def main():
                         label="Download MARC file",
                         data=marc_data,
                         file_name="manga_collection.mrc",
-                        mime="application/octet-stream"
+                        mime="application/octet-stream",
                     )
-                except Exception as e:
+                except Exception:
                     st.error("An error occurred during the export process.")
         with col2:
             if st.button("Download Project State JSON"):
@@ -679,9 +672,9 @@ def main():
                         label="Download JSON file",
                         data=json_data,
                         file_name="project_state.json",
-                        mime="application/json"
+                        mime="application/json",
                     )
-                except Exception as e:
+                except Exception:
                     st.error("An error occurred during the export process.")
         with col3:
             if st.button("Print Labels"):
@@ -704,22 +697,22 @@ def main():
                 label_data = []
                 for book in st.session_state.all_books:
                     label_data.append({
-                        'Title': book.book_title or book.series_name,
+                        "Title": book.book_title or book.series_name,
                         "Author's Name": ", ".join(book.authors) if book.authors else "Unknown",
-                        'Publication Year': str(book.copyright_year) if book.copyright_year else '',
-                        'Series Title': book.series_name,
-                        'Series Volume': str(book.volume_number),
-                        'Call Number': f"Manga {book.barcode}",
-                        'Holdings Barcode': book.barcode,
-                        'spine_label_id': label_id,
-                        'clipart': clipart
+                        "Publication Year": str(book.copyright_year) if book.copyright_year else "",
+                        "Series Title": book.series_name,
+                        "Series Volume": str(book.volume_number),
+                        "Call Number": f"Manga {book.barcode}",
+                        "Holdings Barcode": book.barcode,
+                        "spine_label_id": label_id,
+                        "clipart": clipart,
                     })
                 pdf_data = generate_pdf_sheet(label_data)
                 st.download_button(
                     label="Download Labels PDF",
                     data=pdf_data,
                     file_name="manga_labels.pdf",
-                    mime="application/pdf"
+                    mime="application/pdf",
                 )
                 st.session_state.show_label_form = False
         if st.button("Cancel"):

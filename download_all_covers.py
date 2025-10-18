@@ -6,14 +6,14 @@ This script fetches and caches cover images for all manga volumes and series
 stored in the project database using available APIs.
 """
 
-import os
-import time
 import json
 import sqlite3
-from typing import List, Dict, Optional
+import time
+
 from google_books_client import GoogleBooksClient
 from mal_cover_fetcher import MALCoverFetcher
 from mangadex_cover_fetcher import MangaDexCoverFetcher
+
 
 class CoverDownloader:
     """Download and cache cover images for all manga data in database"""
@@ -30,22 +30,22 @@ class CoverDownloader:
         conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
 
-        cursor.execute('''
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS cached_cover_images (
                 id INTEGER PRIMARY KEY,
                 isbn TEXT UNIQUE,
                 url TEXT,
                 timestamp TEXT
             )
-        ''')
+        """)
 
         conn.commit()
         conn.close()
 
-    def get_all_series(self) -> List[str]:
+    def get_all_series(self) -> list[str]:
         """Get all unique series names from project_state.json"""
         try:
-            with open('project_state.json', 'r') as f:
+            with open("project_state.json") as f:
                 state = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return []
@@ -62,10 +62,10 @@ class CoverDownloader:
                     continue
         return list(series)
 
-    def get_all_volumes(self) -> List[Dict]:
+    def get_all_volumes(self) -> list[dict]:
         """Get all volumes with ISBN from project_state.json"""
         try:
-            with open('project_state.json', 'r') as f:
+            with open("project_state.json") as f:
                 state = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return []
@@ -75,14 +75,14 @@ class CoverDownloader:
             if api_call.get("success", False):
                 try:
                     response = json.loads(api_call["response"])
-                    isbn = response.get('isbn_13')
-                    series = response.get('series_name')
+                    isbn = response.get("isbn_13")
+                    series = response.get("series_name")
                     volume_num = api_call.get("volume")
                     if isbn and series and volume_num:
                         volumes.append({
-                            'series_name': series,
-                            'volume_number': volume_num,
-                            'isbn_13': isbn
+                            "series_name": series,
+                            "volume_number": volume_num,
+                            "isbn_13": isbn,
                         })
                 except json.JSONDecodeError:
                     continue
@@ -93,7 +93,7 @@ class CoverDownloader:
         conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
 
-        cursor.execute('SELECT url FROM cached_cover_images WHERE isbn = ?', (key,))
+        cursor.execute("SELECT url FROM cached_cover_images WHERE isbn = ?", (key,))
         result = cursor.fetchone()
 
         conn.close()
@@ -104,10 +104,10 @@ class CoverDownloader:
         conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
 
-        cursor.execute('''
+        cursor.execute("""
             INSERT OR REPLACE INTO cached_cover_images (isbn, url, timestamp)
             VALUES (?, ?, datetime('now'))
-        ''', (key, url))
+        """, (key, url))
 
         conn.commit()
         conn.close()
@@ -147,9 +147,9 @@ class CoverDownloader:
 
         success_count = 0
         for volume in volumes:
-            isbn = volume['isbn_13']
-            series = volume['series_name']
-            vol_num = volume['volume_number']
+            isbn = volume["isbn_13"]
+            series = volume["series_name"]
+            vol_num = volume["volume_number"]
 
             if self.is_cover_cached(isbn):
                 print(f"✓ Already cached: {series} Vol. {vol_num}")

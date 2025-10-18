@@ -6,16 +6,14 @@ Precaches data for all extant English language paperback volumes of popular mang
 for faster lookup and MARC export operations.
 """
 
-import sys
 import os
+import sys
 import time
-from typing import List, Dict
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
 from manga_lookup import DeepSeekAPI, ProjectState, process_book_data
-
 
 # Series to precache with estimated volume counts
 SERIES_TO_PRECACHE = {
@@ -37,7 +35,7 @@ SERIES_TO_PRECACHE = {
     "Death Note": 12,
     "Bakuman": 20,
     "A Silent Voice": 7,
-    "Haikyu!!": 45
+    "Haikyu!!": 45,
 }
 
 

@@ -5,11 +5,11 @@ MARC Exporter for Manga Lookup Tool
 Creates MARC21 bibliographic and holding records compatible with Atriuum
 """
 
-import sys
 import os
+import sys
 from datetime import datetime
-from typing import List
-from pymarc import Record, Field, Subfield
+
+from pymarc import Field, Record, Subfield
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
@@ -101,13 +101,13 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
 
     # 020 - ISBN
     if book.isbn_13:
-        subfields = [Subfield('a', book.isbn_13)]
+        subfields = [Subfield("a", book.isbn_13)]
         if book.msrp_cost:
-            subfields.append(Subfield('c', f"${book.msrp_cost:.2f}"))
+            subfields.append(Subfield("c", f"${book.msrp_cost:.2f}"))
         record.add_field(Field(
             tag="020",
             indicators=[" ", " "],
-            subfields=subfields
+            subfields=subfields,
         ))
 
     # 040 - Cataloging Source
@@ -115,11 +115,11 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
         tag="040",
         indicators=[" ", " "],
         subfields=[
-            Subfield('a', 'OCoLC'),
-            Subfield('b', 'eng'),
-            Subfield('c', 'OCoLC'),
-            Subfield('e', 'rda')
-        ]
+            Subfield("a", "OCoLC"),
+            Subfield("b", "eng"),
+            Subfield("c", "OCoLC"),
+            Subfield("e", "rda"),
+        ],
     ))
 
     # 100 - Main Entry - Personal Name (Author)
@@ -128,7 +128,7 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
         record.add_field(Field(
             tag="100",
             indicators=["1", " "],
-            subfields=[Subfield('a', formatted_authors)]
+            subfields=[Subfield("a", formatted_authors)],
         ))
 
     # 245 - Title Statement
@@ -136,13 +136,13 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
     title_field = Field(
         tag="245",
         indicators=["1", "0"],
-        subfields=[Subfield('a', book.book_title)]
+        subfields=[Subfield("a", book.book_title)],
     )
 
     # Add responsibility statement if authors exist
     if book.authors:
         formatted_authors = DataValidator.format_authors_list(book.authors)
-        title_field.subfields.append(Subfield('c', formatted_authors))
+        title_field.subfields.append(Subfield("c", formatted_authors))
 
     record.add_field(title_field)
 
@@ -150,14 +150,14 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
     if book.publisher_name or book.copyright_year:
         subfields = []
         if book.publisher_name:
-            subfields.append(Subfield('b', book.publisher_name))
+            subfields.append(Subfield("b", book.publisher_name))
         if book.copyright_year:
-            subfields.append(Subfield('c', str(book.copyright_year)))
+            subfields.append(Subfield("c", str(book.copyright_year)))
 
         record.add_field(Field(
             tag="264",
             indicators=[" ", "1"],  # First publisher, production
-            subfields=subfields
+            subfields=subfields,
         ))
 
     # 300 - Physical Description
@@ -165,14 +165,14 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
         record.add_field(Field(
             tag="300",
             indicators=[" ", " "],
-            subfields=[Subfield('a', book.physical_description)]
+            subfields=[Subfield("a", book.physical_description)],
         ))
     else:
         # Default physical description for manga
         record.add_field(Field(
             tag="300",
             indicators=[" ", " "],
-            subfields=[Subfield('a', "1 volume (unpaged) : chiefly illustrations ; 19 cm")]
+            subfields=[Subfield("a", "1 volume (unpaged) : chiefly illustrations ; 19 cm")],
         ))
 
     # 336-338 - RDA Content, Media, and Carrier Types
@@ -181,10 +181,10 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
         tag="336",
         indicators=[" ", " "],
         subfields=[
-            Subfield('a', 'still image'),
-            Subfield('b', 'sti'),
-            Subfield('2', 'rdacontent')
-        ]
+            Subfield("a", "still image"),
+            Subfield("b", "sti"),
+            Subfield("2", "rdacontent"),
+        ],
     ))
 
     # Media type: unmediated
@@ -192,10 +192,10 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
         tag="337",
         indicators=[" ", " "],
         subfields=[
-            Subfield('a', 'unmediated'),
-            Subfield('b', 'n'),
-            Subfield('2', 'rdamedia')
-        ]
+            Subfield("a", "unmediated"),
+            Subfield("b", "n"),
+            Subfield("2", "rdamedia"),
+        ],
     ))
 
     # Carrier type: volume
@@ -203,10 +203,10 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
         tag="338",
         indicators=[" ", " "],
         subfields=[
-            Subfield('a', 'volume'),
-            Subfield('b', 'nc'),
-            Subfield('2', 'rdacarrier')
-        ]
+            Subfield("a", "volume"),
+            Subfield("b", "nc"),
+            Subfield("2", "rdacarrier"),
+        ],
     ))
 
     # 490 - Series Statement
@@ -215,9 +215,9 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
             tag="490",
             indicators=["1", " "],  # Series traced differently
             subfields=[
-                Subfield('a', book.series_name),
-                Subfield('v', str(book.volume_number))
-            ]
+                Subfield("a", book.series_name),
+                Subfield("v", str(book.volume_number)),
+            ],
         ))
 
     # 520 - Summary
@@ -225,7 +225,7 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
         record.add_field(Field(
             tag="520",
             indicators=[" ", " "],
-            subfields=[Subfield('a', book.description[:500])]  # Limit length
+            subfields=[Subfield("a", book.description[:500])],  # Limit length
         ))
 
     # 500 - General Notes
@@ -235,7 +235,7 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
         record.add_field(Field(
             tag="500",
             indicators=[" ", " "],
-            subfields=[Subfield('a', notes_text)]
+            subfields=[Subfield("a", notes_text)],
         ))
 
     # 650 - Subject Headings
@@ -246,9 +246,9 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
                 tag="650",
                 indicators=[" ", "0"],  # LCSH
                 subfields=[
-                    Subfield('a', genre),
-                    Subfield('v', 'Comic books, strips, etc.')
-                ]
+                    Subfield("a", genre),
+                    Subfield("v", "Comic books, strips, etc."),
+                ],
             ))
 
     # Add manga as a subject
@@ -256,9 +256,9 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
         tag="650",
         indicators=[" ", "0"],
         subfields=[
-            Subfield('a', 'Manga'),
-            Subfield('v', 'Comic books, strips, etc.')
-        ]
+            Subfield("a", "Manga"),
+            Subfield("v", "Comic books, strips, etc."),
+        ],
     ))
 
     # 852 - Location (Holding Information)
@@ -267,11 +267,11 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
         tag="852",
         indicators=["8", " "],
         subfields=[
-            Subfield('b', 'Main Library'),  # Shelving location: Main Library
-            Subfield('h', generate_call_number(book, holding_barcode)),  # Local call number
-            Subfield('p', holding_barcode),  # Barcode
-            Subfield('x', 'Manga collection')  # Public note
-        ]
+            Subfield("b", "Main Library"),  # Shelving location: Main Library
+            Subfield("h", generate_call_number(book, holding_barcode)),  # Local call number
+            Subfield("p", holding_barcode),  # Barcode
+            Subfield("x", "Manga collection"),  # Public note
+        ],
     ))
 
     # 090 - Local Call Number (LOC)
@@ -281,13 +281,13 @@ def create_marc_record(book: BookInfo, holding_barcode: str = "T000001") -> Reco
         record.add_field(Field(
             tag="090",
             indicators=[" ", " "],
-            subfields=[Subfield('a', call_number)]
+            subfields=[Subfield("a", call_number)],
         ))
 
     return record
 
 
-def export_books_to_marc(books: List[BookInfo], output_file: str, holding_barcode_prefix: str = "T"):
+def export_books_to_marc(books: list[BookInfo], output_file: str, holding_barcode_prefix: str = "T"):
     """
     Export a list of books to MARC file
 
@@ -308,7 +308,7 @@ def export_books_to_marc(books: List[BookInfo], output_file: str, holding_barcod
         records.append(record)
 
     # Write records to file
-    with open(output_file, 'wb') as out:
+    with open(output_file, "wb") as out:
         for record in records:
             out.write(record.as_marc())
 
@@ -334,7 +334,7 @@ def create_test_marc_record():
         description="In modern-day Tokyo, shy college student Ken Kaneki's life changes forever when he becomes a half-ghoul after a fateful encounter. He must navigate the dangerous world of ghouls while trying to maintain his humanity.",
         physical_description="224 pages : chiefly illustrations ; 19 cm",
         genres=["Horror", "Dark Fantasy", "Seinen", "Supernatural"],
-        warnings=["MSRP $12.99 is within expected range"]
+        warnings=["MSRP $12.99 is within expected range"],
     )
 
     return create_marc_record(test_book, "T000001")
@@ -353,8 +353,8 @@ if __name__ == "__main__":
         print(f"{field.tag}: {field}")
 
     # Save test record
-    with open("test_manga_record.mrc", 'wb') as out:
+    with open("test_manga_record.mrc", "wb") as out:
         out.write(test_record.as_marc())
 
-    print(f"\nTest record saved to test_manga_record.mrc")
+    print("\nTest record saved to test_manga_record.mrc")
     print("✓ MARC exporter test completed successfully!")

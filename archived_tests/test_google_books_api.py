@@ -4,8 +4,9 @@ Test Google Books API with different authentication methods
 """
 
 import os
+
 import requests
-import json
+
 
 def test_with_api_key():
     """Test Google Books API with API key authentication"""
@@ -20,8 +21,8 @@ def test_with_api_key():
     test_isbn = "9781421580366"  # Tokyo Ghoul Vol 1
     url = "https://www.googleapis.com/books/v1/volumes"
     params = {
-        'q': f'isbn:{test_isbn}',
-        'key': api_key
+        "q": f"isbn:{test_isbn}",
+        "key": api_key,
     }
 
     try:
@@ -29,25 +30,24 @@ def test_with_api_key():
         response.raise_for_status()
 
         data = response.json()
-        if data.get('totalItems', 0) > 0:
+        if data.get("totalItems", 0) > 0:
             print(f"✅ API key works! Found {data['totalItems']} items for ISBN {test_isbn}")
 
             # Show sample data
-            item = data['items'][0]
-            volume_info = item.get('volumeInfo', {})
+            item = data["items"][0]
+            volume_info = item.get("volumeInfo", {})
             print(f"   Title: {volume_info.get('title', 'N/A')}")
 
             # Check for cover images
-            image_links = volume_info.get('imageLinks', {})
+            image_links = volume_info.get("imageLinks", {})
             if image_links:
                 print(f"   Cover images available: {list(image_links.keys())}")
             else:
                 print("   No cover images found")
 
             return True
-        else:
-            print(f"❌ No items found for ISBN {test_isbn}")
-            return False
+        print(f"❌ No items found for ISBN {test_isbn}")
+        return False
 
     except Exception as e:
         print(f"❌ API key test failed: {e}")
@@ -73,7 +73,7 @@ def main():
     api_key = os.getenv("GOOGLE_BOOKS_API_KEY")
 
     if api_key:
-        print(f"✅ GOOGLE_BOOKS_API_KEY found in environment")
+        print("✅ GOOGLE_BOOKS_API_KEY found in environment")
         success = test_with_api_key()
     else:
         print("❌ GOOGLE_BOOKS_API_KEY not found")

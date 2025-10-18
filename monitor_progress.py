@@ -5,16 +5,15 @@ TUI Monitor for Image Caching Progress
 A live terminal UI showing progress of all running image caching operations.
 """
 
+import json
 import os
 import time
-import json
-from collections import defaultdict
+
 from rich.console import Console
 from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskID
-from rich.text import Text
+
 
 def get_log_progress(log_file):
     """Parse progress from a log file"""
@@ -22,7 +21,7 @@ def get_log_progress(log_file):
         return {"total_series": 0, "completed_series": 0, "current_series": "", "volumes_added": 0, "total_volumes": 0}
 
     try:
-        with open(log_file, 'r') as f:
+        with open(log_file) as f:
             lines = f.readlines()
 
         progress = {
@@ -31,7 +30,7 @@ def get_log_progress(log_file):
             "current_series": "",
             "volumes_added": 0,
             "total_volumes": 0,
-            "last_update": ""
+            "last_update": "",
         }
 
         for line in lines[-50:]:  # Check last 50 lines
@@ -59,11 +58,11 @@ def get_log_progress(log_file):
 def get_database_stats():
     """Get current database statistics"""
     try:
-        with open('project_state.json', 'r') as f:
+        with open("project_state.json") as f:
             state = json.load(f)
 
-        volumes = sum(1 for call in state.get('api_calls', []) if call.get('success'))
-        series = len(set(call.get('response', {}).get('series_name', '') for call in state.get('api_calls', []) if call.get('success')))
+        volumes = sum(1 for call in state.get("api_calls", []) if call.get("success"))
+        series = len(set(call.get("response", {}).get("series_name", "") for call in state.get("api_calls", []) if call.get("success")))
 
         return {"total_volumes": volumes, "total_series": series}
 
@@ -79,7 +78,7 @@ def create_progress_display():
         "Missing Volumes": "add_all_volumes_final.txt",
         "New Shonen Series": "add_new_series_log.txt",
         "Additional Series": "add_additional_series_log.txt",
-        "More Series": "add_more_series_log.txt"
+        "More Series": "add_more_series_log.txt",
     }
 
     # Database stats
@@ -129,14 +128,14 @@ def create_progress_display():
 
     # Cache directory stats
     cache_stats = {"images": 0, "size": "0 MB"}
-    if os.path.exists('cache/images'):
+    if os.path.exists("cache/images"):
         try:
             import subprocess
-            result = subprocess.run(['du', '-sh', 'cache/images'], capture_output=True, text=True)
+            result = subprocess.run(["du", "-sh", "cache/images"], check=False, capture_output=True, text=True)
             if result.returncode == 0:
                 parts = result.stdout.strip().split()
                 cache_stats["size"] = parts[0]
-                cache_stats["images"] = len([f for f in os.listdir('cache/images') if f.endswith('.jpg')])
+                cache_stats["images"] = len([f for f in os.listdir("cache/images") if f.endswith(".jpg")])
         except:
             pass
 
@@ -147,7 +146,7 @@ def create_progress_display():
     layout = Panel.fit(
         f"{table}\n\n{summary_table}",
         title="🎯 Manga Collection Manager",
-        border_style="blue"
+        border_style="blue",
     )
 
     return layout

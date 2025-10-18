@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import urllib3
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 """
 Real Cover Image Comparison Test
@@ -7,12 +8,13 @@ Real Cover Image Comparison Test
 Compares actual cover image URLs from DeepSeek API vs Google Books API (keyless)
 """
 
-import os
 import json
-import time
-import requests
+import os
 import sqlite3
+import time
 from datetime import datetime
+
+import requests
 from dotenv import load_dotenv
 
 # Load environment
@@ -72,27 +74,27 @@ def call_deepseek_api(series_name: str, volume: int) -> dict:
 
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {DEEPSEEK_API_KEY}"
+        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
     }
 
     payload = {
         "model": MODEL,
         "messages": [{"role": "user", "content": prompt}],
         "max_tokens": 1200,
-        "temperature": 0.1
+        "temperature": 0.1,
     }
 
     try:
         response = requests.post(DEEPSEEK_URL, headers=headers, json=payload, timeout=60, verify=False)
         response.raise_for_status()
-        
+
         result = response.json()
         content = result["choices"][0]["message"]["content"]
-        
+
         # Parse JSON
         book_data = json.loads(content)
         return book_data, None
-        
+
     except Exception as e:
         return None, str(e)
 
@@ -102,29 +104,29 @@ def call_google_books_api(isbn: str) -> str:
     """Call Google Books API for cover image"""
     if not isbn:
         return None
-        
-    params = {'q': f'isbn:{isbn}'}
-    
+
+    params = {"q": f"isbn:{isbn}"}
+
     try:
         response = requests.get(GOOGLE_BOOKS_URL, params=params, timeout=10)
         response.raise_for_status()
-        
+
         data = response.json()
-        
-        if data.get('totalItems', 0) == 0:
+
+        if data.get("totalItems", 0) == 0:
             return None
-            
-        item = data['items'][0]
-        volume_info = item.get('volumeInfo', {})
-        image_links = volume_info.get('imageLinks', {})
-        
+
+        item = data["items"][0]
+        volume_info = item.get("volumeInfo", {})
+        image_links = volume_info.get("imageLinks", {})
+
         # Prefer larger images
-        for size in ['extraLarge', 'large', 'medium', 'small', 'thumbnail']:
+        for size in ["extraLarge", "large", "medium", "small", "thumbnail"]:
             if size in image_links:
                 return image_links[size]
-                
+
         return None
-        
+
     except Exception as e:
         print(f"Google Books error for ISBN {isbn}: {e}")
         return None
@@ -136,13 +138,13 @@ def main():
         ("Naruto", 1),
         ("Bleach", 1),
         ("Death Note", 1),
-        ("Dragon Ball", 1)
+        ("Dragon Ball", 1),
     ]
-    
+
     # Create table
-    db = sqlite3.connect('project_state.db')
+    db = sqlite3.connect("project_state.db")
     cursor = db.cursor()
-    cursor.execute('''
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS cover_comparison_results (
             id INTEGER PRIMARY KEY,
             series_name TEXT,
@@ -156,32 +158,32 @@ def main():
             google_error TEXT,
             timestamp TEXT
         )
-    ''')
+    """)
     db.commit()
-    
+
     for series_name, volume in test_series:
         print(f"\nTesting {series_name} Volume {volume}")
-        
+
         # Call DeepSeek
         deepseek_data, deepseek_error = call_deepseek_api(series_name, volume)
-        
+
         deepseek_cover = None
         isbn = None
         deepseek_success = False
-        
+
         if deepseek_data:
-            deepseek_cover = deepseek_data.get('cover_image_url')
-            isbn = deepseek_data.get('isbn_13')
+            deepseek_cover = deepseek_data.get("cover_image_url")
+            isbn = deepseek_data.get("isbn_13")
             deepseek_success = True
             print(f"✓ DeepSeek: Cover={bool(deepseek_cover)}, ISBN={isbn}")
         else:
             print(f"✗ DeepSeek failed: {deepseek_error}")
-        
+
         # Call Google Books
         google_cover = None
         google_success = False
         google_error = None
-        
+
         if isbn:
             google_cover = call_google_books_api(isbn)  # Now downloads and returns local URL
             google_success = google_cover is not None
@@ -189,19 +191,19 @@ def main():
         else:
             google_error = "No ISBN from DeepSeek"
             print("✗ Google: No ISBN available")
-        
+
         # Save to DB
-        cursor.execute('''
+        cursor.execute("""
             INSERT INTO cover_comparison_results 
             (series_name, volume, deepseek_cover, google_cover, isbn, deepseek_success, google_success, deepseek_error, google_error, timestamp)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (series_name, volume, deepseek_cover, google_cover, isbn, deepseek_success, google_success, deepseek_error, google_error, datetime.now().isoformat()))
-        
+        """, (series_name, volume, deepseek_cover, google_cover, isbn, deepseek_success, google_success, deepseek_error, google_error, datetime.now().isoformat()))
+
         db.commit()
-        
+
         # Rate limiting
         time.sleep(2)
-    
+
     db.close()
     print("\nTest completed! Check the Flask app at http://localhost:5001")
 

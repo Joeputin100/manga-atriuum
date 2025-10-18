@@ -7,14 +7,16 @@ Use this for development and testing on Termux.
 """
 
 import os
-import json
-import time
-from datetime import datetime
 
 # Import existing core logic
 from manga_lookup import (
-    BookInfo, DeepSeekAPI, DataValidator, ProjectState,
-    parse_volume_range, generate_sequential_barcodes, process_book_data
+    BookInfo,
+    DataValidator,
+    DeepSeekAPI,
+    ProjectState,
+    generate_sequential_barcodes,
+    parse_volume_range,
+    process_book_data,
 )
 
 # Import MARC exporter
@@ -108,9 +110,8 @@ def test_single_lookup():
             print(f"    Publisher: {book.publisher_name}")
             print(f"    MSRP: ${book.msrp_cost:.2f}" if book.msrp_cost else "    MSRP: Unknown")
             return True
-        else:
-            print("  ✗ No data found")
-            return False
+        print("  ✗ No data found")
+        return False
 
     except Exception as e:
         print(f"  ✗ Lookup Error: {e}")
@@ -136,7 +137,7 @@ def test_marc_export():
             physical_description="200 pages",
             genres=["Test", "Genre"],
             warnings=[],
-            barcode="T000001"
+            barcode="T000001",
         )
 
         # Test export
@@ -149,9 +150,8 @@ def test_marc_export():
             # Clean up
             os.remove(filename)
             return True
-        else:
-            print("  ✗ MARC file not created")
-            return False
+        print("  ✗ MARC file not created")
+        return False
 
     except Exception as e:
         print(f"  ✗ MARC Export Error: {e}")

@@ -1,16 +1,16 @@
-import barcode
-from barcode.writer import ImageWriter
-import qrcode
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import inch
-from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
-from reportlab.platypus import Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
-import io
 import csv
+import io
 
+import barcode
+import qrcode
+from barcode.writer import ImageWriter
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Paragraph
 
 # Avery 5160 label dimensions (approximate, for layout)
 LABEL_WIDTH = 2.625 * inch
@@ -93,7 +93,7 @@ def _fit_text_to_box(
             p = Paragraph(line, style)
             # Calculate wrapped height for each paragraph
             width, height = p.wrapOn(
-                c, max_width, max_height
+                c, max_width, max_height,
             )  # c is needed for wrapOn
             current_text_height += height + (0.05 * inch)  # Add line spacing
 
@@ -129,9 +129,9 @@ def create_label(c, x, y, book_data, label_type):
         "Padlock": "🔒",
         "Chili Pepper": "🌶️",
         "Eyeglasses": "👓",
-        "Handcuffs": "🔗"
+        "Handcuffs": "🔗",
     }
-    
+
     clipart = book_data.get("clipart", "None")
     if clipart != "None":
         emoji = clipart_emojis.get(clipart, "")
@@ -151,7 +151,7 @@ def create_label(c, x, y, book_data, label_type):
     series_number = book_data.get("Series Volume", "")
     dewey_number = book_data.get("Call Number", "")
     inventory_number = pad_inventory_number(
-        book_data.get("Holdings Barcode", "")
+        book_data.get("Holdings Barcode", ""),
     )
 
     # Truncate title and series_name for Label 1 if they are too long
@@ -170,10 +170,10 @@ def create_label(c, x, y, book_data, label_type):
             text_lines.append(
                 f"{series_name} {series_number}"
                 if series_number
-                else series_name
+                else series_name,
             )
         text_lines.append(
-            f"<b>{inventory_number}</b> - <b>{dewey_number}</b>"
+            f"<b>{inventory_number}</b> - <b>{dewey_number}</b>",
         )  # Bold inventory and Dewey numbers
 
         # Dynamic font sizing for Label 1
@@ -252,7 +252,7 @@ def create_label(c, x, y, book_data, label_type):
             text_lines.append(
                 f"{series_name} #{series_number}"
                 if series_number
-                else series_name
+                else series_name,
             )
         text_lines.append(inventory_number)
 
@@ -274,7 +274,7 @@ def create_label(c, x, y, book_data, label_type):
         for line in text_lines:
             p = Paragraph(line, style)
             width, height = p.wrapOn(
-                c, max_text_width, max_text_height
+                c, max_text_width, max_text_height,
             )  # Use max_text_height to allow wrapping
             total_text_height += height + (0.05 * inch)  # Add line spacing
 
@@ -305,11 +305,11 @@ def create_label(c, x, y, book_data, label_type):
             style.fontSize = optimal_font_size_line
             p = Paragraph(line_text, style)
             width, height = p.wrapOn(
-                c, max_text_width, max_text_height
+                c, max_text_width, max_text_height,
             )  # Allow wrapping within max_text_height
             current_y -= height  # Move down for current line
             p.drawOn(
-                c, x + 5, current_y + line_offset_y
+                c, x + 5, current_y + line_offset_y,
             )  # Draw from top down, apply offset
             current_y -= 0.05 * inch  # Increased line spacing
 
@@ -336,7 +336,7 @@ def create_label(c, x, y, book_data, label_type):
 
         # Add giant spine label ID
         b_text = book_data.get(
-            "spine_label_id", "B"
+            "spine_label_id", "B",
         )  # Use selected spine label ID
         # Calculate font size to make 'B' flush with label width
         # Start with a large font size and decrease until it fits
@@ -441,7 +441,7 @@ def create_label(c, x, y, book_data, label_type):
         for line in text_above_barcode_lines:
             p = Paragraph(line, style_above)
             width, height = p.wrapOn(
-                c, max_text_above_width, max_text_above_height
+                c, max_text_above_width, max_text_above_height,
             )  # Wrap text within the box
             p.drawOn(c, x + 5, current_y_above - height)  # Draw from top down
             current_y_above -= height + (
@@ -452,7 +452,7 @@ def create_label(c, x, y, book_data, label_type):
         text_left_barcode_lines = []
         if series_name:
             text_left_barcode_lines.append(
-                f"Vol. {series_number}" if series_number else series_name
+                f"Vol. {series_number}" if series_number else series_name,
             )
 
         max_text_left_width = (
@@ -467,7 +467,7 @@ def create_label(c, x, y, book_data, label_type):
                 len(series_number) - 1
             )  # Reduce by 1pt for each char after the first
         optimal_font_size_left = max(
-            optimal_font_size_left, 5
+            optimal_font_size_left, 5,
         )  # Ensure minimum font size
 
         optimal_font_size_left, text_block_height_left = _fit_text_to_box(
@@ -512,7 +512,7 @@ def create_label(c, x, y, book_data, label_type):
                 p = Paragraph(line, style_left)
                 # For rotated text, width and height parameters are swapped
                 width, height = p.wrapOn(
-                    c, max_text_left_width, max_text_left_height
+                    c, max_text_left_width, max_text_left_height,
                 )
                 current_rotated_y -= height  # Move down for current line
                 p.drawOn(c, 0, current_rotated_y)  # Draw from new origin
@@ -548,7 +548,7 @@ def generate_pdf_sheet(book_data_list):
             c.setStrokeColorRGB(0, 0, 0)  # Black color
             c.setLineWidth(0.5)  # Line thickness
             c.roundRect(
-                x_pos, y_pos, LABEL_WIDTH, LABEL_HEIGHT, 5
+                x_pos, y_pos, LABEL_WIDTH, LABEL_HEIGHT, 5,
             )  # 5 units for corner radius
 
             # Draw solid lines for buffer spaces (between labels, not overlapping dotted lines)
@@ -595,7 +595,7 @@ def generate_pdf_sheet(book_data_list):
 # Function to read book data from CSV
 def read_book_data_from_csv(filepath):
     book_data = []
-    with open(filepath, mode="r", newline="") as file:
+    with open(filepath, newline="") as file:
         reader = csv.DictReader(file)
         for row in reader:
             # Convert relevant fields to appropriate types

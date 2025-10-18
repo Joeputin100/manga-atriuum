@@ -3,14 +3,16 @@
 Test script to verify the text-based list display
 """
 
-import sys
 import os
+import sys
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
-from manga_lookup import BookInfo, display_text_list, show_book_details
 from rich.console import Console
+
+from manga_lookup import BookInfo, display_text_list, show_book_details
+
 
 def test_text_list_display():
     """Test if the text-based list displays correctly"""
@@ -30,7 +32,7 @@ def test_text_list_display():
             description="In modern-day Tokyo, shy college student Ken Kaneki's life changes forever when he becomes a half-ghoul after a fateful encounter.",
             physical_description="224 pages, 5 x 7.5 inches",
             genres=["Horror", "Dark Fantasy", "Seinen"],
-            warnings=[]
+            warnings=[],
         ),
         BookInfo(
             series_name="One Piece",
@@ -44,7 +46,7 @@ def test_text_list_display():
             description="Monkey D. Luffy begins his journey to become the Pirate King by gathering a crew and searching for the legendary treasure One Piece.",
             physical_description="208 pages, 5 x 7.5 inches",
             genres=["Shonen", "Adventure", "Fantasy"],
-            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"]
+            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"],
         ),
         BookInfo(
             series_name="Test Series",
@@ -58,8 +60,8 @@ def test_text_list_display():
             description=None,
             physical_description=None,
             genres=[],
-            warnings=["No MSRP found", "Could not extract valid copyright year"]
-        )
+            warnings=["No MSRP found", "Could not extract valid copyright year"],
+        ),
     ]
 
     console = Console()
@@ -91,7 +93,7 @@ def test_book_details():
         description="In modern-day Tokyo, shy college student Ken Kaneki's life changes forever when he becomes a half-ghoul after a fateful encounter.",
         physical_description="224 pages, 5 x 7.5 inches",
         genres=["Horror", "Dark Fantasy", "Seinen"],
-        warnings=[]
+        warnings=[],
     )
 
     console = Console()

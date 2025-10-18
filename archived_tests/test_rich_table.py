@@ -3,14 +3,16 @@
 Test script to check if the Rich table display is working correctly
 """
 
-import sys
 import os
+import sys
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
-from manga_lookup import BookInfo, display_rich_table
 from rich.console import Console
+
+from manga_lookup import BookInfo, display_rich_table
+
 
 def test_rich_table_display():
     """Test if the Rich table displays correctly"""
@@ -30,7 +32,7 @@ def test_rich_table_display():
             description="In modern-day Tokyo, shy college student Ken Kaneki's life changes forever...",
             physical_description="224 pages, 5 x 7.5 inches",
             genres=["Horror", "Dark Fantasy", "Seinen"],
-            warnings=[]
+            warnings=[],
         ),
         BookInfo(
             series_name="One Piece",
@@ -44,8 +46,8 @@ def test_rich_table_display():
             description="Monkey D. Luffy begins his journey to become the Pirate King...",
             physical_description="208 pages, 5 x 7.5 inches",
             genres=["Shonen", "Adventure", "Fantasy"],
-            warnings=[]
-        )
+            warnings=[],
+        ),
     ]
 
     console = Console()
@@ -87,8 +89,8 @@ def test_table_with_empty_data():
             description=None,  # No description
             physical_description=None,  # No physical description
             genres=[],  # No genres
-            warnings=["No MSRP found", "Could not extract valid copyright year"]
-        )
+            warnings=["No MSRP found", "Could not extract valid copyright year"],
+        ),
     ]
 
     try:

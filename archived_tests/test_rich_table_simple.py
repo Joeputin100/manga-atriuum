@@ -3,15 +3,17 @@
 Simple test script to verify Rich table creation without interactive mode
 """
 
-import sys
 import os
+import sys
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
-from manga_lookup import BookInfo
 from rich.console import Console
 from rich.table import Table
+
+from manga_lookup import BookInfo
+
 
 def test_table_creation():
     """Test if the Rich table can be created and displayed"""
@@ -31,8 +33,8 @@ def test_table_creation():
             description="In modern-day Tokyo, shy college student Ken Kaneki's life changes forever...",
             physical_description="224 pages, 5 x 7.5 inches",
             genres=["Horror", "Dark Fantasy", "Seinen"],
-            warnings=[]
-        )
+            warnings=[],
+        ),
     ]
 
     console = Console()
@@ -79,7 +81,7 @@ def test_table_creation():
             year,
             description,
             physical,
-            genres
+            genres,
         )
 
     # Display the table

@@ -3,11 +3,12 @@
 Quick test script to debug DeepSeek API for series name correction
 """
 
-import os
 import sys
-sys.path.append('.')
+
+sys.path.append(".")
 
 from manga_lookup import DeepSeekAPI
+
 
 def test_api():
     """Test the DeepSeek API directly"""

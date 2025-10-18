@@ -6,16 +6,14 @@ Precache series name suggestions for the most popular manga series
 so the correction workflow shows results very quickly.
 """
 
-import sys
 import os
+import sys
 import time
-from typing import List
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
 from manga_lookup import DeepSeekAPI, ProjectState
-
 
 # Popular manga series to cache for correction workflow
 POPULAR_SERIES = [
@@ -57,11 +55,11 @@ POPULAR_SERIES = [
     "Yu Yu Hakusho",
     "Rurouni Kenshin",
     "Inuyasha",
-    "Sailor Moon"
+    "Sailor Moon",
 ]
 
 
-def cache_series_corrections(series_names: List[str], project_state: ProjectState, deepseek_api: DeepSeekAPI):
+def cache_series_corrections(series_names: list[str], project_state: ProjectState, deepseek_api: DeepSeekAPI):
     """Cache series name corrections for a list of series"""
     print(f"\n🔍 Caching series name corrections for {len(series_names)} series...")
 

@@ -3,13 +3,14 @@
 Integration test to check if there are any actual trailing comma issues
 """
 
-import sys
 import os
+import sys
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
-from manga_lookup import process_book_data, DataValidator
+from manga_lookup import DataValidator, process_book_data
+
 
 def test_with_real_api_data():
     """Test with actual API response data from project_state.json"""
@@ -28,7 +29,7 @@ def test_with_real_api_data():
             "copyright_year": 2015,
             "description": "In modern-day Tokyo, shy college student Ken Kaneki's life changes forever...",
             "physical_description": "224 pages, 5 x 7.5 inches, black and white illustrations",
-            "genres": ["Horror", "Dark Fantasy", "Seinen", "Supernatural", "Psychological"]
+            "genres": ["Horror", "Dark Fantasy", "Seinen", "Supernatural", "Psychological"],
         },
         {
             "series_name": "One Piece",
@@ -41,8 +42,8 @@ def test_with_real_api_data():
             "copyright_year": 2003,
             "description": "Monkey D. Luffy begins his journey...",
             "physical_description": "208 pages, 5 x 7.5 inches",
-            "genres": ["Shonen", "Adventure", "Fantasy"]
-        }
+            "genres": ["Shonen", "Adventure", "Fantasy"],
+        },
     ]
 
     all_passed = True
@@ -57,19 +58,19 @@ def test_with_real_api_data():
         print(f"  Formatted authors: '{formatted_authors}'")
 
         # Check for trailing comma issues
-        if formatted_authors.endswith(','):
-            print(f"  ⚠️  WARNING: Trailing comma detected!")
+        if formatted_authors.endswith(","):
+            print("  ⚠️  WARNING: Trailing comma detected!")
             all_passed = False
 
         # Check for multiple commas in single author
-        if len(book.authors) == 1 and ',' in formatted_authors and formatted_authors.count(',') > 1:
-            print(f"  ⚠️  WARNING: Multiple commas in single author!")
+        if len(book.authors) == 1 and "," in formatted_authors and formatted_authors.count(",") > 1:
+            print("  ⚠️  WARNING: Multiple commas in single author!")
             all_passed = False
 
         # Check if the formatting is correct
         expected_formats = {
             1: "Ishida, Sui",
-            2: "Oda, Eiichiro"
+            2: "Oda, Eiichiro",
         }
         if formatted_authors != expected_formats[i]:
             print(f"  ⚠️  WARNING: Unexpected format! Expected: '{expected_formats[i]}'")
@@ -94,7 +95,7 @@ def test_edge_cases():
             "copyright_year": 2023,
             "description": "Test description",
             "physical_description": "200 pages",
-            "genres": ["Test"]
+            "genres": ["Test"],
         },
         # Case with multiple authors as string
         {
@@ -108,8 +109,8 @@ def test_edge_cases():
             "copyright_year": 2023,
             "description": "Test description",
             "physical_description": "200 pages",
-            "genres": ["Test"]
-        }
+            "genres": ["Test"],
+        },
     ]
 
     all_passed = True
@@ -125,8 +126,8 @@ def test_edge_cases():
         print(f"  Formatted authors: '{formatted_authors}'")
 
         # Check for trailing comma issues
-        if formatted_authors.endswith(','):
-            print(f"  ⚠️  WARNING: Trailing comma detected!")
+        if formatted_authors.endswith(","):
+            print("  ⚠️  WARNING: Trailing comma detected!")
             all_passed = False
 
     return all_passed

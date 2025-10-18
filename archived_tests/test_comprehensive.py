@@ -4,10 +4,10 @@ Comprehensive test script for manga_lookup functionality
 Tests all major components including DeepSeek API integration, data validation, and Rich TUI
 """
 
-import sys
-import os
 import json
+import os
 import re
+import sys
 from datetime import datetime
 
 # Add the current directory to Python path
@@ -50,8 +50,8 @@ def test_isbn_validation():
     print("="*50)
 
     try:
-        from isbntools.app import canonical, to_isbn13, mask, info
         from isbnlib import is_isbn13
+        from isbntools.app import canonical, info, mask, to_isbn13
     except ImportError:
         print("  ✗ SKIP: isbntools not installed")
         return False
@@ -64,7 +64,7 @@ def test_isbn_validation():
 
         try:
             masked = mask(canon)
-            parts = masked.split('-')
+            parts = masked.split("-")
             group_info = info(canon)
 
             return {
@@ -75,7 +75,7 @@ def test_isbn_validation():
                 "registrant": parts[2],
                 "publication": parts[3],
                 "check_digit": parts[4],
-                "group_description": group_info
+                "group_description": group_info,
             }
         except Exception as e:
             return {"valid": False, "error": str(e)}
@@ -115,8 +115,8 @@ def test_date_validation():
 
         # Try to extract year from various formats
         year_patterns = [
-            r'\b(19|20)\d{2}\b',  # 4-digit years
-            r'\b\d{4}\b',          # Any 4-digit number
+            r"\b(19|20)\d{2}\b",  # 4-digit years
+            r"\b\d{4}\b",          # Any 4-digit number
         ]
 
         for pattern in year_patterns:
@@ -266,18 +266,16 @@ def test_author_formatting():
         if len(name_parts) == 2:
             # Assume "First Last" format
             return f"{name_parts[1]}, {name_parts[0]}"
-        elif len(name_parts) == 1:
+        if len(name_parts) == 1:
             # Single name (like "Oda")
             return name_parts[0]
-        else:
-            # Complex name, try to handle
-            # For Japanese names, last name is usually first
-            if any(part.endswith('-') for part in name_parts):
-                # Handle hyphenated names
-                return author_name
-            else:
-                # Default: assume first part is first name, last part is last name
-                return f"{name_parts[-1]}, {' '.join(name_parts[:-1])}"
+        # Complex name, try to handle
+        # For Japanese names, last name is usually first
+        if any(part.endswith("-") for part in name_parts):
+            # Handle hyphenated names
+            return author_name
+        # Default: assume first part is first name, last part is last name
+        return f"{name_parts[-1]}, {' '.join(name_parts[:-1])}"
 
     def format_authors_list(authors):
         """Format list of authors as comma-separated 'Last, First M.'"""
@@ -369,7 +367,7 @@ def test_deepseek_prompt_structure():
         "msrp_cost",
         "isbn_13",
         "JSON format",
-        "grounded deep research"
+        "grounded deep research",
     ]
 
     all_present = True
@@ -419,9 +417,8 @@ def main():
     if passed == total:
         print("🎉 All tests passed! Ready for implementation.")
         return True
-    else:
-        print("⚠️ Some tests failed. Please review before implementation.")
-        return False
+    print("⚠️ Some tests failed. Please review before implementation.")
+    return False
 
 if __name__ == "__main__":
     success = main()

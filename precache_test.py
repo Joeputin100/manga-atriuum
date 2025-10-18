@@ -3,15 +3,14 @@
 Test Precaching - Cache a few series first
 """
 
-import sys
 import os
+import sys
 import time
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
 from manga_lookup import DeepSeekAPI, ProjectState, process_book_data
-
 
 # Test with smaller series first
 TEST_SERIES = {

@@ -6,16 +6,14 @@ Precaches data for all extant English language paperback volumes of the requeste
 for faster lookup and MARC export operations.
 """
 
-import sys
 import os
+import sys
 import time
-from typing import List, Dict
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
 from manga_lookup import DeepSeekAPI, ProjectState, process_book_data
-
 
 # Requested series with estimated volume counts
 REQUESTED_SERIES = {

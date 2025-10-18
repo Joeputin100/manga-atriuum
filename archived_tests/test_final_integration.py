@@ -3,13 +3,14 @@
 Final integration test to verify both MSRP rounding and text-based list functionality
 """
 
-import sys
 import os
+import sys
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
-from manga_lookup import process_book_data, DataValidator
+from manga_lookup import DataValidator, process_book_data
+
 
 def test_msrp_rounding():
     """Test MSRP rounding functionality"""
@@ -25,17 +26,17 @@ def test_msrp_rounding():
     all_passed = True
     for msrp, expected_warning in test_cases:
         test_data = {
-            'series_name': 'Test Series',
-            'volume_number': 1,
-            'book_title': 'Test Series (Volume 1)',
-            'authors': ['Test, Author'],
-            'msrp_cost': msrp,
-            'isbn_13': '9781234567890',
-            'publisher_name': 'Test Publisher',
-            'copyright_year': 2023,
-            'description': 'Test description',
-            'physical_description': '200 pages',
-            'genres': ['Test']
+            "series_name": "Test Series",
+            "volume_number": 1,
+            "book_title": "Test Series (Volume 1)",
+            "authors": ["Test, Author"],
+            "msrp_cost": msrp,
+            "isbn_13": "9781234567890",
+            "publisher_name": "Test Publisher",
+            "copyright_year": 2023,
+            "description": "Test description",
+            "physical_description": "200 pages",
+            "genres": ["Test"],
         }
 
         book = process_book_data(test_data, 1)
@@ -46,12 +47,11 @@ def test_msrp_rounding():
             else:
                 print(f"  ✗ MSRP ${msrp}: Expected warning '{expected_warning}' but got {book.warnings}")
                 all_passed = False
+        elif not book.warnings:
+            print(f"  ✓ MSRP ${msrp}: No warnings as expected")
         else:
-            if not book.warnings:
-                print(f"  ✓ MSRP ${msrp}: No warnings as expected")
-            else:
-                print(f"  ✗ MSRP ${msrp}: Expected no warnings but got {book.warnings}")
-                all_passed = False
+            print(f"  ✗ MSRP ${msrp}: Expected no warnings but got {book.warnings}")
+            all_passed = False
 
     return all_passed
 
@@ -61,34 +61,34 @@ def test_field_status_indicators():
 
     # Test book with complete data
     complete_data = {
-        'series_name': 'Complete Series',
-        'volume_number': 1,
-        'book_title': 'Complete Series (Volume 1)',
-        'authors': ['Complete, Author'],
-        'msrp_cost': 12.99,
-        'isbn_13': '9781234567890',
-        'publisher_name': 'Complete Publisher',
-        'copyright_year': 2023,
-        'description': 'Complete description',
-        'physical_description': '200 pages',
-        'genres': ['Complete']
+        "series_name": "Complete Series",
+        "volume_number": 1,
+        "book_title": "Complete Series (Volume 1)",
+        "authors": ["Complete, Author"],
+        "msrp_cost": 12.99,
+        "isbn_13": "9781234567890",
+        "publisher_name": "Complete Publisher",
+        "copyright_year": 2023,
+        "description": "Complete description",
+        "physical_description": "200 pages",
+        "genres": ["Complete"],
     }
 
     complete_book = process_book_data(complete_data, 1)
 
     # Test book with missing data
     missing_data = {
-        'series_name': 'Missing Series',
-        'volume_number': 1,
-        'book_title': 'Missing Series (Volume 1)',
-        'authors': ['Missing, Author'],
-        'msrp_cost': None,
-        'isbn_13': None,
-        'publisher_name': None,
-        'copyright_year': None,
-        'description': None,
-        'physical_description': None,
-        'genres': []
+        "series_name": "Missing Series",
+        "volume_number": 1,
+        "book_title": "Missing Series (Volume 1)",
+        "authors": ["Missing, Author"],
+        "msrp_cost": None,
+        "isbn_13": None,
+        "publisher_name": None,
+        "copyright_year": None,
+        "description": None,
+        "physical_description": None,
+        "genres": [],
     }
 
     missing_book = process_book_data(missing_data, 1)
@@ -101,7 +101,7 @@ def test_field_status_indicators():
         ("Copyright Year", complete_book.copyright_year is not None),
         ("Description", bool(complete_book.description)),
         ("Physical Description", bool(complete_book.physical_description)),
-        ("Genres", bool(complete_book.genres))
+        ("Genres", bool(complete_book.genres)),
     ]
 
     all_complete = all(is_populated for _, is_populated in complete_fields)
@@ -119,7 +119,7 @@ def test_field_status_indicators():
         ("Copyright Year", missing_book.copyright_year is not None),
         ("Description", bool(missing_book.description)),
         ("Physical Description", bool(missing_book.physical_description)),
-        ("Genres", bool(missing_book.genres))
+        ("Genres", bool(missing_book.genres)),
     ]
 
     all_missing = not any(is_populated for _, is_populated in missing_fields)

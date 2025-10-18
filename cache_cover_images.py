@@ -8,11 +8,11 @@ for all books that have ISBN-13 data using the Google Books API.
 
 import json
 import time
-from typing import Dict, List, Optional
-from google_books_client import GoogleBooksClient
-from manga_lookup import process_book_data
 
-def extract_books_from_project_state(project_state_file: str = "project_state.json") -> List[Dict]:
+from google_books_client import GoogleBooksClient
+
+
+def extract_books_from_project_state(project_state_file: str = "project_state.json") -> list[dict]:
     """
     Extract all books with ISBN-13 data from project state
 
@@ -20,7 +20,7 @@ def extract_books_from_project_state(project_state_file: str = "project_state.js
         List of book dictionaries with series_name, volume_number, and isbn_13
     """
     try:
-        with open(project_state_file, 'r') as f:
+        with open(project_state_file) as f:
             state = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Error loading project state: {e}")
@@ -42,7 +42,7 @@ def extract_books_from_project_state(project_state_file: str = "project_state.js
                         "series_name": response_data.get("series_name"),
                         "volume_number": api_call.get("volume"),
                         "isbn_13": isbn_13,
-                        "raw_data": response_data
+                        "raw_data": response_data,
                     })
             except (json.JSONDecodeError, KeyError) as e:
                 print(f"Error parsing API response: {e}")
@@ -50,7 +50,7 @@ def extract_books_from_project_state(project_state_file: str = "project_state.js
 
     return books
 
-def cache_cover_images_for_books(books: List[Dict]) -> Dict[str, str]:
+def cache_cover_images_for_books(books: list[dict]) -> dict[str, str]:
     """
     Cache cover image URLs for all books with ISBN-13 data
 
@@ -74,7 +74,7 @@ def cache_cover_images_for_books(books: List[Dict]) -> Dict[str, str]:
 
         # Skip if we already have this ISBN cached
         if isbn_13 in cover_cache:
-            print(f"  ✓ Already cached")
+            print("  ✓ Already cached")
             continue
 
         # Fetch cover image URL
@@ -84,31 +84,31 @@ def cache_cover_images_for_books(books: List[Dict]) -> Dict[str, str]:
             cover_cache[isbn_13] = cover_url
             print(f"  ✓ Found cover: {cover_url}")
         else:
-            print(f"  ✗ No cover found")
+            print("  ✗ No cover found")
 
         # Small delay to be respectful to the API
         time.sleep(0.2)
 
     return cover_cache
 
-def save_cover_cache(cover_cache: Dict[str, str], cache_file: str = "cover_cache.json"):
+def save_cover_cache(cover_cache: dict[str, str], cache_file: str = "cover_cache.json"):
     """Save cover cache to JSON file"""
     try:
-        with open(cache_file, 'w') as f:
+        with open(cache_file, "w") as f:
             json.dump(cover_cache, f, indent=2)
         print(f"✓ Cover cache saved to {cache_file} ({len(cover_cache)} covers)")
-    except IOError as e:
+    except OSError as e:
         print(f"Error saving cover cache: {e}")
 
-def load_cover_cache(cache_file: str = "cover_cache.json") -> Dict[str, str]:
+def load_cover_cache(cache_file: str = "cover_cache.json") -> dict[str, str]:
     """Load cover cache from JSON file"""
     try:
-        with open(cache_file, 'r') as f:
+        with open(cache_file) as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
-def update_project_state_with_covers(cover_cache: Dict[str, str], project_state_file: str = "project_state.json"):
+def update_project_state_with_covers(cover_cache: dict[str, str], project_state_file: str = "project_state.json"):
     """
     Update project state with cover image URLs
 
@@ -116,7 +116,7 @@ def update_project_state_with_covers(cover_cache: Dict[str, str], project_state_
     in the cached responses for future use.
     """
     try:
-        with open(project_state_file, 'r') as f:
+        with open(project_state_file) as f:
             state = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Error loading project state for update: {e}")
@@ -144,10 +144,10 @@ def update_project_state_with_covers(cover_cache: Dict[str, str], project_state_
 
     # Save updated state
     try:
-        with open(project_state_file, 'w') as f:
+        with open(project_state_file, "w") as f:
             json.dump(state, f, indent=2)
         print(f"✓ Updated project state with {updated_count} cover URLs")
-    except IOError as e:
+    except OSError as e:
         print(f"Error saving updated project state: {e}")
 
 def main():

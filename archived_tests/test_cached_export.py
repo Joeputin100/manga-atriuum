@@ -5,8 +5,8 @@ Test MARC Export with Cached Data
 Test exporting MARC records using the currently cached manga data.
 """
 
-import sys
 import os
+import sys
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
@@ -32,7 +32,7 @@ def test_cached_export():
     test_series = [
         "Tokyo Ghoul",
         "Death Note",
-        "A Silent Voice"
+        "A Silent Voice",
     ]
 
     all_books = []
@@ -56,7 +56,7 @@ def test_cached_export():
                     except:
                         # Try to extract JSON from response
                         import re
-                        json_match = re.search(r'\{.*\}', cached_response, re.DOTALL)
+                        json_match = re.search(r"\{.*\}", cached_response, re.DOTALL)
                         if json_match:
                             book_data = json.loads(json_match.group())
 

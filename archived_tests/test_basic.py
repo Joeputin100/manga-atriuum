@@ -4,6 +4,7 @@ Basic test to verify the script works
 """
 
 import os
+
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -15,14 +16,14 @@ def test_environment():
     if api_key:
         print(f"✓ API Key loaded: {api_key[:10]}...")
         return True
-    else:
-        print("✗ API Key not found")
-        return False
+    print("✗ API Key not found")
+    return False
 
 def test_imports():
     """Test if all required imports work"""
     try:
         import json
+
         import requests
         from rich.console import Console
         from rich.prompt import Prompt

@@ -6,13 +6,12 @@ This script adds volumes for 10 currently popular shonen manga series
 that are not yet in the database.
 """
 
-import os
 import json
 import time
-from typing import List, Dict
 
 # Import existing modules
-from manga_lookup import DeepSeekAPI, DataValidator, GoogleBooksAPI, process_book_data, ProjectState
+from manga_lookup import DeepSeekAPI, GoogleBooksAPI, ProjectState, process_book_data
+
 
 def get_book_data_with_retry(api, series, volume, project_state, max_retries=3):
     """Get book data with retry logic for network errors"""
@@ -40,16 +39,16 @@ def main():
 
     # 10 popular shonen manga series with their max volumes
     new_series = {
-        'Demon Slayer: Kimetsu no Yaiba': 23,
-        'Jujutsu Kaisen': 23,
-        'My Hero Academia': 38,
-        'Chainsaw Man': 15,
-        'Spy x Family': 11,
-        'Dr. Stone': 26,
-        'Fire Force': 34,
-        'The Rising of the Shield Hero': 45,
-        'Crayon Shin-chan': 60,
-        'Happiness': 50,
+        "Demon Slayer: Kimetsu no Yaiba": 23,
+        "Jujutsu Kaisen": 23,
+        "My Hero Academia": 38,
+        "Chainsaw Man": 15,
+        "Spy x Family": 11,
+        "Dr. Stone": 26,
+        "Fire Force": 34,
+        "The Rising of the Shield Hero": 45,
+        "Crayon Shin-chan": 60,
+        "Happiness": 50,
     }
 
     total_added = 0
@@ -74,7 +73,7 @@ def main():
                     series_added += 1
                     total_added += 1
                     # Save incrementally
-                    with open('project_state.json', 'w') as f:
+                    with open("project_state.json", "w") as f:
                         json.dump(project_state, f, indent=2)
                 else:
                     print(f"    ✗ Failed to process {series_name} Vol. {volume}")

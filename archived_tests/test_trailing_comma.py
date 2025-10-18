@@ -3,13 +3,14 @@
 Test script to reproduce the trailing comma issue in author name formatting
 """
 
-import sys
 import os
+import sys
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
 from manga_lookup import DataValidator
+
 
 def test_author_formatting_trailing_comma():
     """Test author name formatting for trailing comma issue"""

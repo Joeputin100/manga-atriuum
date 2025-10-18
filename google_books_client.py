@@ -8,8 +8,8 @@ using ISBN-13 numbers. It includes caching and rate limiting.
 
 import os
 import time
+
 import requests
-from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -33,7 +33,7 @@ class GoogleBooksClient:
 
         self.last_request_time = time.time()
 
-    def get_cover_image_url(self, isbn_13: str) -> Optional[str]:
+    def get_cover_image_url(self, isbn_13: str) -> str | None:
         """
         Fetch cover image URL from Google Books API using ISBN-13
         Downloads and caches the image locally, returns local URL
@@ -59,39 +59,39 @@ class GoogleBooksClient:
             data = response.json()
 
             # Check if we found any books
-            if data.get('totalItems', 0) == 0:
+            if data.get("totalItems", 0) == 0:
                 return None
 
             # Get the first item
-            item = data['items'][0]
-            volume_info = item.get('volumeInfo', {})
+            item = data["items"][0]
+            volume_info = item.get("volumeInfo", {})
 
             # Try to get the largest available cover image
-            image_links = volume_info.get('imageLinks', {})
+            image_links = volume_info.get("imageLinks", {})
 
             # Prefer larger images, fall back to smaller ones
-            for image_size in ['extraLarge', 'large', 'medium', 'small', 'thumbnail', 'smallThumbnail']:
+            for image_size in ["extraLarge", "large", "medium", "small", "thumbnail", "smallThumbnail"]:
                 if image_size in image_links:
                     cover_url = image_links[image_size]
                     try:
                         # Download and cache the image
                         img_response = requests.get(cover_url, timeout=10)
                         img_response.raise_for_status()
-                        
+
                         # Save to cache
-                        os.makedirs('cache/images', exist_ok=True)
+                        os.makedirs("cache/images", exist_ok=True)
                         filename = f"{isbn_13.replace('-', '_')}.jpg"
                         filepath = f"cache/images/{filename}"
-                        with open(filepath, 'wb') as f:
+                        with open(filepath, "wb") as f:
                             f.write(img_response.content)
-                        
+
                         # Return local URL
                         return f"/images/{filename}"
-                        
+
                     except Exception as download_error:
                         print(f"Error downloading image for ISBN {isbn_13}: {download_error}")
                         continue
-            
+
             return None
 
         except requests.exceptions.RequestException as e:
@@ -101,7 +101,7 @@ class GoogleBooksClient:
             print(f"Error parsing Google Books response for ISBN {isbn_13}: {e}")
             return None
 
-def get_cover_image_url(isbn_13: str) -> Optional[str]:
+def get_cover_image_url(isbn_13: str) -> str | None:
     """
     Convenience function to get cover image URL
     Downloads and caches the image, returns local URL

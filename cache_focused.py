@@ -6,16 +6,14 @@ Precaches the most important volumes (1-10) for each requested series first,
 then continues with remaining volumes. This ensures core volumes are cached quickly.
 """
 
-import sys
 import os
+import sys
 import time
-from typing import List, Dict
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
 from manga_lookup import DeepSeekAPI, ProjectState, process_book_data
-
 
 # Requested series with core volumes (1-10) first, then remaining
 REQUESTED_SERIES = {

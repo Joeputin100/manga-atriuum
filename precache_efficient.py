@@ -6,16 +6,14 @@ Precaches data for all extant English language paperback volumes,
 using existing cache and only fetching missing volumes.
 """
 
-import sys
 import os
+import sys
 import time
-from typing import Dict, List
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
 from manga_lookup import DeepSeekAPI, ProjectState, process_book_data
-
 
 # Series to precache with estimated volume counts
 SERIES_TO_PRECACHE = {
@@ -37,11 +35,11 @@ SERIES_TO_PRECACHE = {
     "Death Note": 12,
     "Bakuman": 20,
     "A Silent Voice": 7,
-    "Haikyu!!": 45
+    "Haikyu!!": 45,
 }
 
 
-def check_existing_cache(series_name: str, max_volumes: int, deepseek_api: DeepSeekAPI, project_state: ProjectState) -> List[int]:
+def check_existing_cache(series_name: str, max_volumes: int, deepseek_api: DeepSeekAPI, project_state: ProjectState) -> list[int]:
     """Check which volumes are already cached"""
     cached_volumes = []
     missing_volumes = []
@@ -58,7 +56,7 @@ def check_existing_cache(series_name: str, max_volumes: int, deepseek_api: DeepS
     return cached_volumes, missing_volumes
 
 
-def precache_missing_volumes(series_name: str, missing_volumes: List[int], deepseek_api: DeepSeekAPI, project_state: ProjectState) -> Dict[str, int]:
+def precache_missing_volumes(series_name: str, missing_volumes: list[int], deepseek_api: DeepSeekAPI, project_state: ProjectState) -> dict[str, int]:
     """Precache missing volumes for a series"""
     successful = 0
     failed = 0
@@ -124,12 +122,12 @@ def main():
 
         # Precache missing volumes
         if missing_volumes:
-            print(f"  Precaching missing volumes...")
+            print("  Precaching missing volumes...")
             results = precache_missing_volumes(series_name, missing_volumes, deepseek_api, project_state)
             total_fetched += results["successful"]
             total_failed += results["failed"]
         else:
-            print(f"  ✓ All volumes already cached")
+            print("  ✓ All volumes already cached")
 
     # Print summary
     print("\n" + "=" * 60)

@@ -5,9 +5,10 @@ Enhanced Progress Monitor
 Displays progress of manga database operations with detailed metrics.
 """
 
+import json
 import os
 import time
-import json
+
 
 def get_log_progress(log_file):
     """Parse progress from a log file"""
@@ -15,7 +16,7 @@ def get_log_progress(log_file):
         return {"volumes_added": 0, "current_series": "Not started", "status": "Idle", "total_expected": 0, "remaining": 0}
 
     try:
-        with open(log_file, 'r') as f:
+        with open(log_file) as f:
             lines = f.readlines()
 
         volumes_added = sum(1 for line in lines if "✓ Added" in line)
@@ -31,7 +32,7 @@ def get_log_progress(log_file):
                 except:
                     pass
                 break
-            elif "volumes:" in line and "🎯 Adding" in line:
+            if "volumes:" in line and "🎯 Adding" in line:
                 # For series addition logs
                 parts = line.split(" (")
                 if len(parts) > 1:
@@ -54,7 +55,7 @@ def get_log_progress(log_file):
             "current_series": current_series,
             "status": status,
             "total_expected": total_expected,
-            "remaining": remaining
+            "remaining": remaining,
         }
 
     except Exception as e:
@@ -63,10 +64,10 @@ def get_log_progress(log_file):
 def get_database_stats():
     """Get current database statistics"""
     try:
-        with open('project_state.json', 'r') as f:
+        with open("project_state.json") as f:
             state = json.load(f)
 
-        volumes = sum(1 for call in state.get('api_calls', []) if call.get('success'))
+        volumes = sum(1 for call in state.get("api_calls", []) if call.get("success"))
         return {"total_volumes": volumes}
 
     except:
@@ -92,7 +93,7 @@ def main():
     try:
         while True:
             # Clear screen
-            os.system('clear' if os.name == 'posix' else 'cls')
+            os.system("clear" if os.name == "posix" else "cls")
 
             # Get stats
             current_time = time.time()
@@ -104,7 +105,7 @@ def main():
                 "Missing Volumes": "add_all_volumes_final.txt",
                 "New Shonen Series": "add_new_series_log.txt",
                 "Additional Series": "add_additional_series_log.txt",
-                "More Series": "add_more_series_log.txt"
+                "More Series": "add_more_series_log.txt",
             }
 
             print("📊 Enhanced Manga Database Progress Monitor")
@@ -135,7 +136,7 @@ def main():
                 print(f"{op_name}:")
                 print(f"  Status: {progress['status']}")
                 print(f"  Volumes Added: {progress['volumes_added']}")
-                if progress.get('total_expected', 0) > 0:
+                if progress.get("total_expected", 0) > 0:
                     print(f"  Remaining: {progress.get('remaining', 0)}")
                 print(f"  Current Series: {progress['current_series']}")
                 print()

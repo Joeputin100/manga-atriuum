@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sqlite3
+
 """
 Manga Lookup Tool
 
@@ -8,41 +9,40 @@ corrects series names, fetches detailed book information, and displays results
 in an interactive Rich TUI with clickable row interface.
 """
 
-import os
 import json
+import os
 import re
 import time
-import requests
-import tomllib
-from datetime import datetime
-from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
+from datetime import datetime
+
+import requests
 from dotenv import load_dotenv
-from rich.console import Console
-from rich.prompt import Prompt, Confirm, IntPrompt
-from rich.panel import Panel
 from rich import print as rprint
 
 # Load environment variables
 load_dotenv()
 
+
 @dataclass
 class BookInfo:
     """Data class to store comprehensive book information"""
+
     series_name: str
     volume_number: int
     book_title: str
-    authors: List[str]
-    msrp_cost: Optional[float]
-    isbn_13: Optional[str]
-    publisher_name: Optional[str]
-    copyright_year: Optional[int]
-    description: Optional[str]
-    physical_description: Optional[str]
-    genres: List[str]
-    warnings: List[str]
-    barcode: Optional[str] = None
-    cover_image_url: Optional[str] = None
+    authors: list[str]
+    msrp_cost: float | None
+    isbn_13: str | None
+    publisher_name: str | None
+    copyright_year: int | None
+    description: str | None
+    physical_description: str | None
+    genres: list[str]
+    warnings: list[str]
+    barcode: str | None = None
+    cover_image_url: str | None = None
+
 
 class ProjectState:
     """Advanced project state management with SQLite database for performance"""
@@ -58,15 +58,15 @@ class ProjectState:
         cursor = self.conn.cursor()
 
         # Metadata table for global stats
-        cursor.execute('''
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS metadata (
                 key TEXT PRIMARY KEY,
                 value TEXT
             )
-        ''')
+        """)
 
         # Cached responses table
-        cursor.execute('''
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS cached_responses (
                 id INTEGER PRIMARY KEY,
                 prompt_hash TEXT,
@@ -75,10 +75,10 @@ class ProjectState:
                 timestamp TEXT,
                 UNIQUE(prompt_hash, volume)
             )
-        ''')
+        """)
 
         # API calls table
-        cursor.execute('''
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS api_calls (
                 id INTEGER PRIMARY KEY,
                 prompt TEXT,
@@ -87,27 +87,27 @@ class ProjectState:
                 success BOOLEAN,
                 timestamp TEXT
             )
-        ''')
+        """)
 
         # Searches table
-        cursor.execute('''
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS searches (
                 id INTEGER PRIMARY KEY,
                 query TEXT,
                 books_found INTEGER,
                 timestamp TEXT
             )
-        ''')
+        """)
 
         # Cached cover images
-        cursor.execute('''
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS cached_cover_images (
                 id INTEGER PRIMARY KEY,
                 isbn TEXT UNIQUE,
                 url TEXT,
                 timestamp TEXT
             )
-        ''')
+        """)
 
         self.conn.commit()
 
@@ -117,49 +117,65 @@ class ProjectState:
         defaults = {
             "interaction_count": "0",
             "total_books_found": "0",
-            "start_time": datetime.now().isoformat()
+            "start_time": datetime.now().isoformat(),
         }
         for key, value in defaults.items():
-            cursor.execute('INSERT OR IGNORE INTO metadata (key, value) VALUES (?, ?)', (key, value))
+            cursor.execute(
+                "INSERT OR IGNORE INTO metadata (key, value) VALUES (?, ?)",
+                (key, value),
+            )
         self.conn.commit()
 
     def _get_metadata(self, key: str) -> str:
         cursor = self.conn.cursor()
-        cursor.execute('SELECT value FROM metadata WHERE key = ?', (key,))
+        cursor.execute("SELECT value FROM metadata WHERE key = ?", (key,))
         row = cursor.fetchone()
         return row[0] if row else "0"
 
     def _set_metadata(self, key: str, value: str):
         cursor = self.conn.cursor()
-        cursor.execute('INSERT OR REPLACE INTO metadata (key, value) VALUES (?, ?)', (key, value))
+        cursor.execute(
+            "INSERT OR REPLACE INTO metadata (key, value) VALUES (?, ?)", (key, value),
+        )
         self.conn.commit()
 
-    def record_api_call(self, prompt: str, response: str, volume: int, success: bool = True):
+    def record_api_call(
+        self, prompt: str, response: str, volume: int, success: bool = True,
+    ):
         """Record API call with full details for caching"""
         cursor = self.conn.cursor()
         timestamp = datetime.now().isoformat()
 
         # Insert API call
-        cursor.execute('''
+        cursor.execute(
+            """
             INSERT INTO api_calls (prompt, response, volume, success, timestamp)
             VALUES (?, ?, ?, ?, ?)
-        ''', (prompt, response, volume, success, timestamp))
+        """,
+            (prompt, response, volume, success, timestamp),
+        )
 
         # Cache successful responses
         if success:
             prompt_hash = f"{prompt[:100]}_{volume}"
-            cursor.execute('''
+            cursor.execute(
+                """
                 INSERT OR REPLACE INTO cached_responses (prompt_hash, volume, response, timestamp)
                 VALUES (?, ?, ?, ?)
-            ''', (prompt_hash, volume, response, timestamp))
+            """,
+                (prompt_hash, volume, response, timestamp),
+            )
 
         self.conn.commit()
 
-    def get_cached_response(self, prompt: str, volume: int) -> Optional[str]:
+    def get_cached_response(self, prompt: str, volume: int) -> str | None:
         """Get cached response if available"""
         cursor = self.conn.cursor()
         prompt_hash = f"{prompt[:100]}_{volume}"
-        cursor.execute('SELECT response FROM cached_responses WHERE prompt_hash = ? AND volume = ?', (prompt_hash, volume))
+        cursor.execute(
+            "SELECT response FROM cached_responses WHERE prompt_hash = ? AND volume = ?",
+            (prompt_hash, volume),
+        )
         row = cursor.fetchone()
         return row[0] if row else None
 
@@ -175,14 +191,18 @@ class ProjectState:
         self._set_metadata("total_books_found", str(total_books))
 
         # Insert search
-        cursor.execute('INSERT INTO searches (query, books_found, timestamp) VALUES (?, ?, ?)',
-                       (search_query, books_found, timestamp))
+        cursor.execute(
+            "INSERT INTO searches (query, books_found, timestamp) VALUES (?, ?, ?)",
+            (search_query, books_found, timestamp),
+        )
         self.conn.commit()
 
-    def get_cached_cover_image(self, isbn_key: str) -> Optional[str]:
+    def get_cached_cover_image(self, isbn_key: str) -> str | None:
         """Get cached cover image URL by ISBN key"""
         cursor = self.conn.cursor()
-        cursor.execute("SELECT url FROM cached_cover_images WHERE isbn = ?", (isbn_key,))
+        cursor.execute(
+            "SELECT url FROM cached_cover_images WHERE isbn = ?", (isbn_key,),
+        )
         row = cursor.fetchone()
         return row[0] if row else None
 
@@ -190,9 +210,12 @@ class ProjectState:
         """Cache a cover image URL"""
         cursor = self.conn.cursor()
         timestamp = datetime.now().isoformat()
-        cursor.execute("INSERT OR REPLACE INTO cached_cover_images (isbn, url, timestamp) VALUES (?, ?, ?)",
-                       (isbn_key, url, timestamp))
+        cursor.execute(
+            "INSERT OR REPLACE INTO cached_cover_images (isbn, url, timestamp) VALUES (?, ?, ?)",
+            (isbn_key, url, timestamp),
+        )
         self.conn.commit()
+
 
 class DeepSeekAPI:
     """Handles DeepSeek API interactions with rate limiting and error handling"""
@@ -206,7 +229,7 @@ class DeepSeekAPI:
         self.model = "deepseek-chat"  # Using DeepSeek-V3.2-Exp (non-thinking mode)
         self.last_request_time = time.time()
 
-    def correct_series_name(self, series_name: str) -> List[str]:
+    def correct_series_name(self, series_name: str) -> list[str]:
         """Use DeepSeek API to correct and suggest manga series names"""
         prompt = f"""
         Given the manga series name "{series_name}", provide 3-5 corrected or alternative names
@@ -235,22 +258,22 @@ class DeepSeekAPI:
 
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.api_key}"
+            "Authorization": f"Bearer {self.api_key}",
         }
 
         payload = {
             "model": self.model,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
+            "messages": [{"role": "user", "content": prompt}],
             "max_tokens": 200,
-            "temperature": 0.3
+            "temperature": 0.3,
         }
 
         content = None  # Initialize content variable
 
         try:
-            response = requests.post(self.base_url, headers=headers, json=payload, timeout=60)
+            response = requests.post(
+                self.base_url, headers=headers, json=payload, timeout=60,
+            )
             response.raise_for_status()
 
             result = response.json()
@@ -285,13 +308,17 @@ class DeepSeekAPI:
 
         except json.JSONDecodeError as e:
             rprint(f"[red]JSON decode error in DeepSeek API response: {e}[/red]")
-            rprint(f"[yellow]Response content: {content if content else 'Not available'}[/yellow]")
+            rprint(
+                f"[yellow]Response content: {content if content else 'Not available'}[/yellow]",
+            )
             return [series_name]  # Fallback to original name
         except Exception as e:
             rprint(f"[red]Error using DeepSeek API: {e}[/red]")
             return [series_name]  # Fallback to original name
 
-    def get_book_info(self, series_name: str, volume_number: int, project_state: ProjectState) -> Optional[Dict]:
+    def get_book_info(
+        self, series_name: str, volume_number: int, project_state: ProjectState,
+    ) -> dict | None:
         """Get comprehensive book information using DeepSeek API"""
 
         # Create comprehensive prompt
@@ -304,48 +331,51 @@ class DeepSeekAPI:
             try:
                 return json.loads(cached_response)
             except json.JSONDecodeError:
-                rprint(f"[yellow]⚠️ Cached data corrupted, fetching fresh data[/yellow]")
+                rprint("[yellow]⚠️ Cached data corrupted, fetching fresh data[/yellow]")
 
         # If we get here, we need to make a new API call
         rprint(f"[blue]🔍 Making API call for volume {volume_number}[/blue]")
 
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.api_key}"
+            "Authorization": f"Bearer {self.api_key}",
         }
 
         payload = {
             "model": self.model,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
+            "messages": [{"role": "user", "content": prompt}],
             "max_tokens": 1000,
-            "temperature": 0.1
+            "temperature": 0.1,
         }
 
         try:
-            response = requests.post(self.base_url, headers=headers, json=payload, timeout=120)
+            response = requests.post(
+                self.base_url, headers=headers, json=payload, timeout=120,
+            )
             response.raise_for_status()
 
             result = response.json()
             content = result["choices"][0]["message"]["content"]
             # Parse JSON response
             content = content.strip()
-            if content.startswith('```json'):
-                content = content[7:]
-            if content.endswith('```'):
-                content = content[:-3]
+            content = content.removeprefix("```json")
+            content = content.removesuffix("```")
             content = content.strip()
             try:
                 book_data = json.loads(content)
             except json.JSONDecodeError as e:
-
-                rprint(f"[red]Invalid JSON response for volume {volume_number}: {e}[/red]")
+                rprint(
+                    f"[red]Invalid JSON response for volume {volume_number}: {e}[/red]",
+                )
                 rprint(f"[red]Content: {content[:500]}[/red]")
-                project_state.record_api_call(prompt, content, volume_number, success=False)
-            if not book_data.get('number_of_extant_volumes'):
+                project_state.record_api_call(
+                    prompt, content, volume_number, success=False,
+                )
+            if not book_data.get("number_of_extant_volumes"):
                 google_api = GoogleBooksAPI()
-                book_data['number_of_extant_volumes'] = google_api.get_total_volumes(series_name)
+                book_data["number_of_extant_volumes"] = google_api.get_total_volumes(
+                    series_name,
+                )
                 return None
 
             # Record successful API call
@@ -355,14 +385,17 @@ class DeepSeekAPI:
 
         except requests.exceptions.HTTPError as e:
             if e.response and e.response.status_code == 429:
-                rprint(f"[yellow]Rate limit exceeded for volume {volume_number}, waiting 5 seconds...[/yellow]")
+                rprint(
+                    f"[yellow]Rate limit exceeded for volume {volume_number}, waiting 5 seconds...[/yellow]",
+                )
                 time.sleep(5)
                 return self.get_book_info(series_name, volume_number, project_state)
-            else:
-                rprint(f"[red]HTTP error for volume {volume_number}: {e}[/red]")
+            rprint(f"[red]HTTP error for volume {volume_number}: {e}[/red]")
         except Exception as e:
             rprint(f"[red]Error fetching data for volume {volume_number}: {e}[/red]")
             return None
+
+
 class VertexAPI:
     """Handles Vertex AI interactions using Gemini model"""
 
@@ -371,7 +404,9 @@ class VertexAPI:
         self.base_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
         self.model = "gemini-1.5-flash"
 
-    def get_book_info(self, series_name: str, volume_number: int, project_state: ProjectState) -> Optional[Dict]:
+    def get_book_info(
+        self, series_name: str, volume_number: int, project_state: ProjectState,
+    ) -> dict | None:
         """Get comprehensive book information using Vertex AI"""
 
         # Create comprehensive prompt
@@ -380,29 +415,24 @@ class VertexAPI:
         # Check cache first
         cached_response = project_state.get_cached_response(prompt, volume_number)
         if cached_response:
-            rprint(f"[cyan]📚 Using cached data from Vertex for volume {volume_number}[/cyan]")
+            rprint(
+                f"[cyan]📚 Using cached data from Vertex for volume {volume_number}[/cyan]",
+            )
             try:
                 return json.loads(cached_response)
             except json.JSONDecodeError:
-                rprint(f"[yellow]⚠️ Cached data corrupted, fetching fresh data[/yellow]")
+                rprint("[yellow]⚠️ Cached data corrupted, fetching fresh data[/yellow]")
 
         # If we get here, we need to make a new API call
         rprint(f"[blue]🔍 Making Vertex API call for volume {volume_number}[/blue]")
 
         url = f"{self.base_url}?key={self.api_key}" if self.api_key else self.base_url
 
-        payload = {
-            "contents": [
-                {
-                    "parts": [
-                        {
-                            "text": prompt
-                        }
-                    ]
-                }
-            ]
-        }
--e 
+        payload = {"contents": [{"parts": [{"text": prompt}]}]}
+
+
+
+
 class DataValidator:
     """Handles data validation and formatting"""
 
@@ -435,33 +465,38 @@ class DataValidator:
         if len(name_parts) == 2:
             # Assume "First Last" format
             return f"{name_parts[1]}, {name_parts[0]}"
-        elif len(name_parts) == 1:
+        if len(name_parts) == 1:
             # Single name (like "Oda")
             return name_parts[0]
-        else:
-            # Complex name, try to handle
-            if any(part.endswith('-') for part in name_parts):
-                # Handle hyphenated names
-                return author_name
-            else:
-                # Default: assume first part is first name, last part is last name
-                return f"{name_parts[-1]}, {' '.join(name_parts[:-1])}"
+        # Complex name, try to handle
+        if any(part.endswith("-") for part in name_parts):
+            # Handle hyphenated names
+            return author_name
+        # Default: assume first part is first name, last part is last name
+        return f"{name_parts[-1]}, {' '.join(name_parts[:-1])}"
 
     @staticmethod
-    def format_authors_list(authors: List[str]) -> str:
+    def format_authors_list(authors: list[str]) -> str:
         """Format list of authors as comma-separated 'Last, First M.'"""
         if not authors:
             return ""
-        formatted_authors = [DataValidator.format_author_name(author) for author in authors]
+        formatted_authors = [
+            DataValidator.format_author_name(author) for author in authors
+        ]
         return ", ".join(formatted_authors)
--e 
+
+
+
+
 class GoogleBooksAPI:
     """Handles Google Books API interactions for cover image retrieval using keyless queries"""
 
     def __init__(self):
         self.base_url = "https://www.googleapis.com/books/v1/volumes"
 
-    def get_cover_image_url(self, isbn: str, project_state: Optional[ProjectState] = None) -> Optional[str]:
+    def get_cover_image_url(
+        self, isbn: str, project_state: ProjectState | None = None,
+    ) -> str | None:
         """Get cover image URL for a book by ISBN using keyless Google Books API"""
         if not isbn:
             return None
@@ -483,19 +518,19 @@ class GoogleBooksAPI:
             response.raise_for_status()
             data = response.json()
 
-            if data.get('totalItems', 0) == 0:
+            if data.get("totalItems", 0) == 0:
                 print(f"✗ No results found for ISBN {isbn}")
                 return None
 
-            volume_info = data['items'][0]['volumeInfo']
-            image_links = volume_info.get('imageLinks', {})
+            volume_info = data["items"][0]["volumeInfo"]
+            image_links = volume_info.get("imageLinks", {})
 
             # Get the small thumbnail cover image URL
-            cover_url = image_links.get('smallThumbnail')
+            cover_url = image_links.get("smallThumbnail")
 
             # If small thumbnail not available, try other sizes
             if not cover_url:
-                for size in ['thumbnail', 'small', 'medium', 'large', 'extraLarge']:
+                for size in ["thumbnail", "small", "medium", "large", "extraLarge"]:
                     if size in image_links:
                         cover_url = image_links[size]
                         break
@@ -529,16 +564,17 @@ class GoogleBooksAPI:
             response.raise_for_status()
             data = response.json()
 
-            if data.get('totalItems', 0) == 0:
+            if data.get("totalItems", 0) == 0:
                 return 0
 
             # Extract volume numbers from titles
             volume_numbers = []
-            for item in data.get('items', []):
-                title = item['volumeInfo'].get('title', '').lower()
+            for item in data.get("items", []):
+                title = item["volumeInfo"].get("title", "").lower()
                 # Look for volume patterns
                 import re
-                match = re.search(r'volume (\d+)', title)
+
+                match = re.search(r"volume (\d+)", title)
                 if match:
                     volume_numbers.append(int(match.group(1)))
 
@@ -546,8 +582,11 @@ class GoogleBooksAPI:
 
         except Exception:
             return 0
--e 
-def parse_volume_range(volume_input: str) -> List[int]:
+
+
+
+
+def parse_volume_range(volume_input: str) -> list[int]:
     """Parse volume range input like '1-5,7,10' and omnibus formats like '17-18-19' into list of volume numbers"""
     volumes = []
 
@@ -555,14 +594,14 @@ def parse_volume_range(volume_input: str) -> List[int]:
     parts = [part.strip() for part in volume_input.split(",")]
 
     for part in parts:
-        if '-' in part:
+        if "-" in part:
             # Count the number of hyphens to determine format
-            hyphens_count = part.count('-')
+            hyphens_count = part.count("-")
 
             if hyphens_count == 1:
                 # Handle range like '1-5' (single range)
                 try:
-                    start, end = map(int, part.split('-'))
+                    start, end = map(int, part.split("-"))
                     volumes.extend(range(start, end + 1))
                 except ValueError:
                     raise ValueError(f"Invalid volume range format: {part}")
@@ -570,7 +609,7 @@ def parse_volume_range(volume_input: str) -> List[int]:
                 # Handle omnibus format like '17-18-19' (multiple volumes in one book)
                 try:
                     # Split by hyphens and convert all parts to integers
-                    omnibus_volumes = list(map(int, part.split('-')))
+                    omnibus_volumes = list(map(int, part.split("-")))
                     volumes.extend(omnibus_volumes)
                 except ValueError:
                     raise ValueError(f"Invalid omnibus format: {part}")
@@ -584,16 +623,19 @@ def parse_volume_range(volume_input: str) -> List[int]:
     # Remove duplicates and sort
     return sorted(list(set(volumes)))
 
-def generate_sequential_barcodes(start_barcode: str, count: int) -> List[str]:
+
+def generate_sequential_barcodes(start_barcode: str, count: int) -> list[str]:
     """Generate sequential barcodes from a starting barcode"""
     barcodes = []
 
     # Extract prefix and numeric part
-    import re
-    match = re.match(r'([A-Za-z]*)(\d+)', start_barcode)
+
+    match = re.match(r"([A-Za-z]*)(\d+)", start_barcode)
 
     if not match:
-        raise ValueError(f"Invalid barcode format: {start_barcode}. Expected format like 'T000001'")
+        raise ValueError(
+            f"Invalid barcode format: {start_barcode}. Expected format like 'T000001'",
+        )
 
     prefix = match.group(1) or ""
     start_num = int(match.group(2))
@@ -606,13 +648,21 @@ def generate_sequential_barcodes(start_barcode: str, count: int) -> List[str]:
 
     return barcodes
 
-def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Optional[GoogleBooksAPI] = None, project_state: Optional[ProjectState] = None) -> BookInfo:
+
+def process_book_data(
+    raw_data: dict,
+    volume_number: int,
+    google_books_api: GoogleBooksAPI | None = None,
+    project_state: ProjectState | None = None,
+) -> BookInfo:
     """Process raw API data into structured BookInfo"""
     warnings = []
 
     # Extract and validate data
     series_name = DataValidator.format_title(raw_data.get("series_name", ""))
-    book_title = DataValidator.format_title(raw_data.get("book_title", f"{series_name} (Volume {volume_number})"))
+    book_title = DataValidator.format_title(
+        raw_data.get("book_title", f"{series_name} (Volume {volume_number})"),
+    )
 
     # Ensure series name is in the title if missing
     if series_name and series_name.lower() not in book_title.lower():
@@ -626,7 +676,11 @@ def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Opti
         if ", " in authors_raw:
             # Check if it's likely a single author in "Last, First" format
             parts = authors_raw.split(", ")
-            if len(parts) == 2 and len(parts[0].split()) <= 2 and len(parts[1].split()) <= 2:
+            if (
+                len(parts) == 2
+                and len(parts[0].split()) <= 2
+                and len(parts[1].split()) <= 2
+            ):
                 # Likely a single author in "Last, First" format
                 authors = [authors_raw.strip()]
             else:
@@ -647,7 +701,9 @@ def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Opti
             msrp_cost = float(msrp_cost)
             if msrp_cost < 10:
                 rounded_msrp = 10.0
-                warnings.append(f"MSRP ${msrp_cost:.2f} is below minimum $10 (rounded up to ${rounded_msrp:.2f})")
+                warnings.append(
+                    f"MSRP ${msrp_cost:.2f} is below minimum $10 (rounded up to ${rounded_msrp:.2f})",
+                )
             elif msrp_cost > 30:
                 warnings.append(f"MSRP ${msrp_cost:.2f} exceeds typical maximum $30")
         except (ValueError, TypeError):
@@ -659,7 +715,8 @@ def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Opti
     date_str = str(raw_data.get("copyright_year", ""))
     if date_str:
         import re
-        year_patterns = [r'(19|20)\d{2}', r'\d{4}']
+
+        year_patterns = [r"(19|20)\d{2}", r"\d{4}"]
         for pattern in year_patterns:
             matches = re.findall(pattern, date_str)
             if matches:
@@ -684,7 +741,9 @@ def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Opti
     if not cover_image_url and google_books_api:
         isbn = raw_data.get("isbn_13")
         if isbn:
-            cover_image_url = google_books_api.get_cover_image_url(isbn, project_state=project_state)
+            cover_image_url = google_books_api.get_cover_image_url(
+                isbn, project_state=project_state,
+            )
             # Debug: Print cover image status
             if cover_image_url:
                 print(f"✓ Found cover image for ISBN {isbn}: {cover_image_url}")
@@ -704,5 +763,5 @@ def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Opti
         physical_description=raw_data.get("physical_description"),
         genres=genres,
         warnings=warnings,
-        cover_image_url=cover_image_url
+        cover_image_url=cover_image_url,
     )

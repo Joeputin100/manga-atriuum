@@ -6,53 +6,46 @@ Displays HTML table comparing DeepSeek vs Google Books cover images.
 """
 
 import sqlite3
+
 from flask import Flask, render_template_string
 from flask_cors import CORS
-from flask import request
-
-import base64
-from io import BytesIO
-from PIL import Image, ImageDraw, ImageFont
-
-import random
-from typing import List, Dict
 
 app = Flask(__name__)
 CORS(app)
 
 @app.after_request
 def add_csp(response):
-    response.headers['Content-Security-Policy'] = "img-src * data: blob:; upgrade-insecure-requests"
+    response.headers["Content-Security-Policy"] = "img-src * data: blob:; upgrade-insecure-requests"
     return response
 
-@app.route('/images/<filename>')
+@app.route("/images/<filename>")
 def serve_image(filename):
-    return send_from_directory('cache/images', filename)
+    return send_from_directory("cache/images", filename)
 
-def get_comparison_results() -> List[Dict]:
+def get_comparison_results() -> list[dict]:
     """Get results from database"""
-    db = sqlite3.connect('project_state.db')
+    db = sqlite3.connect("project_state.db")
     cursor = db.cursor()
-    cursor.execute('SELECT * FROM cover_comparison_results ORDER BY id')
+    cursor.execute("SELECT * FROM cover_comparison_results ORDER BY id")
     columns = [desc[0] for desc in cursor.description]
     results = [dict(zip(columns, row)) for row in cursor.fetchall()]
     db.close()
     return results
 
-@app.route('/')
+@app.route("/")
 def index():
     """Main page with comparison table"""
     results = get_comparison_results()
-    
+
     # Calculate stats
     total = len(results)
-    deepseek_success = sum(1 for r in results if r['deepseek_success'])
-    google_success = sum(1 for r in results if r['google_success'])
-    both_success = sum(1 for r in results if r['deepseek_success'] and r['google_success'])
-    deepseek_only = sum(1 for r in results if r['deepseek_success'] and not r['google_success'])
-    google_only = sum(1 for r in results if not r['deepseek_success'] and r['google_success'])
-    
-    html_template = '''
+    deepseek_success = sum(1 for r in results if r["deepseek_success"])
+    google_success = sum(1 for r in results if r["google_success"])
+    both_success = sum(1 for r in results if r["deepseek_success"] and r["google_success"])
+    deepseek_only = sum(1 for r in results if r["deepseek_success"] and not r["google_success"])
+    google_only = sum(1 for r in results if not r["deepseek_success"] and r["google_success"])
+
+    html_template = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -208,10 +201,10 @@ def index():
     </div>
 </body>
 </html>
-    '''
-    
-    return render_template_string(html_template, 
-                                results=results, 
+    """
+
+    return render_template_string(html_template,
+                                results=results,
                                 total=total,
                                 deepseek_success=deepseek_success,
                                 google_success=google_success,
@@ -219,5 +212,5 @@ def index():
                                 deepseek_only=deepseek_only,
                                 google_only=google_only)
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001, ssl_context=("cert.pem", "key.pem"))
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5001, ssl_context=("cert.pem", "key.pem"))

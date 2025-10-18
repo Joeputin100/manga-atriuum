@@ -5,12 +5,11 @@ Add Additional Series to Database
 This script adds various additional series including comics and manga.
 """
 
-import os
-import json
 import time
 
 # Import existing modules
-from manga_lookup import DeepSeekAPI, DataValidator, GoogleBooksAPI, process_book_data, ProjectState
+from manga_lookup import DeepSeekAPI, GoogleBooksAPI, ProjectState, process_book_data
+
 
 def get_book_data_with_retry(api, series, volume, project_state, max_retries=3):
     """Get book data with retry logic for network errors"""

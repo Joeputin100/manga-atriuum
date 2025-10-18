@@ -3,8 +3,9 @@
 Test Google Books API without authentication
 """
 
+
 import requests
-import json
+
 
 def test_google_books_no_auth():
     """Test Google Books API without authentication"""
@@ -14,8 +15,8 @@ def test_google_books_no_auth():
     test_isbn = "9781421580366"  # Tokyo Ghoul Vol 1
     url = "https://www.googleapis.com/books/v1/volumes"
     params = {
-        'q': f'isbn:{test_isbn}',
-        'maxResults': 1
+        "q": f"isbn:{test_isbn}",
+        "maxResults": 1,
     }
 
     try:
@@ -23,16 +24,16 @@ def test_google_books_no_auth():
         response.raise_for_status()
 
         data = response.json()
-        total_items = data.get('totalItems', 0)
+        total_items = data.get("totalItems", 0)
         print(f"✅ Success! Found {total_items} items for ISBN {test_isbn}")
 
         if total_items > 0:
-            item = data['items'][0]
-            volume_info = item.get('volumeInfo', {})
+            item = data["items"][0]
+            volume_info = item.get("volumeInfo", {})
             print(f"   Title: {volume_info.get('title', 'N/A')}")
 
             # Check for cover images
-            image_links = volume_info.get('imageLinks', {})
+            image_links = volume_info.get("imageLinks", {})
             if image_links:
                 print(f"   Cover images available: {list(image_links.keys())}")
                 for size, url in image_links.items():

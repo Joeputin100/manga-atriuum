@@ -6,31 +6,31 @@ Adds all extant volumes for existing series (missing ones) and 10 new popular sh
 Commits and pushes after every 10 volumes.
 """
 
-import os
 import json
-import time
 import subprocess
+import time
 from collections import defaultdict
 
 # Import existing modules
-from manga_lookup import DeepSeekAPI, DataValidator, GoogleBooksAPI, process_book_data, ProjectState
+from manga_lookup import DeepSeekAPI, GoogleBooksAPI, ProjectState, process_book_data
+
 
 def get_current_volumes() -> dict:
     """Get current volumes per series from project_state.json"""
     try:
-        with open('project_state.json', 'r') as f:
+        with open("project_state.json") as f:
             state = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
     series_volumes = defaultdict(set)
 
-    for api_call in state.get('api_calls', []):
-        if api_call.get('success', False):
+    for api_call in state.get("api_calls", []):
+        if api_call.get("success", False):
             try:
-                response = json.loads(api_call['response'])
-                series = response.get('series_name')
-                volume = api_call.get('volume')
+                response = json.loads(api_call["response"])
+                series = response.get("series_name")
+                volume = api_call.get("volume")
                 if series and volume:
                     series_volumes[series].add(volume)
             except json.JSONDecodeError:
@@ -86,9 +86,9 @@ def get_book_data_with_retry(api, series, volume, project_state, max_retries=3):
 def commit_and_push(count):
     """Commit and push changes after every 10 volumes"""
     try:
-        subprocess.run(['git', 'add', 'project_state.json'], check=True)
-        subprocess.run(['git', 'commit', '-m', f'feat: add {count} volumes to database'], check=True)
-        subprocess.run(['git', 'push', 'origin', 'main'], check=True)
+        subprocess.run(["git", "add", "project_state.json"], check=True)
+        subprocess.run(["git", "commit", "-m", f"feat: add {count} volumes to database"], check=True)
+        subprocess.run(["git", "push", "origin", "main"], check=True)
         print(f"✓ Committed and pushed after {count} volumes")
     except subprocess.CalledProcessError as e:
         print(f"✗ Git operation failed: {e}")
@@ -100,44 +100,44 @@ def main():
 
     # All series with their max volumes (existing partial + new)
     max_volumes = {
-        'One Piece': 110,
-        'Naruto': 72,
-        'Bleach': 74,
-        'Death Note': 13,
-        'Attack on Titan': 34,
-        'Attack on Titan: Before the Fall': 17,
-        'Black Butler': 32,
-        'Black Clover': 33,
-        'Blue Exorcist': 27,
-        'Boruto: Naruto Next Generations': 18,
-        'Boruto: Naruto The Next Generation': 18,
-        'Boruto: Two Blue Vortex': 5,
-        'Cells At Work': 8,
-        'Deadman Wonderland': 13,
-        'Golden Kamuy': 31,
-        'Haikyuu!!': 45,
-        'Mob Psycho 100': 16,
-        'Noragami: Stray God': 27,
-        'One Punch Man': 26,
-        'Silent Voice, A': 7,
-        'To Your Eternity': 18,
-        'Tokyo Ghoul': 14,
-        'Tokyo Ghoul:re': 16,
-        'Akira': 6,
-        'Assassination Classroom': 21,
-        'Barefoot Gen: A Cartoon Story of Hiroshima': 10,
-        'Show-ha Shoten': 6,
-        'Show-ha Shoten!': 6,
-        'Demon Slayer: Kimetsu no Yaiba': 23,
-        'Jujutsu Kaisen': 23,
-        'My Hero Academia': 38,
-        'Chainsaw Man': 15,
-        'Spy x Family': 11,
-        'Dr. Stone': 26,
-        'Fire Force': 34,
-        'The Rising of the Shield Hero': 45,
-        'Crayon Shin-chan': 60,
-        'Happiness': 50,
+        "One Piece": 110,
+        "Naruto": 72,
+        "Bleach": 74,
+        "Death Note": 13,
+        "Attack on Titan": 34,
+        "Attack on Titan: Before the Fall": 17,
+        "Black Butler": 32,
+        "Black Clover": 33,
+        "Blue Exorcist": 27,
+        "Boruto: Naruto Next Generations": 18,
+        "Boruto: Naruto The Next Generation": 18,
+        "Boruto: Two Blue Vortex": 5,
+        "Cells At Work": 8,
+        "Deadman Wonderland": 13,
+        "Golden Kamuy": 31,
+        "Haikyuu!!": 45,
+        "Mob Psycho 100": 16,
+        "Noragami: Stray God": 27,
+        "One Punch Man": 26,
+        "Silent Voice, A": 7,
+        "To Your Eternity": 18,
+        "Tokyo Ghoul": 14,
+        "Tokyo Ghoul:re": 16,
+        "Akira": 6,
+        "Assassination Classroom": 21,
+        "Barefoot Gen: A Cartoon Story of Hiroshima": 10,
+        "Show-ha Shoten": 6,
+        "Show-ha Shoten!": 6,
+        "Demon Slayer: Kimetsu no Yaiba": 23,
+        "Jujutsu Kaisen": 23,
+        "My Hero Academia": 38,
+        "Chainsaw Man": 15,
+        "Spy x Family": 11,
+        "Dr. Stone": 26,
+        "Fire Force": 34,
+        "The Rising of the Shield Hero": 45,
+        "Crayon Shin-chan": 60,
+        "Happiness": 50,
     }
 
     current_volumes = get_current_volumes()
@@ -183,12 +183,12 @@ def main():
 
                     # Save incrementally
                     state_dict = {
-                        'api_calls': getattr(project_state, 'api_calls', []),
-                        'cached_responses': getattr(project_state, 'cached_responses', {}),
-                        'start_time': getattr(project_state, 'start_time', None),
-                        'interactions': getattr(project_state, 'interactions', [])
+                        "api_calls": getattr(project_state, "api_calls", []),
+                        "cached_responses": getattr(project_state, "cached_responses", {}),
+                        "start_time": getattr(project_state, "start_time", None),
+                        "interactions": getattr(project_state, "interactions", []),
                     }
-                    with open('project_state.json', 'w') as f:
+                    with open("project_state.json", "w") as f:
                         json.dump(state_dict, f, indent=2)
 
                     # Commit and push every 10 volumes

@@ -6,9 +6,8 @@ Creates multiple test MARC records with bibliographic and holding information
 for testing import into Atriuum library system.
 """
 
-import sys
 import os
-from datetime import datetime
+import sys
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
@@ -34,7 +33,7 @@ def create_test_books():
             description="In modern-day Tokyo, shy college student Ken Kaneki's life changes forever when he becomes a half-ghoul after a fateful encounter. He must navigate the dangerous world of ghouls while trying to maintain his humanity.",
             physical_description="224 pages : chiefly illustrations ; 19 cm",
             genres=["Horror", "Dark Fantasy", "Seinen", "Supernatural"],
-            warnings=["MSRP $12.99 is within expected range"]
+            warnings=["MSRP $12.99 is within expected range"],
         ),
 
         # Book 2: One Piece Volume 1 (with MSRP under $10)
@@ -50,7 +49,7 @@ def create_test_books():
             description="Monkey D. Luffy begins his journey to become the Pirate King by gathering a crew and searching for the legendary treasure One Piece.",
             physical_description="208 pages : chiefly illustrations ; 19 cm",
             genres=["Shonen", "Adventure", "Fantasy", "Comedy"],
-            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"]
+            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"],
         ),
 
         # Book 3: Naruto Volume 1
@@ -66,7 +65,7 @@ def create_test_books():
             description="Naruto Uzumaki, a young ninja who seeks recognition from his peers and dreams of becoming the Hokage, the leader of his village.",
             physical_description="192 pages : chiefly illustrations ; 19 cm",
             genres=["Shonen", "Action", "Adventure", "Martial Arts"],
-            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"]
+            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"],
         ),
 
         # Book 4: Attack on Titan Volume 1
@@ -82,7 +81,7 @@ def create_test_books():
             description="In a world where the last of humanity lives within three concentric walls, protecting them from gigantic, man-eating Titans, Eren Yeager vows to cleanse the earth of the Titan menace.",
             physical_description="192 pages : chiefly illustrations ; 20 cm",
             genres=["Action", "Dark Fantasy", "Post-apocalyptic", "Horror"],
-            warnings=[]
+            warnings=[],
         ),
 
         # Book 5: My Hero Academia Volume 1
@@ -98,7 +97,7 @@ def create_test_books():
             description="In a world where most people have superpowers, middle school student Izuku Midoriya wants to be a hero more than anything, but he hasn't got an ounce of power in him.",
             physical_description="192 pages : chiefly illustrations ; 19 cm",
             genres=["Shonen", "Superhero", "Action", "School Life"],
-            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"]
+            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"],
         ),
 
         # Book 6: Demon Slayer Volume 1
@@ -114,7 +113,7 @@ def create_test_books():
             description="In Taisho-era Japan, kindhearted Tanjiro Kamado makes a living selling charcoal. But his peaceful life is shattered when a demon slaughters his entire family.",
             physical_description="192 pages : chiefly illustrations ; 19 cm",
             genres=["Shonen", "Supernatural", "Action", "Historical"],
-            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"]
+            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"],
         ),
 
         # Book 7: Jujutsu Kaisen Volume 1
@@ -130,7 +129,7 @@ def create_test_books():
             description="Yuji Itadori is high schooler who spends his days visiting his bedridden grandfather. Although he looks like your average teenager, his immense physical strength is something to behold!",
             physical_description="192 pages : chiefly illustrations ; 19 cm",
             genres=["Shonen", "Supernatural", "Action", "Horror"],
-            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"]
+            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"],
         ),
 
         # Book 8: Chainsaw Man Volume 1
@@ -146,7 +145,7 @@ def create_test_books():
             description="Denji is a young man who will do anything for money, even hunting down devils with his pet devil Pochita. He's a simple man with simple dreams, drowning under a mountain of debt.",
             physical_description="192 pages : chiefly illustrations ; 19 cm",
             genres=["Shonen", "Action", "Supernatural", "Dark Comedy"],
-            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"]
+            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"],
         ),
 
         # Book 9: Spy x Family Volume 1
@@ -162,7 +161,7 @@ def create_test_books():
             description="Master spy Twilight must build a fake family and execute a perfect mission to maintain world peace. What he doesn't know is that the wife he's chosen is an assassin and the child he's adopted is a telepath!",
             physical_description="192 pages : chiefly illustrations ; 19 cm",
             genres=["Shonen", "Action", "Comedy", "Slice of Life"],
-            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"]
+            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"],
         ),
 
         # Book 10: Boruto: Naruto Next Generations Volume 1
@@ -178,8 +177,8 @@ def create_test_books():
             description="Naruto was a young shinobi with an incorrigible knack for mischief. He achieved his dream to become the greatest ninja in his village, and now his face sits atop the Hokage monument.",
             physical_description="192 pages : chiefly illustrations ; 19 cm",
             genres=["Shonen", "Action", "Adventure", "Martial Arts"],
-            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"]
-        )
+            warnings=["MSRP $9.99 is below minimum $10 (rounded up to $10.0)"],
+        ),
     ]
 
     return test_books

@@ -3,8 +3,8 @@
 Test script to verify cover image extraction from project state
 """
 
-import json
 from cache_cover_images import extract_books_from_project_state
+
 
 def test_cover_extraction():
     """Test that we can extract books with ISBN-13 from project state"""

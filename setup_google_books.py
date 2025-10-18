@@ -7,17 +7,16 @@ instructions for getting the API key from Google Cloud Console.
 """
 
 import os
-import sys
+
 
 def check_api_key():
     """Check if Google Books API key is available"""
     api_key = os.getenv("GOOGLE_BOOKS_API_KEY")
     if api_key:
-        print(f"✅ GOOGLE_BOOKS_API_KEY found")
+        print("✅ GOOGLE_BOOKS_API_KEY found")
         return True
-    else:
-        print("❌ GOOGLE_BOOKS_API_KEY not found")
-        return False
+    print("❌ GOOGLE_BOOKS_API_KEY not found")
+    return False
 
 def setup_instructions():
     """Print setup instructions for Google Books API"""
@@ -83,12 +82,12 @@ DEEPSEEK_API_KEY = "your-deepseek-api-key-here"
     # Check if secrets file already exists
     if os.path.exists(secrets_path):
         print(f"⚠️  {secrets_path} already exists")
-        with open(secrets_path, 'r') as f:
+        with open(secrets_path) as f:
             existing_content = f.read()
         print(f"Current content:\n{existing_content}")
     else:
         # Create template
-        with open(secrets_path, 'w') as f:
+        with open(secrets_path, "w") as f:
             f.write(template_content)
         print(f"✅ Created {secrets_path} template")
         print("Please edit this file with your actual API keys")

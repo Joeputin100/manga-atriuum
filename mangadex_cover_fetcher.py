@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+
 """
 MangaDex Cover Image Fetcher
 
@@ -8,10 +9,11 @@ Downloads and caches images locally.
 """
 
 import os
-import time
-import requests
-from typing import Optional
 import sqlite3
+import time
+
+import requests
+
 
 class MangaDexCoverFetcher:
     """Fetch manga covers from MangaDex API"""
@@ -31,14 +33,14 @@ class MangaDexCoverFetcher:
 
         self.last_request_time = time.time()
 
-    def search_manga(self, title: str) -> Optional[dict]:
+    def search_manga(self, title: str) -> dict | None:
         """Search for manga by title"""
         self._rate_limit()
 
         params = {
-            'title': title,
-            'limit': 5,  # Get top 5 results
-            'includes[]': ['cover_art']
+            "title": title,
+            "limit": 5,  # Get top 5 results
+            "includes[]": ["cover_art"],
         }
 
         try:
@@ -47,45 +49,45 @@ class MangaDexCoverFetcher:
 
             data = response.json()
 
-            if data.get('data') and len(data['data']) > 0:
+            if data.get("data") and len(data["data"]) > 0:
                 # Return the first (most relevant) result
-                return data['data'][0]
+                return data["data"][0]
 
         except Exception as e:
             print(f"Error searching MangaDex for '{title}': {e}")
 
         return None
 
-    def get_cover_url(self, manga_data: dict) -> Optional[str]:
+    def get_cover_url(self, manga_data: dict) -> str | None:
         """Extract cover image URL from manga data"""
         try:
-            relationships = manga_data.get('relationships', [])
+            relationships = manga_data.get("relationships", [])
             for rel in relationships:
-                if rel.get('type') == 'cover_art':
-                    cover_id = rel['id']
+                if rel.get("type") == "cover_art":
+                    cover_id = rel["id"]
                     # Get the cover filename
                     self._rate_limit()
                     cover_response = requests.get(f"{self.base_url}/cover/{cover_id}", timeout=10)
                     cover_response.raise_for_status()
                     cover_data = cover_response.json()
-                    filename = cover_data['data']['attributes']['fileName']
+                    filename = cover_data["data"]["attributes"]["fileName"]
                     return f"https://uploads.mangadex.org/covers/{manga_data['id']}/{filename}"
         except Exception as e:
             print(f"Error getting cover URL: {e}")
         return None
 
-    def download_and_cache_image(self, image_url: str, series_name: str) -> Optional[str]:
+    def download_and_cache_image(self, image_url: str, series_name: str) -> str | None:
         """Download image and cache locally"""
         if not image_url:
             return None
 
         try:
             # Create cache directory
-            os.makedirs('cache/images', exist_ok=True)
+            os.makedirs("cache/images", exist_ok=True)
 
             # Generate filename from series name
-            safe_name = "".join(c for c in series_name if c.isalnum() or c in (' ', '-', '_')).rstrip()
-            safe_name = safe_name.replace(' ', '_')
+            safe_name = "".join(c for c in series_name if c.isalnum() or c in (" ", "-", "_")).rstrip()
+            safe_name = safe_name.replace(" ", "_")
             filename = f"{safe_name}_mangadex.jpg"
             filepath = f"cache/images/{filename}"
 
@@ -94,7 +96,7 @@ class MangaDexCoverFetcher:
             img_response.raise_for_status()
 
             # Save to cache
-            with open(filepath, 'wb') as f:
+            with open(filepath, "wb") as f:
                 f.write(img_response.content)
 
             print(f"✓ Using direct image URL for '{series_name}'")
@@ -104,7 +106,7 @@ class MangaDexCoverFetcher:
             print(f"✗ Error downloading image for '{series_name}': {e}")
             return None
 
-    def fetch_cover_for_series(self, series_name: str) -> Optional[str]:
+    def fetch_cover_for_series(self, series_name: str) -> str | None:
         """Fetch and cache cover image for a manga series"""
         print(f"Searching MangaDex for '{series_name}'...")
 
@@ -129,7 +131,7 @@ def get_all_series_from_db() -> list:
 
     try:
 
-        with open('project_state.json', 'r') as f:
+        with open("project_state.json") as f:
 
             state = json.load(f)
 
@@ -164,22 +166,22 @@ def get_all_series_from_db() -> list:
 
 def update_series_cover_in_db(series_name: str, cover_url: str):
     """Update the database with cover URL for a series"""
-    db = sqlite3.connect('project_state.db')
+    db = sqlite3.connect("project_state.db")
     cursor = db.cursor()
 
     try:
         # Update cover_comparison_results if exists
-        cursor.execute('''
+        cursor.execute("""
             UPDATE cover_comparison_results
             SET google_cover = ?
             WHERE series_name = ?
-        ''', (cover_url, series_name))
+        """, (cover_url, series_name))
 
         # Also update cached_cover_images
-        cursor.execute('''
+        cursor.execute("""
             INSERT OR REPLACE INTO cached_cover_images (isbn, url, timestamp)
             VALUES (?, ?, datetime('now'))
-        ''', (f"mangadex:{series_name}", cover_url))
+        """, (f"mangadex:{series_name}", cover_url))
 
         print(f"Updated DB: {series_name} -> {cover_url}")
 

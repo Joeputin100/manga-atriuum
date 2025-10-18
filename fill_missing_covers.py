@@ -6,15 +6,14 @@ This script updates the database to use series-level covers (from MangaDex)
 for volumes that don't have individual covers.
 """
 
-import os
 import json
 import sqlite3
-from typing import List, Dict, Optional
 
-def get_all_volumes() -> List[Dict]:
+
+def get_all_volumes() -> list[dict]:
     """Get all volumes with their data from project_state.json"""
     try:
-        with open('project_state.json', 'r') as f:
+        with open("project_state.json") as f:
             state = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return []
@@ -24,26 +23,26 @@ def get_all_volumes() -> List[Dict]:
         if api_call.get("success", False):
             try:
                 response = json.loads(api_call["response"])
-                isbn = response.get('isbn_13')
-                series = response.get('series_name')
+                isbn = response.get("isbn_13")
+                series = response.get("series_name")
                 volume_num = api_call.get("volume")
                 if isbn and series and volume_num:
                     volumes.append({
-                        'series_name': series,
-                        'volume_number': volume_num,
-                        'isbn_13': isbn,
-                        'cover_image_url': response.get('cover_image_url')
+                        "series_name": series,
+                        "volume_number": volume_num,
+                        "isbn_13": isbn,
+                        "cover_image_url": response.get("cover_image_url"),
                     })
             except json.JSONDecodeError:
                 continue
     return volumes
 
-def get_series_cover(series_name: str) -> Optional[str]:
+def get_series_cover(series_name: str) -> str | None:
     """Get cached series cover URL from database"""
-    db = sqlite3.connect('project_state.db')
+    db = sqlite3.connect("project_state.db")
     cursor = db.cursor()
 
-    cursor.execute('SELECT url FROM cached_cover_images WHERE isbn = ?', (f"mangadex:{series_name}",))
+    cursor.execute("SELECT url FROM cached_cover_images WHERE isbn = ?", (f"mangadex:{series_name}",))
     row = cursor.fetchone()
 
     db.close()
@@ -51,13 +50,13 @@ def get_series_cover(series_name: str) -> Optional[str]:
 
 def update_volume_cover(isbn: str, cover_url: str):
     """Update volume cover in database"""
-    db = sqlite3.connect('project_state.db')
+    db = sqlite3.connect("project_state.db")
     cursor = db.cursor()
 
-    cursor.execute('''
+    cursor.execute("""
         INSERT OR REPLACE INTO cached_cover_images (isbn, url, timestamp)
         VALUES (?, ?, datetime('now'))
-    ''', (isbn, cover_url))
+    """, (isbn, cover_url))
 
     db.commit()
     db.close()
@@ -72,9 +71,9 @@ def main():
     updated_count = 0
 
     for volume in volumes:
-        series = volume['series_name']
-        isbn = volume['isbn_13']
-        existing_cover = volume.get('cover_image_url')
+        series = volume["series_name"]
+        isbn = volume["isbn_13"]
+        existing_cover = volume.get("cover_image_url")
 
         # Skip if already has a cover
         if existing_cover:

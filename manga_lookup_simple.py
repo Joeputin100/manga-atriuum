@@ -3,13 +3,14 @@
 Simple Manga Lookup Tool - Basic Working Version
 """
 
-import os
 import json
+import os
+
 import requests
 from dotenv import load_dotenv
-from rich.console import Console
-from rich.prompt import Prompt, IntPrompt
 from rich import print as rprint
+from rich.console import Console
+from rich.prompt import IntPrompt, Prompt
 
 # Load environment variables
 load_dotenv()
@@ -27,16 +28,16 @@ def correct_series_name(series_name: str) -> list:
 
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
+        "Authorization": f"Bearer {api_key}",
     }
 
     payload = {
         "model": "deepseek-chat",
         "messages": [
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": prompt},
         ],
         "max_tokens": 200,
-        "temperature": 0.3
+        "temperature": 0.3,
     }
 
     try:

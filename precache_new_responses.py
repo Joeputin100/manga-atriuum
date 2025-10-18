@@ -6,9 +6,10 @@ This script loads the existing project state, identifies all series and volumes 
 and re-fetches the book information with the updated prompts to populate the cache with new responses.
 """
 
-import os
 import re
-from manga_lookup import ProjectState, DeepSeekAPI
+
+from manga_lookup import DeepSeekAPI, ProjectState
+
 
 def extract_series_and_volume_from_prompt(prompt: str) -> tuple[str, int] | None:
     """Extract series_name and volume_number from the comprehensive prompt"""
@@ -31,7 +32,7 @@ def main():
     # Since the db is sqlite, we can query it directly
     import sqlite3
 
-    conn = sqlite3.connect('project_state.db')
+    conn = sqlite3.connect("project_state.db")
     cursor = conn.cursor()
 
     # Get all cached responses

@@ -3,13 +3,14 @@
 Test script to reproduce the author parsing issue from API data
 """
 
-import sys
 import os
+import sys
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
-from manga_lookup import process_book_data, DataValidator
+from manga_lookup import DataValidator, process_book_data
+
 
 def test_author_parsing_from_api():
     """Test how authors are parsed from API data"""
@@ -29,7 +30,7 @@ def test_author_parsing_from_api():
             "copyright_year": 2003,
             "description": "Monkey D. Luffy begins his journey...",
             "physical_description": "208 pages, 5 x 7.5 inches",
-            "genres": ["Shonen", "Adventure", "Fantasy"]
+            "genres": ["Shonen", "Adventure", "Fantasy"],
         },
         # Case 2: Multiple authors as string
         {
@@ -43,7 +44,7 @@ def test_author_parsing_from_api():
             "copyright_year": 2003,
             "description": "Naruto Uzumaki begins his journey...",
             "physical_description": "192 pages, 5 x 7.5 inches",
-            "genres": ["Shonen", "Action", "Fantasy"]
+            "genres": ["Shonen", "Action", "Fantasy"],
         },
         # Case 3: Authors as list (ideal case)
         {
@@ -57,7 +58,7 @@ def test_author_parsing_from_api():
             "copyright_year": 2004,
             "description": "Ichigo Kurosaki becomes a Soul Reaper...",
             "physical_description": "200 pages, 5 x 7.5 inches",
-            "genres": ["Shonen", "Supernatural", "Action"]
+            "genres": ["Shonen", "Supernatural", "Action"],
         },
         # Case 4: Single author without comma
         {
@@ -71,8 +72,8 @@ def test_author_parsing_from_api():
             "copyright_year": 2012,
             "description": "Humanity fights against giant Titans...",
             "physical_description": "192 pages, 5 x 7.5 inches",
-            "genres": ["Dark Fantasy", "Action", "Horror"]
-        }
+            "genres": ["Dark Fantasy", "Action", "Horror"],
+        },
     ]
 
     for i, raw_data in enumerate(test_cases, 1):
@@ -87,11 +88,11 @@ def test_author_parsing_from_api():
         print(f"  Formatted authors: '{formatted_authors}'")
 
         # Check for trailing comma issues
-        if formatted_authors.endswith(','):
-            print(f"  ⚠️  WARNING: Trailing comma detected!")
+        if formatted_authors.endswith(","):
+            print("  ⚠️  WARNING: Trailing comma detected!")
 
-        if len(book.authors) == 1 and ',' in formatted_authors and formatted_authors.count(',') > 1:
-            print(f"  ⚠️  WARNING: Multiple commas in single author!")
+        if len(book.authors) == 1 and "," in formatted_authors and formatted_authors.count(",") > 1:
+            print("  ⚠️  WARNING: Multiple commas in single author!")
 
 if __name__ == "__main__":
     print("Running author parsing tests...\n")

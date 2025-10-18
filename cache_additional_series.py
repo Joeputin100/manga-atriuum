@@ -5,16 +5,14 @@ Cache Additional Manga Series
 Precache data for additional requested manga series.
 """
 
-import sys
 import os
+import sys
 import time
-from typing import List, Dict
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
 from manga_lookup import DeepSeekAPI, ProjectState, process_book_data
-
 
 # Additional series with estimated volume counts
 ADDITIONAL_SERIES = {
@@ -61,7 +59,7 @@ ADDITIONAL_SERIES = {
     "Tokyo Revengers Full Color": 31,
     "Graineliers": 10,
     "Berserk Deluxe": 14,
-    "Soul Eater": 25
+    "Soul Eater": 25,
 }
 
 
@@ -115,7 +113,7 @@ def precache_series_core_volumes(series_name: str, max_volumes: int, project_sta
     return successful_volumes, failed_volumes
 
 
-def cache_series_names(series_names: List[str], project_state: ProjectState, deepseek_api: DeepSeekAPI):
+def cache_series_names(series_names: list[str], project_state: ProjectState, deepseek_api: DeepSeekAPI):
     """Cache series name corrections for additional series"""
     print(f"\n🔍 Caching series name corrections for {len(series_names)} additional series...")
 

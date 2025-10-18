@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-import sqlite3
 import random
+import sqlite3
 from datetime import datetime
 
 # Create table
-db = sqlite3.connect('project_state.db')
+db = sqlite3.connect("project_state.db")
 cursor = db.cursor()
-cursor.execute('''
+cursor.execute("""
     CREATE TABLE IF NOT EXISTS cover_comparison_results (
         id INTEGER PRIMARY KEY,
         series_name TEXT,
@@ -18,7 +18,7 @@ cursor.execute('''
         google_success BOOLEAN,
         timestamp TEXT
     )
-''')
+""")
 db.commit()
 
 # Test data
@@ -29,18 +29,18 @@ for i in range(10):
     volume = random.randint(1, 5)
     deepseek_success = random.choice([True, False])
     google_success = random.choice([True, False])
-    
+
     # Use picsum.photos for mock API URLs - different seeds for different sources
     deepseek_cover = f"https://picsum.photos/200/300?random={hash(series + 'DeepSeek') % 1000}" if deepseek_success else None
     google_cover = f"https://picsum.photos/200/300?random={hash(series + 'Google') % 1000}" if google_success else None
     isbn = f"978123456789{random.randint(0,9)}"
-    
-    cursor.execute('''
+
+    cursor.execute("""
         INSERT INTO cover_comparison_results 
         (series_name, volume, deepseek_cover, google_cover, isbn, deepseek_success, google_success, timestamp)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (series, volume, deepseek_cover, google_cover, isbn, deepseek_success, google_success, datetime.now().isoformat()))
-    
+    """, (series, volume, deepseek_cover, google_cover, isbn, deepseek_success, google_success, datetime.now().isoformat()))
+
     print(f"Added test result for {series} Vol {volume}")
 
 db.commit()
