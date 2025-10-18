@@ -280,21 +280,29 @@ def series_input_form():
     st.header("📚 Manga Series Input")
     if not any(not entry["volumes"] for entry in st.session_state.series_entries):
         # Starting barcode - show until used
-        if not st.session_state.get("start_barcode_used", False):
         # Starting barcode - always show with current value
+        if not st.session_state.get("barcode_confirmed", False):
             st.markdown("<i style='color: gray;'>(e.g. T000001)</i>", unsafe_allow_html=True)
-            start_barcode = st.text_input(
+            start_barcode_input = st.text_input(
                 "Starting Barcode",
-                value=st.session_state.start_barcode,
+                
                 placeholder="Enter starting barcode",
                 help="Enter starting barcode (e.g., T000001 or MANGA001)",
+                key="start_barcode_input",
             )
-            if start_barcode and start_barcode != st.session_state.start_barcode:
-                st.session_state.start_barcode = start_barcode
-            st.session_state["start_barcode_used"] = True
-
+            if st.button("Confirm Barcode"):
+                if start_barcode_input:
+                    st.session_state.start_barcode = start_barcode_input
+                    # Show barcode increment pattern
+                    sample_barcodes = generate_sequential_barcodes(start_barcode_input, 5)
+                    st.success(f"Barcode pattern confirmed: {", ".join(sample_barcodes)}...")
+                    st.session_state.barcode_confirmed = True
+                    st.rerun()
+                if not start_barcode_input:
+                    st.error("Please enter a starting barcode")
         # Series input section
-        st.subheader("Add Series")
+        if st.session_state.get("barcode_confirmed", False):
+            st.subheader("Add Series")
 
         # Make series name entry ordinal
         series_count = len(st.session_state.series_entries) + 1
