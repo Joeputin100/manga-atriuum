@@ -402,3 +402,307 @@ class VertexAPI:
                 }
             ]
         }
+-e 
+class DataValidator:
+    """Handles data validation and formatting"""
+
+    @staticmethod
+    def format_title(title: str) -> str:
+        """Format title with leading articles shifted to the end"""
+        articles = ["the", "a", "an"]
+        words = title.split()
+
+        if words and words[0].lower() in articles:
+            article = words[0]
+            rest = " ".join(words[1:])
+            return f"{rest}, {article.capitalize()}"
+
+        return title
+
+    @staticmethod
+    def format_author_name(author_name: str) -> str:
+        """Format author name as 'Last, First M.'"""
+        if not author_name:
+            return ""
+
+        # Check if already in "Last, First" format
+        if ", " in author_name:
+            return author_name
+
+        # Handle common Japanese name formats
+        name_parts = author_name.strip().split()
+
+        if len(name_parts) == 2:
+            # Assume "First Last" format
+            return f"{name_parts[1]}, {name_parts[0]}"
+        elif len(name_parts) == 1:
+            # Single name (like "Oda")
+            return name_parts[0]
+        else:
+            # Complex name, try to handle
+            if any(part.endswith('-') for part in name_parts):
+                # Handle hyphenated names
+                return author_name
+            else:
+                # Default: assume first part is first name, last part is last name
+                return f"{name_parts[-1]}, {' '.join(name_parts[:-1])}"
+
+    @staticmethod
+    def format_authors_list(authors: List[str]) -> str:
+        """Format list of authors as comma-separated 'Last, First M.'"""
+        if not authors:
+            return ""
+        formatted_authors = [DataValidator.format_author_name(author) for author in authors]
+        return ", ".join(formatted_authors)
+-e 
+class GoogleBooksAPI:
+    """Handles Google Books API interactions for cover image retrieval using keyless queries"""
+
+    def __init__(self):
+        self.base_url = "https://www.googleapis.com/books/v1/volumes"
+
+    def get_cover_image_url(self, isbn: str, project_state: Optional[ProjectState] = None) -> Optional[str]:
+        """Get cover image URL for a book by ISBN using keyless Google Books API"""
+        if not isbn:
+            return None
+
+        # Check cache first if project_state is provided
+        if project_state:
+            cached_url = project_state.get_cached_cover_image(f"isbn:{isbn}")
+            if cached_url:
+                print(f"✓ Using cached cover image for ISBN {isbn}")
+                return cached_url
+
+        # Construct the keyless API URL
+        url = f"{self.base_url}?q=isbn:{isbn}&maxResults=1"
+        print(f"🔍 Searching Google Books API for ISBN {isbn}")
+
+        try:
+            # Make the keyless HTTP request
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+
+            if data.get('totalItems', 0) == 0:
+                print(f"✗ No results found for ISBN {isbn}")
+                return None
+
+            volume_info = data['items'][0]['volumeInfo']
+            image_links = volume_info.get('imageLinks', {})
+
+            # Get the small thumbnail cover image URL
+            cover_url = image_links.get('smallThumbnail')
+
+            # If small thumbnail not available, try other sizes
+            if not cover_url:
+                for size in ['thumbnail', 'small', 'medium', 'large', 'extraLarge']:
+                    if size in image_links:
+                        cover_url = image_links[size]
+                        break
+
+            if cover_url:
+                print(f"✓ Found cover image for ISBN {isbn}: {cover_url}")
+                # Cache the result
+                if project_state:
+                    project_state.cache_cover_image(f"isbn:{isbn}", cover_url)
+            else:
+                print(f"✗ No cover image found in Google Books for ISBN {isbn}")
+
+            return cover_url
+
+        except requests.exceptions.RequestException as e:
+            print(f"⚠️ Request error for ISBN {isbn}: {e}")
+            # Silently fail - cover images are optional
+            return None
+        except Exception as e:
+            print(f"⚠️ Unexpected error for ISBN {isbn}: {e}")
+            # Silently fail - cover images are optional
+            return None
+
+    def get_total_volumes(self, series_name: str) -> int:
+        """Get the total number of volumes in a manga series using Google Books API"""
+        query = f'intitle:"{series_name}" manga'
+        url = f"{self.base_url}?q={query}&maxResults=40&orderBy=relevance"
+
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+
+            if data.get('totalItems', 0) == 0:
+                return 0
+
+            # Extract volume numbers from titles
+            volume_numbers = []
+            for item in data.get('items', []):
+                title = item['volumeInfo'].get('title', '').lower()
+                # Look for volume patterns
+                import re
+                match = re.search(r'volume (\d+)', title)
+                if match:
+                    volume_numbers.append(int(match.group(1)))
+
+            return max(volume_numbers) if volume_numbers else 0
+
+        except Exception:
+            return 0
+-e 
+def parse_volume_range(volume_input: str) -> List[int]:
+    """Parse volume range input like '1-5,7,10' and omnibus formats like '17-18-19' into list of volume numbers"""
+    volumes = []
+
+    # Split by commas
+    parts = [part.strip() for part in volume_input.split(",")]
+
+    for part in parts:
+        if '-' in part:
+            # Count the number of hyphens to determine format
+            hyphens_count = part.count('-')
+
+            if hyphens_count == 1:
+                # Handle range like '1-5' (single range)
+                try:
+                    start, end = map(int, part.split('-'))
+                    volumes.extend(range(start, end + 1))
+                except ValueError:
+                    raise ValueError(f"Invalid volume range format: {part}")
+            else:
+                # Handle omnibus format like '17-18-19' (multiple volumes in one book)
+                try:
+                    # Split by hyphens and convert all parts to integers
+                    omnibus_volumes = list(map(int, part.split('-')))
+                    volumes.extend(omnibus_volumes)
+                except ValueError:
+                    raise ValueError(f"Invalid omnibus format: {part}")
+        else:
+            # Handle single volume like '7'
+            try:
+                volumes.append(int(part))
+            except ValueError:
+                raise ValueError(f"Invalid volume number: {part}")
+
+    # Remove duplicates and sort
+    return sorted(list(set(volumes)))
+
+def generate_sequential_barcodes(start_barcode: str, count: int) -> List[str]:
+    """Generate sequential barcodes from a starting barcode"""
+    barcodes = []
+
+    # Extract prefix and numeric part
+    import re
+    match = re.match(r'([A-Za-z]*)(\d+)', start_barcode)
+
+    if not match:
+        raise ValueError(f"Invalid barcode format: {start_barcode}. Expected format like 'T000001'")
+
+    prefix = match.group(1) or ""
+    start_num = int(match.group(2))
+    num_digits = len(match.group(2))
+
+    for i in range(count):
+        current_num = start_num + i
+        barcode = f"{prefix}{current_num:0{num_digits}d}"
+        barcodes.append(barcode)
+
+    return barcodes
+
+def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Optional[GoogleBooksAPI] = None, project_state: Optional[ProjectState] = None) -> BookInfo:
+    """Process raw API data into structured BookInfo"""
+    warnings = []
+
+    # Extract and validate data
+    series_name = DataValidator.format_title(raw_data.get("series_name", ""))
+    book_title = DataValidator.format_title(raw_data.get("book_title", f"{series_name} (Volume {volume_number})"))
+
+    # Ensure series name is in the title if missing
+    if series_name and series_name.lower() not in book_title.lower():
+        book_title = f"{series_name}: {book_title}"
+
+    # Handle authors - ensure they're in list format
+    authors_raw = raw_data.get("authors", [])
+    if isinstance(authors_raw, str):
+        # Check if the string contains multiple authors separated by commas
+        # Look for patterns that indicate multiple authors vs single author with comma
+        if ", " in authors_raw:
+            # Check if it's likely a single author in "Last, First" format
+            parts = authors_raw.split(", ")
+            if len(parts) == 2 and len(parts[0].split()) <= 2 and len(parts[1].split()) <= 2:
+                # Likely a single author in "Last, First" format
+                authors = [authors_raw.strip()]
+            else:
+                # Likely multiple authors, split by comma
+                authors = [author.strip() for author in authors_raw.split(",")]
+        else:
+            # No commas, treat as single author
+            authors = [authors_raw.strip()]
+    else:
+        authors = authors_raw
+
+    # Validate MSRP
+    msrp_cost = raw_data.get("msrp_cost")
+    if msrp_cost is None:
+        warnings.append("No MSRP found")
+    else:
+        try:
+            msrp_cost = float(msrp_cost)
+            if msrp_cost < 10:
+                rounded_msrp = 10.0
+                warnings.append(f"MSRP ${msrp_cost:.2f} is below minimum $10 (rounded up to ${rounded_msrp:.2f})")
+            elif msrp_cost > 30:
+                warnings.append(f"MSRP ${msrp_cost:.2f} exceeds typical maximum $30")
+        except (ValueError, TypeError):
+            warnings.append("Invalid MSRP format")
+            msrp_cost = None
+
+    # Validate copyright year
+    copyright_year = None
+    date_str = str(raw_data.get("copyright_year", ""))
+    if date_str:
+        import re
+        year_patterns = [r'(19|20)\d{2}', r'\d{4}']
+        for pattern in year_patterns:
+            matches = re.findall(pattern, date_str)
+            if matches:
+                year = int(matches[0])
+                if 1900 <= year <= datetime.now().year + 1:
+                    copyright_year = year
+                    break
+    if not copyright_year:
+        warnings.append("Could not extract valid copyright year")
+
+    # Handle genres
+    genres_raw = raw_data.get("genres", [])
+    if isinstance(genres_raw, str):
+        genres = [genre.strip() for genre in genres_raw.split(",")]
+    else:
+        genres = genres_raw
+
+    # Extract cover image URL if available from DeepSeek data
+    cover_image_url = raw_data.get("cover_image_url")
+
+    # If no cover image from DeepSeek and Google Books API is available, try to fetch it
+    if not cover_image_url and google_books_api:
+        isbn = raw_data.get("isbn_13")
+        if isbn:
+            cover_image_url = google_books_api.get_cover_image_url(isbn, project_state=project_state)
+            # Debug: Print cover image status
+            if cover_image_url:
+                print(f"✓ Found cover image for ISBN {isbn}: {cover_image_url}")
+            else:
+                print(f"✗ No cover image found for ISBN {isbn}")
+
+    return BookInfo(
+        series_name=series_name,
+        volume_number=volume_number,
+        book_title=book_title,
+        authors=authors,
+        msrp_cost=msrp_cost,
+        isbn_13=raw_data.get("isbn_13"),
+        publisher_name=raw_data.get("publisher_name"),
+        copyright_year=copyright_year,
+        description=raw_data.get("description"),
+        physical_description=raw_data.get("physical_description"),
+        genres=genres,
+        warnings=warnings,
+        cover_image_url=cover_image_url
+    )
