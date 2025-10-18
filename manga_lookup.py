@@ -745,3 +745,91 @@ def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Opti
         warnings=warnings,
         cover_image_url=cover_image_url
     )
+class DataValidator:
+    """Handles data validation and formatting"""
+
+    @staticmethod
+    def format_title(title: str) -> str:
+        """Format title with leading articles shifted to the end"""
+        articles = ["the", "a", "an"]
+        words = title.split()
+
+        if words and words[0].lower() in articles:
+            article = words[0]
+            rest = " ".join(words[1:])
+            return f"{rest}, {article.capitalize()}"
+
+        return title
+
+    @staticmethod
+    def format_author_name(author_name: str) -> str:
+        """Format author name as 'Last, First M.'"""
+        if not author_name:
+            return ""
+
+        # Check if already in "Last, First" format
+        if ", " in author_name:
+            return author_name
+
+        # Handle common Japanese name formats
+        name_parts = author_name.strip().split()
+
+        if len(name_parts) == 2:
+            # Assume "First Last" format
+            return f"{name_parts[1]}, {name_parts[0]}"
+        elif len(name_parts) == 1:
+            # Single name (like "Oda")
+            return name_parts[0]
+        else:
+            # Complex name, try to handle
+            if any(part.endswith('-') for part in name_parts):
+                # Handle hyphenated names
+                return author_name
+            else:
+                # Default: assume first part is first name, last part is last name
+                return f"{name_parts[-1]}, {' '.join(name_parts[:-1])}"
+
+    @staticmethod
+    def format_authors_list(authors: List[str]) -> str:
+        """Format list of authors as comma-separated 'Last, First M.'"""
+        if not authors:
+            return ""
+        formatted_authors = [DataValidator.format_author_name(author) for author in authors]
+        return ", ".join(formatted_authors)
+
+def parse_volume_range(volume_input: str) -> List[int]:
+    """Parse volume range input like '1-5,7,10' and omnibus formats like '17-18-19' into list of volume numbers"""
+    volumes = []
+
+    # Split by commas
+    parts = [part.strip() for part in volume_input.split(",")]
+
+    for part in parts:
+        if '-' in part:
+            # Count the number of hyphens to determine format
+            hyphens_count = part.count('-')
+
+            if hyphens_count == 1:
+                # Handle range like '1-5' (single range)
+                try:
+                    start, end = map(int, part.split('-'))
+                    volumes.extend(range(start, end + 1))
+                except ValueError:
+                    raise ValueError(f"Invalid volume range format: {part}")
+            else:
+                # Handle omnibus format like '17-18-19' (multiple volumes in one book)
+                try:
+                    # Split by hyphens and convert all parts to integers
+                    omnibus_volumes = list(map(int, part.split('-')))
+                    volumes.extend(omnibus_volumes)
+                except ValueError:
+                    raise ValueError(f"Invalid omnibus format: {part}")
+        else:
+            # Handle single volume like '7'
+            try:
+                volumes.append(int(part))
+            except ValueError:
+                raise ValueError(f"Invalid volume number: {part}")
+
+    # Remove duplicates and sort
+    return sorted(list(set(volumes)))
