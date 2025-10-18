@@ -35,7 +35,7 @@ from pathlib import Path
 from mal_cover_fetcher import MALCoverFetcher
 
 # Import existing core logic
-from manga_lookup import (
+# from manga_lookup import (
     BookInfo,
     DeepSeekAPI,
     GoogleBooksAPI,
