@@ -396,43 +396,6 @@ class DeepSeekAPI:
             return None
 
 
-class VertexAPI:
-    """Handles Vertex AI interactions using Gemini model"""
-
-    def __init__(self):
-        self.api_key = os.getenv("GEMINI_API_KEY")
-        self.base_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
-        self.model = "gemini-1.5-flash"
-
-    def get_book_info(
-        self, series_name: str, volume_number: int, project_state: ProjectState,
-    ) -> dict | None:
-        """Get comprehensive book information using Vertex AI"""
-
-        # Create comprehensive prompt
-        prompt = self._create_comprehensive_prompt(series_name, volume_number)
-
-        # Check cache first
-        cached_response = project_state.get_cached_response(prompt, volume_number)
-        if cached_response:
-            rprint(
-                f"[cyan]📚 Using cached data from Vertex for volume {volume_number}[/cyan]",
-            )
-            try:
-                return json.loads(cached_response)
-            except json.JSONDecodeError:
-                rprint("[yellow]⚠️ Cached data corrupted, fetching fresh data[/yellow]")
-
-        # If we get here, we need to make a new API call
-        rprint(f"[blue]🔍 Making Vertex API call for volume {volume_number}[/blue]")
-
-        url = f"{self.base_url}?key={self.api_key}" if self.api_key else self.base_url
-
-        payload = {"contents": [{"parts": [{"text": prompt}]}]}
-
-
-
-
 class DataValidator:
     """Handles data validation and formatting"""
 
