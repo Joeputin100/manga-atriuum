@@ -467,7 +467,8 @@ def confirm_single_series(series_name):
                     if total_volumes != "Unknown":
                                 description += "\\n\\nTotal Volumes: " + str(total_volumes)
                     total_volumes = book_data.get("number_of_extant_volumes", "Unknown") if book_data else "Unknown"
-                except Exception:
+                except Exception as e:
+                    st.error(f"API Error: {str(e)}")
                     authors = []
                     description = "Unable to fetch details"
                     total_volumes = "Unknown"
