@@ -299,23 +299,16 @@ def series_input_form():
                 key="start_barcode_input",
             )
             # Show barcode increment pattern dynamically
-    st.write(f"Current barcode input: '{start_barcode_input}'")
             if start_barcode_input:
-                sample_barcodes = generate_sequential_barcodes(start_barcode_input, 5)
-    st.write(f"Current barcode input: '{start_barcode_input}'")
-            if start_barcode_input:
-                try:
                     sample_barcodes = generate_sequential_barcodes(start_barcode_input, 5)
                     st.write(f"Barcode pattern: {", ".join(sample_barcodes)}")
-                except ValueError as e:
-                    st.write(f"Invalid barcode format: {e}")
-    st.write(f"Current barcode input: '{start_barcode_input}'")
-                if start_barcode_input:
+            if start_barcode_input:
                     st.session_state.start_barcode = start_barcode_input
+                    # Show barcode increment pattern
+                    sample_barcodes = generate_sequential_barcodes(start_barcode_input, 5)
+                    st.success(f"Barcode pattern confirmed: {", ".join(sample_barcodes)}...")
                     st.session_state.barcode_confirmed = True
                     st.rerun()
-                if not start_barcode_input:
-                    st.error("Please enter a starting barcode")
         if st.session_state.get("barcode_confirmed", False):
             st.subheader("Add Series")
 
@@ -357,7 +350,7 @@ def series_input_form():
 
                 # Try to get cover image
                 cover_url = None
-                try:
+            try:
                     # Create a dummy book object to get series cover
                     dummy_book = BookInfo(
                         series_name=entry["confirmed_name"],
@@ -378,7 +371,6 @@ def series_input_form():
                         pass
 
                 if cover_url:
-                    try:
                         st.image(cover_url, width=100)
                     except Exception:
                         pass
@@ -390,7 +382,6 @@ def series_input_form():
                     volume_input = st.text_input(f"Volumes for {entry["confirmed_name"]}", placeholder="1-5, 10", key=f"volumes_{i}")
                 with col2:
                     if st.button("Add Volumes", key=f"add_vol_{i}") and volume_input:
-                        try:
                             volumes = parse_volume_range(volume_input)
                             entry["volumes"] = volumes
                             st.success(f"You have successfully added volumes {', '.join(map(str, volumes))} to {entry["confirmed_name"]}!")
@@ -478,7 +469,7 @@ def confirm_single_series(series_name):
         for i, suggestion in enumerate(suggestions):
             with cols[i % len(cols)]:
                 # Fetch series details
-                try:
+            try:
                     book_data = deepseek_api.get_book_info(suggestion, 1, st.session_state.project_state)
                     st.write(f"Book data keys: {list(book_data.keys()) if book_data else None}")
                     authors = book_data.get("authors", []) if book_data else []
@@ -516,7 +507,7 @@ def confirm_single_series(series_name):
                 st.subheader(suggestion)
 
                 # Try to get cover image
-                try:
+            try:
                     dummy_book = BookInfo(
                         series_name=suggestion,
                         volume_number=1,
@@ -537,7 +528,6 @@ def confirm_single_series(series_name):
                     pass
 
                 if cover_url:
-                    try:
                         st.image(cover_url, width=100)
                     except Exception:
                         pass
@@ -668,7 +658,7 @@ def main():
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             if st.button("Export to MARC", type="primary"):
-                try:
+            try:
                     import os
                     import tempfile
                     with tempfile.NamedTemporaryFile(mode="w+b", suffix=".mrc", delete=False) as temp_file:
@@ -687,7 +677,7 @@ def main():
                     st.error("An error occurred during the export process.")
         with col2:
             if st.button("Download Project State JSON"):
-                try:
+            try:
                     import json
                     state_data = st.session_state.project_state.__dict__  # Get the dict of ProjectState
                     json_data = json.dumps(state_data, indent=2)
