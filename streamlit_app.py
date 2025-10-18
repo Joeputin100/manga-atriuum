@@ -1,5 +1,6 @@
 # Manga Lookup Tool - Dev Version
 # Trivial change to trigger redeploy
+# Trivial change to trigger redeploy
 #!/usr/bin/env python3
 # Updated for deployment
 """
