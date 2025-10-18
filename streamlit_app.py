@@ -333,5 +333,5 @@ def series_input_form():
                 "Starting Barcode",
                 placeholder="Enter starting barcode",
                 help="Enter starting barcode (e.g., T000001 or MANGA001)",
-                key="start_barcode_input",
+                ,
             )
