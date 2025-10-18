@@ -746,3 +746,104 @@ def generate_sequential_barcodes(start_barcode: str, count: int) -> List[str]:
         barcodes.append(barcode)
 
     return barcodes
+
+def process_book_data(raw_data: Dict, volume_number: int, google_books_api: Optional[GoogleBooksAPI] = None, project_state: Optional[ProjectState] = None) -> BookInfo:
+    """Process raw API data into structured BookInfo"""
+    warnings = []
+
+    # Extract and validate data
+    series_name = DataValidator.format_title(raw_data.get("series_name", ""))
+    book_title = DataValidator.format_title(raw_data.get("book_title", f"{series_name} (Volume {volume_number})"))
+
+    # Ensure series name is in the title if missing
+    if series_name and series_name.lower() not in book_title.lower():
+        book_title = f"{series_name}: {book_title}"
+
+    # Handle authors - ensure they're in list format
+    authors_raw = raw_data.get("authors", [])
+    if isinstance(authors_raw, str):
+        # Check if the string contains multiple authors separated by commas
+        # Look for patterns that indicate multiple authors vs single author with comma
+        if ", " in authors_raw:
+            # Check if it's likely a single author in "Last, First" format
+            parts = authors_raw.split(", ")
+            if len(parts) == 2 and len(parts[0].split()) <= 2 and len(parts[1].split()) <= 2:
+                # Likely a single author in "Last, First" format
+                authors = [authors_raw.strip()]
+            else:
+                # Likely multiple authors, split by comma
+                authors = [author.strip() for author in authors_raw.split(",")]
+        else:
+            # No commas, treat as single author
+            authors = [authors_raw.strip()]
+    else:
+        authors = authors_raw
+
+    # Validate MSRP
+    msrp_cost = raw_data.get("msrp_cost")
+    if msrp_cost is None:
+        warnings.append("No MSRP found")
+    else:
+        try:
+            msrp_cost = float(msrp_cost)
+            if msrp_cost < 10:
+                rounded_msrp = 10.0
+                warnings.append(f"MSRP ${msrp_cost:.2f} is below minimum $10 (rounded up to ${rounded_msrp:.2f})")
+            elif msrp_cost > 30:
+                warnings.append(f"MSRP ${msrp_cost:.2f} exceeds typical maximum $30")
+        except (ValueError, TypeError):
+            warnings.append("Invalid MSRP format")
+            msrp_cost = None
+
+    # Validate copyright year
+    copyright_year = None
+    date_str = str(raw_data.get("copyright_year", ""))
+    if date_str:
+        import re
+        year_patterns = [r'\b(19|20)\d{2}\b', r'\b\d{4}\b']
+        for pattern in year_patterns:
+            matches = re.findall(pattern, date_str)
+            if matches:
+                year = int(matches[0])
+                if 1900 <= year <= datetime.now().year + 1:
+                    copyright_year = year
+                    break
+    if not copyright_year:
+        warnings.append("Could not extract valid copyright year")
+
+    # Handle genres
+    genres_raw = raw_data.get("genres", [])
+    if isinstance(genres_raw, str):
+        genres = [genre.strip() for genre in genres_raw.split(",")]
+    else:
+        genres = genres_raw
+
+    # Extract cover image URL if available from DeepSeek data
+    cover_image_url = raw_data.get("cover_image_url")
+
+    # If no cover image from DeepSeek and Google Books API is available, try to fetch it
+    if not cover_image_url and google_books_api:
+        isbn = raw_data.get("isbn_13")
+        if isbn:
+            cover_image_url = google_books_api.get_cover_image_url(isbn, project_state=project_state)
+            # Debug: Print cover image status
+            if cover_image_url:
+                print(f"✓ Found cover image for ISBN {isbn}: {cover_image_url}")
+            else:
+                print(f"✗ No cover image found for ISBN {isbn}")
+
+    return BookInfo(
+        series_name=series_name,
+        volume_number=volume_number,
+        book_title=book_title,
+        authors=authors,
+        msrp_cost=msrp_cost,
+        isbn_13=raw_data.get("isbn_13"),
+        publisher_name=raw_data.get("publisher_name"),
+        copyright_year=copyright_year,
+        description=raw_data.get("description"),
+        physical_description=raw_data.get("physical_description"),
+        genres=genres,
+        warnings=warnings,
+        cover_image_url=cover_image_url
+    )
