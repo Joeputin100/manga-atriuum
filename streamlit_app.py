@@ -278,7 +278,7 @@ def display_progress_section():
 def series_input_form():
     """Multi-series input form"""
     st.header("📚 Manga Series Input")
-    if not any(not entry["volumes"] for entry in st.session_state.series_entries):
+    if not st.session_state.series_entries or any(not entry["volumes"] for entry in st.session_state.series_entries):
         # Starting barcode - show until used
         # Starting barcode - always show with current value
         if not st.session_state.get("barcode_confirmed", False):
